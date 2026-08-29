@@ -3,4 +3,4 @@
 // has to see the "Connect the Kitchen" setup screen. Until then, each device
 // can paste the URL into that setup screen instead, where it's remembered in
 // that browser's localStorage.
-const DEFAULT_API_URL = "";
+const DEFAULT_API_URL = "https://script.google.com/macros/s/AKfycbzV1ftuxqDxkBbRelL0OoYRPGXTDSGwqN8-q290MF2kWHh5_X83RYWkkKZu_2fGqffH9g/exec";
