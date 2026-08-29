@@ -163,9 +163,20 @@ function readBanks_(student) {
   return out;
 }
 
+// Sheets auto-detects date- and boolean-looking strings and silently stores
+// them as real Date/boolean cell values instead of text, even though
+// Setup.gs and saveSetting only ever write plain strings. Normalize back to
+// the plain strings the frontend expects, regardless of what type the cell
+// actually ended up holding.
+function normalizeSettingValue_(v) {
+  if (v instanceof Date) return Utilities.formatDate(v, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  if (typeof v === 'boolean') return v ? 'true' : 'false';
+  return String(v);
+}
+
 function readSettings_() {
   var out = {};
-  sheetToObjects_(getSheet_('Settings')).forEach(function (r) { out[r.key] = r.value; });
+  sheetToObjects_(getSheet_('Settings')).forEach(function (r) { out[r.key] = normalizeSettingValue_(r.value); });
   return out;
 }
 

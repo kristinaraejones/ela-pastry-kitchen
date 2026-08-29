@@ -108,6 +108,11 @@ function seedSettingsIfEmpty_() {
     ['termFinalsUnlocked', 'false'],
     ['monthlyTestOverride', ''] // '' = automatic schedule, 'true' = forced locked, 'false' = forced open
   ];
+  // Force the value column to plain text BEFORE writing, so Sheets doesn't
+  // silently auto-convert "2026-09-02"/"true"/"false" into real Date/boolean
+  // cells (Code.gs's readSettings_ normalizes either way, but keeping the
+  // raw sheet as plain text is less confusing for a human skimming it).
+  sh.getRange(2, 2, rows.length, 1).setNumberFormat('@');
   sh.getRange(2, 1, rows.length, SHEET_HEADERS.Settings.length).setValues(rows);
 }
 

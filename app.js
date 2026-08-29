@@ -136,9 +136,13 @@ async function loadChild(student) {
 function parseSettings(raw) {
   raw = raw || {};
   const override = raw.monthlyTestOverride === "true" ? true : raw.monthlyTestOverride === "false" ? false : null;
+  // Expect a plain "yyyy-MM-dd" string, but tolerate a full ISO timestamp
+  // too (e.g. an older backend that hadn't normalized a Sheets-auto-converted
+  // Date cell yet) so we never silently produce an Invalid Date/NaN.
   let dueDate;
   if (raw.dueDate) {
-    dueDate = new Date(raw.dueDate + "T00:00:00");
+    dueDate = new Date(raw.dueDate.includes("T") ? raw.dueDate : raw.dueDate + "T00:00:00");
+    if (isNaN(dueDate)) { dueDate = new Date(); dueDate.setDate(dueDate.getDate() + 4); }
   } else {
     dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 4);
