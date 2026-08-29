@@ -28,15 +28,21 @@ I can't do steps 1–2 for you — they require being logged into your own Googl
 - **MonthTestMarkers** — how far into each subject's month-wide bank a student has already been tested, so monthly/term tests sample what's new.
 - **BurnLog** — history of redone ("burnt") sections.
 - **Banks** *(addition beyond the literal spec text, needed to make "sample since last test" actually work)* — each subject's growing month/term word or question bank per student.
-- **Settings** — the shared weekly due date, current week number, and the parent's Term Final / Monthly Test overrides. The mockup's "demo controls" became real persisted settings here, per the spec's own note that they "should be a real per-family setting, not just a demo toggle, once built for real."
+- **Settings** — a `key | value` table holding each student's `current_week` pointer (`kenley_current_week`, `adelyn_current_week`) plus the parent's global Term Final / Monthly Test overrides. There are no dates anywhere in this sheet.
 
 ## Task types
 
 Ported 1:1 from the mockup: `read`, `external`, `reflection` (with the Approve/Refire review loop), `graded-mc`, `graded-dictation` (word/sentence, word-by-word spelling + separate grammar checklist), `pos-tagger` (Level 1), and `phrase-tagger` (Levels 2–4, driven by `GRAMMAR_LEVEL_OPTIONS`-shaped `options` arrays).
 
+## Pacing: completion-based, not calendar-based
+
+There are no due dates anywhere in this app — Homeschool Planet remains the system of record for actual calendar pacing. Instead, each student has their own persistent `current_week` pointer in the Settings sheet. Only that week's `Schedule` rows (plus the "unlocked whenever" monthly/term-test tasks, which aren't tied to any single week) count as her active work — past and future weeks' content simply isn't part of the active set, it's not "locked."
+
+Advancing is her own deliberate click, not the parent's and not automatic: once every station for her current week reaches **Served**, an "Advance to Week N+1" button appears in her own view. Clicking it increments her `current_week` and nothing else — a week can otherwise sit half-finished indefinitely. A station with no content loaded yet for the active week shows as **empty** (not Served, not counted toward "plates served," and not advance-eligible), specifically so advancing can never accidentally chain through weeks that haven't been authored yet.
+
 ## Status system
 
-**Served ✓** / **Burning 🔥** / **Burnt ⚫** — computed live from completion + score + the shared due date, never a manually-set flag. See the build spec for the exact rules.
+**Served ✓** / **Burning 🔥** — computed live from completion + score, never a manually-set flag. There is no "Burnt" status — an earlier version tied a third status to due dates; that's been removed by deliberate decision. A station that isn't done yet just isn't done yet, with no calendar pressure or auto-flagging. See the build spec for the exact rules.
 
 ## What's real content vs. placeholder right now
 
@@ -47,7 +53,8 @@ Ported 1:1 from the mockup: `read`, `external`, `reflection` (with the Approve/R
 
 - In-progress answers (an unsubmitted MC selection, a half-typed grammar tagging pass) aren't synced to the Sheet — only submitted/graded results are. Syncing every keystroke would mean a network write per tap; this matches how often the original mockup's own state actually changed meaningfully.
 - Submissions are upserted (latest state per task), not append-only history — see the Submissions bullet above for why that's still faithful to the audit-trail intent.
-- The due date, current week, and test-lock overrides are one shared, global setting — not per-student — matching the spec's own "shared weekly due date" language.
+- Term Final / Monthly Test overrides are one shared, global setting — not per-student — since they're the parent's own toggles, not something each kid paces independently. `current_week` itself, by contrast, is per-student.
+- A reflection sent back for revision in a week the student has since advanced past won't reappear in her own view (which only ever shows her *current* week) — it still shows up in the parent's "Needs Your Eyes" queue regardless of week, but there's currently no way for her to reopen and resubmit it herself once she's moved on. Revisiting past weeks at all is out of scope here; the build spec calls it out as a separate, not-yet-built parent-view feature.
 
 ## Local development
 

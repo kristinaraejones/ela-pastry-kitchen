@@ -27,7 +27,6 @@ body{margin:0;background:var(--chalk-bg);background-image:radial-gradient(circle
 .station:hover{transform:translateY(-2px);border-color:#F0A8B8;}
 .station.done{border-color:var(--herb);}
 .station.burning{border-color:var(--saffron);}
-.station.burnt{border-color:var(--tomato);}
 .station.active{outline:2px solid var(--saffron);}
 .station-tag{font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:.06em;color:var(--chalk-dim);text-transform:uppercase;}
 .station-title{font-size:1rem;font-weight:600;margin:5px 0 2px;}
@@ -37,13 +36,10 @@ body{margin:0;background:var(--chalk-bg);background-image:radial-gradient(circle
 .stamp{font-family:'Pacifico',cursive;font-weight:700;font-size:0.85rem;color:var(--herb);border:2px solid var(--herb);border-radius:6px;padding:1px 8px;transform:rotate(-6deg);opacity:0;transition:opacity .2s ease;}
 .station.done .stamp{opacity:0.9;}
 .station.burning .stamp{opacity:0.9;color:var(--saffron);border-color:var(--saffron);}
-.station.burnt .stamp{opacity:0.9;color:var(--tomato);border-color:var(--tomato);}
 .due-control{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--chalk-dim);margin-bottom:16px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:8px 12px;flex-wrap:wrap;}
 .due-control button{background:var(--rail);border:1px solid var(--card-border);color:var(--chalk-text);border-radius:5px;width:24px;height:24px;cursor:pointer;font-family:'JetBrains Mono',monospace;}
 .due-status{font-weight:700;}
 .due-status.ok{color:var(--herb);}
-.due-status.warn{color:var(--saffron);}
-.due-status.late{color:var(--tomato);}
 .review-badge{position:absolute;top:8px;right:8px;background:var(--saffron);color:#5B4636;font-family:'JetBrains Mono',monospace;font-size:0.58rem;font-weight:700;padding:2px 6px;border-radius:9px;text-transform:uppercase;}
 .sentback-badge{position:absolute;top:8px;right:8px;background:var(--tomato);color:#fff;font-family:'JetBrains Mono',monospace;font-size:0.58rem;font-weight:700;padding:2px 6px;border-radius:9px;text-transform:uppercase;}
 .sentback-banner{background:#FBE3E6;border:1px solid var(--tomato);border-radius:10px;padding:12px 14px;margin-bottom:16px;}
@@ -51,6 +47,8 @@ body{margin:0;background:var(--chalk-bg);background-image:radial-gradient(circle
 .sentback-chips{display:flex;flex-wrap:wrap;gap:6px;}
 .sentback-chip{background:var(--tomato);color:#fff;font-family:'JetBrains Mono',monospace;font-size:0.72rem;padding:5px 10px;border-radius:6px;cursor:pointer;}
 .sentback-chip:hover{opacity:0.85;}
+.advance-banner{background:#E7F3E3;border:1px solid var(--herb);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.advance-banner-title{font-family:'Pacifico',cursive;font-weight:700;font-size:1.05rem;color:#4F7A4A;}
 
 .detail{background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px;margin-top:16px;display:none;}
 .detail.open{display:block;}

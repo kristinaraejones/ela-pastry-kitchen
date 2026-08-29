@@ -32,16 +32,8 @@
     <div class="progress-label" id="progressLabel"></div>
   </div>
   <div class="due-control">
-    <span>Due date:</span>
-    <button onclick="adjustDueDate(-1)">−</button>
-    <span id="dueStatusText" class="due-status"></span>
-    <button onclick="adjustDueDate(1)">+</button>
-  </div>
-  <div class="due-control">
     <span>Current week:</span>
-    <button onclick="adjustWeekNumber(-1)">−</button>
     <span id="weekNumberText" class="due-status"></span>
-    <button onclick="adjustWeekNumber(1)">+</button>
   </div>
   <div class="due-control" id="termFinalControl" style="display:none;">
     <span>Term Finals:</span>
@@ -51,12 +43,11 @@
     <span id="monthlyTestModeText"></span>
     <button class="btn" style="margin-top:0;" onclick="toggleMonthlyTests()" id="monthlyTestBtn"></button>
   </div>
+  <div id="advanceBanner"></div>
   <div id="sentBackBanner"></div>
   <div class="stations" id="stationsGrid"></div>
   <div class="detail" id="detailPanel"></div>
   <div class="review-queue" id="reviewQueue" style="display:none;">
-    <h3>Overdue (burnt)</h3>
-    <div id="overdueList" style="margin-bottom:20px;"></div>
     <h3>Review Bank</h3>
     <div id="reviewBank" style="margin-bottom:20px;"></div>
     <h3>Burn Log — Sections Redone</h3>

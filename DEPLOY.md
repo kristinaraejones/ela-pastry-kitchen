@@ -22,6 +22,10 @@ Two one-time steps: stand up the Google Sheet + Apps Script backend, then turn o
 
 If you ever change `Code.gs` or `Setup.gs` later, you'll need to create a **new deployment version** (Deploy → Manage deployments → edit → New version) for the changes to take effect — just saving the script isn't enough.
 
+## 1a. Already deployed before? Run the one-time pacing migration
+
+If your Sheet was set up before the due-date system was removed, its Settings tab still has old `dueDate` / `currentWeekNumber` rows. After pasting the updated `Code.gs` and `Setup.gs` and creating a new deployment version (see above), open the Apps Script editor, select **migrateToPerStudentWeeks** in the function dropdown, and click **Run** once. It removes the old rows and adds `kenley_current_week` / `adelyn_current_week`, both starting at week 1. Safe to run more than once.
+
 ## 2. Frontend: GitHub Pages
 
 1. On GitHub, go to this repo's **Settings → Pages**.

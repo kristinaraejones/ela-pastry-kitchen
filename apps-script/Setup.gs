@@ -100,20 +100,40 @@ function seedReviewPoolIfEmpty_() {
 function seedSettingsIfEmpty_() {
   var sh = getSheet_('Settings');
   if (sh.getLastRow() > 1) return;
-  var dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + 4);
   var rows = [
-    ['currentWeekNumber', 1],
-    ['dueDate', dueDate.toISOString().slice(0, 10)],
+    ['kenley_current_week', 1],
+    ['adelyn_current_week', 1],
     ['termFinalsUnlocked', 'false'],
     ['monthlyTestOverride', ''] // '' = automatic schedule, 'true' = forced locked, 'false' = forced open
   ];
   // Force the value column to plain text BEFORE writing, so Sheets doesn't
-  // silently auto-convert "2026-09-02"/"true"/"false" into real Date/boolean
-  // cells (Code.gs's readSettings_ normalizes either way, but keeping the
-  // raw sheet as plain text is less confusing for a human skimming it).
+  // silently auto-convert "true"/"false" into real boolean cells (Code.gs's
+  // readSettings_ normalizes either way, but keeping the raw sheet as plain
+  // text is less confusing for a human skimming it).
   sh.getRange(2, 2, rows.length, 1).setNumberFormat('@');
   sh.getRange(2, 1, rows.length, SHEET_HEADERS.Settings.length).setValues(rows);
+}
+
+/**
+ * One-time migration for a Settings sheet seeded before the due-date system
+ * was removed. Run this ONCE from the function dropdown if your sheet
+ * already has `dueDate` / `currentWeekNumber` rows from an earlier setup —
+ * it deletes those and adds the new per-student `kenley_current_week` /
+ * `adelyn_current_week` pointers (defaulting both to week 1). Safe to run
+ * more than once; it's a no-op if there's nothing left to migrate.
+ */
+function migrateToPerStudentWeeks() {
+  var sh = getSheet_('Settings');
+  var rows = sheetToObjects_(sh);
+  var toDelete = rows.filter(function (r) { return r.key === 'dueDate' || r.key === 'currentWeekNumber'; });
+  toDelete.sort(function (a, b) { return b._row - a._row; }).forEach(function (r) { sh.deleteRow(r._row); });
+  ['kenley', 'adelyn'].forEach(function (student) {
+    var key = student + '_current_week';
+    if (!rows.some(function (r) { return r.key === key; })) sh.appendRow([key, 1]);
+  });
+  var lastRow = sh.getLastRow();
+  if (lastRow > 1) sh.getRange(2, 2, lastRow - 1, 1).setNumberFormat('@');
+  SpreadsheetApp.getUi().alert('Migrated Settings: removed the old due-date system, added per-student current_week pointers (both start at week 1).');
 }
 
 // ---------- Seed content, ported 1:1 from the validated mockup ----------

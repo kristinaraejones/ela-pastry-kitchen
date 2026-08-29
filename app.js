@@ -24,7 +24,7 @@ let pendingPhraseRange = null;
 
 let DATA = null;   // current child's { subjectKey: {name, tag, tasks:[...]} }
 let state = null;  // current child's { subjectKey: { tasks: { taskId: {...} } } }
-let settings = { currentWeekNumber: 1, dueDate: new Date(), termFinalsUnlocked: false, monthlyTestOverride: null };
+let settings = { weeks: { kenley: 1, adelyn: 1 }, termFinalsUnlocked: false, monthlyTestOverride: null };
 
 const childrenCache = {};   // { kenley: {DATA, state} }
 const reviewPoolCache = {}; // { kenley: [ {word,timesMissed,...} ] }
@@ -136,27 +136,13 @@ async function loadChild(student) {
 function parseSettings(raw) {
   raw = raw || {};
   const override = raw.monthlyTestOverride === "true" ? true : raw.monthlyTestOverride === "false" ? false : null;
-  // Expect a plain "yyyy-MM-dd" string, but tolerate a full ISO timestamp
-  // too (e.g. an older backend that hadn't normalized a Sheets-auto-converted
-  // Date cell yet) so we never silently produce an Invalid Date/NaN.
-  let dueDate;
-  if (raw.dueDate) {
-    dueDate = new Date(raw.dueDate.includes("T") ? raw.dueDate : raw.dueDate + "T00:00:00");
-    if (isNaN(dueDate)) { dueDate = new Date(); dueDate.setDate(dueDate.getDate() + 4); }
-  } else {
-    dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 4);
-  }
+  const weeks = {};
+  Object.keys(CHILD_META).forEach(id => { weeks[id] = Number(raw[`${id}_current_week`]) || 1; });
   return {
-    currentWeekNumber: Number(raw.currentWeekNumber) || 1,
-    dueDate,
+    weeks,
     termFinalsUnlocked: raw.termFinalsUnlocked === "true" || raw.termFinalsUnlocked === true,
     monthlyTestOverride: override
   };
-}
-
-function isoDateOnly(d) {
-  return d.toISOString().slice(0, 10);
 }
 
 function buildChildFromBootstrap(resp) {
@@ -168,7 +154,7 @@ function buildChildFromBootstrap(resp) {
       name: tasksForSubject[0].subject_name,
       tag: tasksForSubject[0].subject_tag,
       tasks: tasksForSubject.map(t => Object.assign(
-        { id: t.id, type: t.type, label: t.label, dynamic: t.dynamic, termFinal: t.termFinal, monthlyTest: t.monthlyTest },
+        { id: t.id, type: t.type, label: t.label, dynamic: t.dynamic, termFinal: t.termFinal, monthlyTest: t.monthlyTest, week_number: Number(t.week_number) || 1 },
         t.content || {}
       ))
     };
@@ -243,25 +229,17 @@ async function switchChild(id) {
   render();
 }
 
-// ---------- Settings (shared, global) ----------
+// ---------- Settings: per-student current_week (completion-based, no dates) ----------
 
-function daysUntilDue() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return Math.round((settings.dueDate - today) / 86400000);
-}
-function adjustDueDate(delta) {
-  settings.dueDate.setDate(settings.dueDate.getDate() + delta);
-  apiPost("saveSetting", { key: "dueDate", value: isoDateOnly(settings.dueDate) }).catch(() => {});
-  render();
-}
-function isMonthlyTestWeek() { return settings.currentWeekNumber % 4 === 0; }
+function currentWeek() { return settings.weeks[currentChild] || 1; }
+function isMonthlyTestWeek() { return currentWeek() % 4 === 0; }
 function nextMonthlyTestWeek() {
-  return isMonthlyTestWeek() ? settings.currentWeekNumber : settings.currentWeekNumber + (4 - (settings.currentWeekNumber % 4));
+  const w = currentWeek();
+  return isMonthlyTestWeek() ? w : w + (4 - (w % 4));
 }
-function adjustWeekNumber(delta) {
-  settings.currentWeekNumber = Math.max(1, settings.currentWeekNumber + delta);
-  apiPost("saveSetting", { key: "currentWeekNumber", value: String(settings.currentWeekNumber) }).catch(() => {});
+function advanceWeek() {
+  settings.weeks[currentChild] = currentWeek() + 1;
+  apiPost("saveSetting", { key: `${currentChild}_current_week`, value: String(settings.weeks[currentChild]) }).catch(() => {});
   render();
 }
 function toggleTermFinals() {
@@ -287,9 +265,20 @@ function isTaskLocked(t) {
 
 // ---------- Station status ----------
 
+// Tasks belonging to the currently-active week for this student, plus the
+// "unlocked whenever" monthly/term-test tasks that aren't tied to any one
+// week. Past/future week content just isn't part of this set at all — it's
+// not "locked," it's simply not this week's work.
+function activeTasks(key) {
+  const week = currentWeek();
+  return DATA[key].tasks.filter(t => t.monthlyTest || t.termFinal || t.week_number === week);
+}
+function unlockedActiveTasks(key) {
+  return activeTasks(key).filter(t => !isTaskLocked(t));
+}
 function stationScorePct(key) {
   let sumX = 0, sumY = 0;
-  DATA[key].tasks.forEach(t => {
+  unlockedActiveTasks(key).forEach(t => {
     const s = state[key].tasks[t.id];
     if (s.done && s.score) {
       const parts = s.score.split("/").map(Number);
@@ -299,21 +288,27 @@ function stationScorePct(key) {
   return sumY > 0 ? sumX / sumY : null;
 }
 function stationDone(key) {
-  return DATA[key].tasks.filter(t => !isTaskLocked(t)).every(t => state[key].tasks[t.id].done);
+  const u = unlockedActiveTasks(key);
+  return u.length > 0 && u.every(t => state[key].tasks[t.id].done);
 }
+// "empty" = nothing loaded for this student's current week yet (distinct
+// from "progress" so it never counts as done and never blocks/enables
+// Advance-to-next-week by accident — see allSubjectsServed()).
 function stationStatus(key) {
-  if (stationDone(key)) {
+  const u = unlockedActiveTasks(key);
+  if (u.length === 0) return "empty";
+  if (u.every(t => state[key].tasks[t.id].done)) {
     const pct = stationScorePct(key);
     if (pct !== null && pct < 0.70) return "burning";
     return "served";
   }
-  const days = daysUntilDue();
-  if (days < 0) return "burnt";
-  if (days <= 3) return "burning";
   return "progress";
 }
+function allSubjectsServed() {
+  return Object.keys(DATA).every(key => stationStatus(key) === "served");
+}
 function redoStation(key) {
-  const items = DATA[key].tasks.map(t => {
+  const items = activeTasks(key).map(t => {
     const s = state[key].tasks[t.id];
     if (s.done && s.score) return `${t.label}: scored ${s.score}`;
     if (s.done && s.needsReview) return `${t.label}: submitted, was awaiting your review`;
@@ -328,7 +323,7 @@ function redoStation(key) {
   };
   burnLogCache[currentChild].unshift(record);
   apiPost("addBurnLog", { student: currentChild, ...record }).catch(() => {});
-  DATA[key].tasks.forEach(t => {
+  activeTasks(key).forEach(t => {
     state[key].tasks[t.id] = { open: false, done: false, needsReview: false, reviewed: false, answers: {}, score: null, results: null };
     persistTask(key, t.id);
   });
@@ -891,35 +886,38 @@ function render() {
   const keys = Object.keys(DATA);
   keys.forEach(key => {
     const status = stationStatus(key);
-    if (stationDone(key)) doneCount++; // only count actually-completed stations, not ones merely "burning" from being incomplete-and-due-soon
+    if (stationDone(key)) doneCount++; // only count actually-completed stations, not merely-locked/empty ones
     const needsReview = DATA[key].tasks.some(t => state[key].tasks[t.id].needsReview && !state[key].tasks[t.id].reviewed);
-    const sentBackTasks = DATA[key].tasks.filter(t => state[key].tasks[t.id].sentBack && !state[key].tasks[t.id].done);
+    const sentBackTasks = activeTasks(key).filter(t => state[key].tasks[t.id].sentBack && !state[key].tasks[t.id].done);
     const card = document.createElement("div");
-    card.className = "station" + (status === "served" ? " done" : "") + (status === "burning" ? " burning" : "") + (status === "burnt" ? " burnt" : "") + (openStation === key ? " active" : "");
+    card.className = "station" + (status === "served" ? " done" : "") + (status === "burning" ? " burning" : "") + (openStation === key ? " active" : "");
     card.onclick = () => openStationFn(key);
-    const doneN = DATA[key].tasks.filter(t => state[key].tasks[t.id].done).length;
-    const unlockedTasks = DATA[key].tasks.filter(t => !isTaskLocked(t));
-    const lockedCount = DATA[key].tasks.length - unlockedTasks.length;
-    const stampText = status === "served" ? "SERVED ✓" : status === "burning" ? "BURNING 🔥" : status === "burnt" ? "BURNT ⚫" : "";
+    const active = activeTasks(key);
+    const doneN = active.filter(t => state[key].tasks[t.id].done).length;
+    const unlockedTasks = active.filter(t => !isTaskLocked(t));
+    const lockedCount = active.length - unlockedTasks.length;
+    const stampText = status === "served" ? "SERVED ✓" : status === "burning" ? "BURNING 🔥" : "";
     card.innerHTML = `
       ${sentBackTasks.length > 0 ? `<div class="sentback-badge">🔁 Refire (${sentBackTasks.length})</div>` : (currentView === "parent" && needsReview ? '<div class="review-badge">Review</div>' : "")}
       <div class="station-tag">${DATA[key].tag}</div>
       <div class="station-title">${DATA[key].name}</div>
-      <div class="station-lesson">${unlockedTasks.length} item${unlockedTasks.length > 1 ? "s" : ""} available${lockedCount > 0 ? ` · +${lockedCount} locked` : ""}</div>
+      <div class="station-lesson">${active.length === 0 ? "Nothing loaded for this week yet" : `${unlockedTasks.length} item${unlockedTasks.length !== 1 ? "s" : ""} available${lockedCount > 0 ? ` · +${lockedCount} locked` : ""}`}</div>
       <div class="station-footer">
-        <span class="task-count">${doneN}/${unlockedTasks.length} done</span>
+        <span class="task-count">${active.length === 0 ? "—" : `${doneN}/${unlockedTasks.length} done`}</span>
         <span class="stamp">${stampText}</span>
       </div>`;
     grid.appendChild(card);
   });
 
-  const days = daysUntilDue();
-  const dueEl = document.getElementById("dueStatusText");
-  if (days < 0) dueEl.innerHTML = `<span class="due-status late">${Math.abs(days)} day(s) PAST due</span>`;
-  else if (days <= 3) dueEl.innerHTML = `<span class="due-status warn">${days} day(s) until due</span>`;
-  else dueEl.innerHTML = `<span class="due-status ok">${days} day(s) until due</span>`;
+  document.getElementById("weekNumberText").innerHTML = `<span class="due-status ${isMonthlyTestWeek() ? "ok" : ""}">Week ${currentWeek()}${isMonthlyTestWeek() ? " — test week!" : ""}</span>`;
 
-  document.getElementById("weekNumberText").innerHTML = `<span class="due-status ${isMonthlyTestWeek() ? "ok" : ""}">Week ${settings.currentWeekNumber}${isMonthlyTestWeek() ? " — test week!" : ""}</span>`;
+  const advanceBanner = document.getElementById("advanceBanner");
+  advanceBanner.innerHTML = (currentView !== "parent" && allSubjectsServed())
+    ? `<div class="advance-banner">
+        <div class="advance-banner-title">🎉 Every station served for Week ${currentWeek()}!</div>
+        <button class="btn primary" onclick="advanceWeek()">Advance to Week ${currentWeek() + 1}</button>
+      </div>`
+    : "";
 
   const termCtrl = document.getElementById("termFinalControl");
   termCtrl.style.display = currentView === "parent" ? "flex" : "none";
@@ -944,7 +942,7 @@ function render() {
 
   const sentBackAll = [];
   keys.forEach(key => {
-    DATA[key].tasks.forEach(t => {
+    activeTasks(key).forEach(t => {
       if (state[key].tasks[t.id].sentBack && !state[key].tasks[t.id].done) sentBackAll.push({ key, label: t.label, subject: DATA[key].name });
     });
   });
@@ -960,38 +958,23 @@ function render() {
   if (openStation) {
     const d = DATA[openStation];
     const status = stationStatus(openStation);
-    let rows = "";
-    d.tasks.forEach(t => { rows += `<div class="task-row">${taskHeadHTML(openStation, t)}${isTaskLocked(t) ? "" : taskBodyHTML(openStation, t)}</div>`; });
+    const active = activeTasks(openStation);
+    let rows = active.length === 0
+      ? `<div class="empty-note">Nothing loaded for Week ${currentWeek()} yet — check back once new content is added.</div>`
+      : active.map(t => `<div class="task-row">${taskHeadHTML(openStation, t)}${isTaskLocked(t) ? "" : taskBodyHTML(openStation, t)}</div>`).join("");
     let note = "";
-    const days2 = daysUntilDue();
-    if (status === "burning" && stationDone(openStation)) note = `<div class="burn-note">🔥 Burning — scored below 70%. Redoing will reset this section and log the original scores for your review.</div>`;
-    else if (status === "burning") note = `<div class="burn-note" style="color:var(--saffron);">🔥 Burning — due in ${days2} day(s) and not yet complete.</div>`;
-    else if (status === "burnt") note = `<div class="burn-note">⚫ Burnt — this was due ${Math.abs(days2)} day(s) ago and is still incomplete. Flagged for you in Parent view.</div>`;
+    if (status === "burning") note = `<div class="burn-note">🔥 Burning — scored below 70%. Redoing will reset this section and log the original scores for your review.</div>`;
     panel.className = "detail open";
     panel.innerHTML = `<div class="detail-head">
         <div><div class="detail-tag">${d.tag}</div><div class="detail-title">${d.name}</div>${note}</div>
         <div style="display:flex;gap:8px;align-items:flex-start;">
-          ${status === "burning" && stationDone(openStation) ? `<button class="btn" style="margin-top:0;background:var(--saffron);border-color:var(--saffron);color:#5B4636;" onclick="redoStation('${openStation}')">Redo this section</button>` : ""}
+          ${status === "burning" ? `<button class="btn" style="margin-top:0;background:var(--saffron);border-color:var(--saffron);color:#5B4636;" onclick="redoStation('${openStation}')">Redo this section</button>` : ""}
           <button class="detail-close" onclick="openStationFn('${openStation}')">✕ close</button>
         </div>
       </div>${rows}`;
   } else { panel.className = "detail"; panel.innerHTML = ""; }
 
   if (currentView === "parent") {
-    const overdueList = document.getElementById("overdueList");
-    const burntStations = Object.keys(DATA).filter(k => stationStatus(k) === "burnt");
-    const days3 = daysUntilDue();
-    overdueList.innerHTML = burntStations.length === 0
-      ? `<div class="empty-note">Nothing overdue right now.</div>`
-      : burntStations.map(key => {
-          const incomplete = DATA[key].tasks.filter(t => !state[key].tasks[t.id].done).map(t => t.label);
-          return `<div class="review-item">
-            <strong>${DATA[key].name} — ${DATA[key].tag}</strong>
-            <div class="meta">${Math.abs(days3)} day(s) past due · still missing:</div>
-            <div class="submitted-text">${incomplete.join("\n") || "(nothing recorded)"}</div>
-          </div>`;
-        }).join("");
-
     const pool = loadPool();
     const bank = document.getElementById("reviewBank");
     const active = pool.filter(p => p.status === "active");
