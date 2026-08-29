@@ -891,7 +891,7 @@ function render() {
   const keys = Object.keys(DATA);
   keys.forEach(key => {
     const status = stationStatus(key);
-    if (status !== "progress") doneCount++;
+    if (stationDone(key)) doneCount++; // only count actually-completed stations, not ones merely "burning" from being incomplete-and-due-soon
     const needsReview = DATA[key].tasks.some(t => state[key].tasks[t.id].needsReview && !state[key].tasks[t.id].reviewed);
     const sentBackTasks = DATA[key].tasks.filter(t => state[key].tasks[t.id].sentBack && !state[key].tasks[t.id].done);
     const card = document.createElement("div");
