@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="The Line">
+<meta name="theme-color" content="#FBF1E4">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A5%90%3C/text%3E%3C/svg%3E">
+<title>The ELA Pastry Kitchen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="board" id="board" style="display:none;">
+  <div class="pastry-garland"><span>🥐</span><span>🍰</span><span>🧁</span><span>🍪</span><span>🥧</span></div>
+  <div class="child-switcher" id="childSwitcher"></div>
+  <div class="board-header">
+    <div>
+      <div class="board-title" id="boardTitle">The ELA Pastry Kitchen</div>
+      <div class="board-sub" id="boardSub">GRADE 7 · ELA · FALL TERM</div>
+    </div>
+    <div class="toggle" id="viewToggle" onclick="toggleView()">
+      <div class="toggle-knob" id="toggleKnob">KENLEY</div>
+    </div>
+  </div>
+  <div class="setup-error" id="syncBanner" style="display:none;"></div>
+  <div class="progress-row">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel"></div>
+  </div>
+  <div class="due-control">
+    <span>Due date:</span>
+    <button onclick="adjustDueDate(-1)">−</button>
+    <span id="dueStatusText" class="due-status"></span>
+    <button onclick="adjustDueDate(1)">+</button>
+  </div>
+  <div class="due-control">
+    <span>Current week:</span>
+    <button onclick="adjustWeekNumber(-1)">−</button>
+    <span id="weekNumberText" class="due-status"></span>
+    <button onclick="adjustWeekNumber(1)">+</button>
+  </div>
+  <div class="due-control" id="termFinalControl" style="display:none;">
+    <span>Term Finals:</span>
+    <button class="btn" style="margin-top:0;" onclick="toggleTermFinals()" id="termFinalBtn"></button>
+  </div>
+  <div class="due-control" id="monthlyTestControl" style="display:none;">
+    <span id="monthlyTestModeText"></span>
+    <button class="btn" style="margin-top:0;" onclick="toggleMonthlyTests()" id="monthlyTestBtn"></button>
+  </div>
+  <div id="sentBackBanner"></div>
+  <div class="stations" id="stationsGrid"></div>
+  <div class="detail" id="detailPanel"></div>
+  <div class="review-queue" id="reviewQueue" style="display:none;">
+    <h3>Overdue (burnt)</h3>
+    <div id="overdueList" style="margin-bottom:20px;"></div>
+    <h3>Review Bank</h3>
+    <div id="reviewBank" style="margin-bottom:20px;"></div>
+    <h3>Burn Log — Sections Redone</h3>
+    <div id="burnLogList" style="margin-bottom:20px;"></div>
+    <h3>Needs Your Eyes</h3>
+    <div id="reviewList"></div>
+  </div>
+  <footer>ELA only — Rouxbe and Money Lab stay tracked separately in Homeschool Planet.</footer>
+</div>
+
+<div class="loading-note" id="loadingNote">Loading the kitchen…</div>
+
+<div class="setup-overlay" id="setupOverlay" style="display:none;">
+  <div class="setup-card">
+    <h2>Connect the Kitchen</h2>
+    <p>This device needs the Apps Script Web App URL for your Google Sheet backend. You only have to do this once per device — see <code>DEPLOY.md</code> in the repo for how to get this URL.</p>
+    <div class="setup-error" id="setupError" style="display:none;"></div>
+    <input type="text" id="setupUrlInput" placeholder="https://script.google.com/macros/s/XXXX/exec">
+    <button class="btn primary" onclick="submitSetupUrl()">Connect</button>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
