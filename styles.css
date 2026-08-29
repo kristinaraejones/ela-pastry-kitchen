@@ -52,6 +52,10 @@ body{margin:0;background:var(--chalk-bg);background-image:radial-gradient(circle
 
 .detail{background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px;margin-top:16px;display:none;}
 .detail.open{display:block;}
+.week-report{background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px;margin-top:16px;}
+.week-report-title{font-family:'Pacifico',cursive;color:var(--saffron);font-size:1.2rem;margin-bottom:12px;}
+.week-report-subject{font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--chalk-dim);margin:16px 0 8px;}
+.week-report-subject:first-of-type{margin-top:0;}
 .detail-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
 .detail-title{font-size:1.1rem;font-weight:700;}
 .detail-tag{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--chalk-dim);}
@@ -80,6 +84,7 @@ body{margin:0;background:var(--chalk-bg);background-image:radial-gradient(circle
 .mc-option.incorrect{border-color:var(--tomato);background:#FBE3E6;}
 textarea{width:100%;min-height:80px;background:#FFFFFF;border:1px solid var(--rail);border-radius:6px;color:var(--chalk-text);font-family:'Nunito',sans-serif;font-size:0.85rem;padding:10px;resize:vertical;}
 input[type=text]{width:100%;background:#FFFFFF;border:1px solid var(--rail);border-radius:6px;color:var(--chalk-text);font-family:'JetBrains Mono',monospace;font-size:0.85rem;padding:8px 10px;}
+input[type=number]{background:#FFFFFF;border:1px solid var(--rail);border-radius:5px;color:var(--chalk-text);font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:4px 6px;}
 .word-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
 .word-row label{font-size:0.8rem;color:var(--chalk-dim);width:150px;flex-shrink:0;}
 .btn{font-family:'JetBrains Mono',monospace;font-size:0.72rem;padding:7px 14px;border-radius:6px;border:1px solid var(--card-border);background:var(--rail);color:var(--chalk-text);cursor:pointer;margin-top:8px;}

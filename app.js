@@ -21,6 +21,8 @@ let openStation = null;
 let posPopupOpen = null;
 let phraseRangeStart = null;
 let pendingPhraseRange = null;
+let parentNavWeek = null;      // parent-only week browser; null = not yet landed on current week
+let exportControlsReady = false; // guards one-time default-fill of the export range inputs
 
 let DATA = null;   // current child's { subjectKey: {name, tag, tasks:[...]} }
 let state = null;  // current child's { subjectKey: { tasks: { taskId: {...} } } }
@@ -196,6 +198,15 @@ function deriveStatus(s) {
   return "not_started";
 }
 
+// Human-readable version of deriveStatus, shared by the past-week report and the PDF export.
+function statusLabel(s) {
+  if (s.sentBack) return "Sent back — awaiting resubmission";
+  if (s.reviewed) return "Reviewed & approved";
+  if (s.needsReview) return "Submitted — awaiting review";
+  if (s.done) return "Complete";
+  return "Not started";
+}
+
 function persistTask(key, id) {
   const s = state[key].tasks[id];
   apiPost("saveSubmission", {
@@ -226,6 +237,7 @@ async function switchChild(id) {
   DATA = childrenCache[id].DATA;
   state = childrenCache[id].state;
   openStation = null; posPopupOpen = null; phraseRangeStart = null; pendingPhraseRange = null;
+  parentNavWeek = null; exportControlsReady = false;
   render();
 }
 
@@ -307,6 +319,35 @@ function stationStatus(key) {
 function allSubjectsServed() {
   return Object.keys(DATA).every(key => stationStatus(key) === "served");
 }
+
+// ---------- Parent-only week navigator (past/current/upcoming) ----------
+
+// Monthly/term-test tasks are excluded from week-scoped views: they're
+// "unlocked whenever," not tied to one week, and Submissions only ever
+// keeps the latest attempt (no per-attempt history) — so attributing a
+// retaken test's current score to whichever week it happened to be
+// authored under would misrepresent that week's actual record. Their live
+// status still shows normally in the current-week dashboard, unchanged.
+function weekScopedTasks(key, week) {
+  return DATA[key] ? DATA[key].tasks.filter(t => t.week_number === week && !t.monthlyTest && !t.termFinal) : [];
+}
+function maxAuthoredWeek() {
+  let max = currentWeek();
+  Object.keys(DATA).forEach(key => {
+    DATA[key].tasks.forEach(t => {
+      if (!t.monthlyTest && !t.termFinal && t.week_number > max) max = t.week_number;
+    });
+  });
+  return max;
+}
+function navPrevWeek() {
+  parentNavWeek = Math.max(1, parentNavWeek - 1);
+  render();
+}
+function navNextWeek() {
+  parentNavWeek = Math.min(maxAuthoredWeek(), parentNavWeek + 1);
+  render();
+}
 function redoStation(key) {
   const items = activeTasks(key).map(t => {
     const s = state[key].tasks[t.id];
@@ -332,6 +373,7 @@ function redoStation(key) {
 
 function toggleView() {
   currentView = currentView === "kenley" ? "parent" : "kenley";
+  if (currentView !== "parent") { parentNavWeek = null; exportControlsReady = false; } // re-land on current week next time parent view opens
   render();
 }
 function openStationFn(key) {
@@ -870,6 +912,105 @@ function taskBodyHTML(key, t) {
   return `<div class="task-body ${s.open ? "open" : ""}">${inner}</div>`;
 }
 
+// ---------- Past-week report / upcoming-week preview (read-only, no handlers) ----------
+
+function renderPastTaskReport(key, t, s) {
+  let extra = "";
+  if (t.type === "reflection" && s.answers && s.answers.text) {
+    extra += `<div class="submitted-text">${s.answers.text}</div>`;
+    if (s.parentComment) extra += `<div class="parent-feedback">📝 ${s.parentComment}</div>`;
+  }
+  return `<div class="review-item">
+    <strong>${t.label}</strong>
+    <div class="meta">${statusLabel(s)}${s.score ? " · Scored " + s.score : ""}</div>
+    ${extra}
+  </div>`;
+}
+
+function renderUpcomingTaskPreview(t) {
+  let preview;
+  if (t.type === "read") preview = t.content;
+  else if (t.type === "reflection") preview = `<div class="lesson-text"><p>${t.prompt}</p></div>`;
+  else if (t.type === "external") preview = `<div class="lesson-text">${t.note || ""}</div>`;
+  else if (t.type === "graded-mc") preview = `<div class="lesson-text">${(t.questions || []).length} question(s)</div>`;
+  else if (t.type === "graded-dictation") preview = `<div class="lesson-text">${t.prompt || ""}</div>`;
+  else preview = `<div class="lesson-text">(interactive exercise — nothing to preview yet)</div>`;
+  return `<div class="review-item"><strong>${t.label}</strong><div class="meta">${t.type}</div>${preview}</div>`;
+}
+
+function renderWeekReportPanel() {
+  const panel = document.getElementById("weekReportPanel");
+  const week = parentNavWeek;
+  const isPast = week < currentWeek();
+  const sections = [];
+  let anyContent = false;
+  SUBJECT_ORDER.forEach(key => {
+    const tasks = weekScopedTasks(key, week);
+    if (tasks.length === 0) return;
+    anyContent = true;
+    sections.push(`<div class="week-report-subject">${DATA[key].name}</div>`);
+    tasks.forEach(t => {
+      const s = state[key].tasks[t.id];
+      sections.push(isPast ? renderPastTaskReport(key, t, s) : renderUpcomingTaskPreview(t));
+    });
+  });
+  panel.innerHTML = `
+    <div class="week-report-title">Week ${week} — ${isPast ? "completed record" : "preview"}</div>
+    ${anyContent ? sections.join("") : `<div class="empty-note">Nothing planned yet for Week ${week}.</div>`}
+  `;
+}
+
+// ---------- PDF export ----------
+
+function exportWeeksPdf() {
+  const from = Math.max(1, parseInt(document.getElementById("exportFromWeek").value, 10) || 1);
+  const to = Math.max(from, parseInt(document.getElementById("exportToWeek").value, 10) || currentWeek());
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "pt", format: "letter" });
+  const marginX = 48, maxWidth = 612 - marginX * 2, pageBottom = 792 - 48;
+  let y = 56;
+
+  function writeLine(text, opts = {}) {
+    const size = opts.size || 10;
+    doc.setFontSize(size);
+    doc.setFont(undefined, opts.bold ? "bold" : "normal");
+    const lines = doc.splitTextToSize(String(text), maxWidth);
+    if (y + lines.length * size * 1.35 > pageBottom) { doc.addPage(); y = 56; }
+    doc.text(lines, marginX, y);
+    y += lines.length * size * 1.35;
+  }
+
+  writeLine(`The ELA Pastry Kitchen — ${CHILD_META[currentChild].name}`, { size: 18, bold: true });
+  writeLine(`Weeks ${from}–${to} · exported ${new Date().toLocaleDateString()}`, { size: 10 });
+  y += 8;
+
+  for (let week = from; week <= to; week++) {
+    writeLine(`Week ${week}`, { size: 14, bold: true });
+    let anyForWeek = false;
+    SUBJECT_ORDER.forEach(key => {
+      const tasks = weekScopedTasks(key, week);
+      if (tasks.length === 0) return;
+      anyForWeek = true;
+      writeLine(DATA[key].name, { size: 12, bold: true });
+      tasks.forEach(t => {
+        const s = state[key].tasks[t.id];
+        let line = `${t.label} (${t.type}) — ${statusLabel(s)}`;
+        if (s.score) line += ` — Scored ${s.score}`;
+        writeLine(line, { size: 10 });
+        if (t.type === "reflection" && s.answers && s.answers.text) {
+          writeLine(s.answers.text, { size: 9 });
+          if (s.parentComment) writeLine(`Parent feedback: ${s.parentComment}`, { size: 9 });
+        }
+      });
+      y += 4;
+    });
+    if (!anyForWeek) writeLine("Nothing recorded for this week.", { size: 10 });
+    y += 10;
+  }
+
+  doc.save(`ela-pastry-kitchen-${currentChild}-weeks-${from}-${to}.pdf`);
+}
+
 function render() {
   document.getElementById("childSwitcher").innerHTML = Object.keys(CHILD_META).map(id =>
     `<button class="child-pill ${currentChild === id ? "active" : ""}" onclick="switchChild('${id}')">${CHILD_META[id].name}</button>`
@@ -879,6 +1020,29 @@ function render() {
   document.getElementById("viewToggle").classList.toggle("parent", currentView === "parent");
   document.getElementById("toggleKnob").textContent = currentView === "parent" ? "PARENT" : CHILD_META[currentChild].name.toUpperCase();
   document.getElementById("reviewQueue").style.display = currentView === "parent" ? "block" : "none";
+
+  if (currentView === "parent" && parentNavWeek === null) parentNavWeek = currentWeek();
+  const showingWeekReport = currentView === "parent" && parentNavWeek !== currentWeek();
+
+  document.getElementById("studentWeekControl").style.display = currentView === "parent" ? "none" : "flex";
+  const navCtrl = document.getElementById("weekNavControl");
+  const exportCtrl = document.getElementById("exportControl");
+  navCtrl.style.display = currentView === "parent" ? "flex" : "none";
+  exportCtrl.style.display = currentView === "parent" ? "flex" : "none";
+  if (currentView === "parent") {
+    const week = parentNavWeek;
+    const qualifier = week === currentWeek() ? " (current)" : week < currentWeek() ? " (past — read only)" : " (upcoming — preview)";
+    document.getElementById("weekNavLabel").textContent = `Week ${week}${qualifier}`;
+    document.getElementById("weekNavPrev").disabled = week <= 1;
+    document.getElementById("weekNavNext").disabled = week >= maxAuthoredWeek();
+    if (!exportControlsReady) {
+      document.getElementById("exportFromWeek").value = 1;
+      document.getElementById("exportToWeek").value = currentWeek();
+      exportControlsReady = true;
+    }
+  }
+  document.getElementById("weekReportPanel").style.display = showingWeekReport ? "block" : "none";
+  if (showingWeekReport) renderWeekReportPanel();
 
   const grid = document.getElementById("stationsGrid");
   grid.innerHTML = "";
@@ -906,7 +1070,7 @@ function render() {
         <span class="task-count">${active.length === 0 ? "—" : `${doneN}/${unlockedTasks.length} done`}</span>
         <span class="stamp">${stampText}</span>
       </div>`;
-    grid.appendChild(card);
+    if (!showingWeekReport) grid.appendChild(card);
   });
 
   document.getElementById("weekNumberText").innerHTML = `<span class="due-status ${isMonthlyTestWeek() ? "ok" : ""}">Week ${currentWeek()}${isMonthlyTestWeek() ? " — test week!" : ""}</span>`;
@@ -955,7 +1119,9 @@ function render() {
     </div>` : "";
 
   const panel = document.getElementById("detailPanel");
-  if (openStation) {
+  if (showingWeekReport) {
+    panel.className = "detail"; panel.innerHTML = "";
+  } else if (openStation) {
     const d = DATA[openStation];
     const status = stationStatus(openStation);
     const active = activeTasks(openStation);

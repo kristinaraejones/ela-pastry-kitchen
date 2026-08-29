@@ -44,6 +44,20 @@ Advancing is her own deliberate click, not the parent's and not automatic: once 
 
 **Served ✓** / **Burning 🔥** — computed live from completion + score, never a manually-set flag. There is no "Burnt" status — an earlier version tied a third status to due dates; that's been removed by deliberate decision. A station that isn't done yet just isn't done yet, with no calendar pressure or auto-flagging. See the build spec for the exact rules.
 
+## Parent-view week navigator
+
+A `‹ Week N ›` browser, visible only in Parent view, independent of whatever week the student herself is currently on. It covers three states:
+
+- **Current** (`Week N === current_week`) — identical to the regular live Parent dashboard: interactive station cards, Approve/Refire, everything as usual.
+- **Past** (`Week N < current_week`) — a read-only record: per subject, per task, its completion status, score if graded, and (for reflections) the full submitted text plus any parent comment from the Refire loop. No Refire/Approve/redo controls here — correcting a past week is a deliberate separate action, not something browsing back should make easy to do by accident.
+- **Upcoming** (`Week N > current_week`, up to however far content has actually been authored) — a preview of the lesson content and task list with no submission data, since nothing's been done yet. A week with literally nothing authored shows "nothing planned yet" rather than an error.
+
+Monthly/term-test tasks are deliberately left out of every week-scoped view (past, upcoming, and PDF export alike) — they're "unlocked whenever," not tied to one week, and `Submissions` only ever keeps a task's latest attempt (no per-attempt history). Attributing a since-retaken test's current score to whichever week it happened to be filed under would misrepresent that week's actual record. Their live status is unaffected and still shows normally on the current-week dashboard.
+
+## PDF export
+
+A parent-facing "Export weeks — to — → Export PDF" control, for the currently-selected child (the existing Kenley/Adelyn switcher is the student selector; there's no separate one). Generates a PDF client-side with [jsPDF](https://github.com/parallax/jsPDF) (loaded from a CDN — no server round-trip, no extra Google Drive/Docs permission scopes), organized by week then by subject: task label, type, completion status, score if graded, and the full text of any reflection submission plus its parent comment if it went through Refire. Dictation/tagging exercises show just the final score, not a blow-by-blow of every word or tag.
+
 ## What's real content vs. placeholder right now
 
 - **Kenley** — Week 1 / Month 1 real content for all five subjects (Vocab Set A, AAS Step 7, Month 1 four-level grammar analysis, MBS Pause Point 1, Writing Block 1).
@@ -54,7 +68,7 @@ Advancing is her own deliberate click, not the parent's and not automatic: once 
 - In-progress answers (an unsubmitted MC selection, a half-typed grammar tagging pass) aren't synced to the Sheet — only submitted/graded results are. Syncing every keystroke would mean a network write per tap; this matches how often the original mockup's own state actually changed meaningfully.
 - Submissions are upserted (latest state per task), not append-only history — see the Submissions bullet above for why that's still faithful to the audit-trail intent.
 - Term Final / Monthly Test overrides are one shared, global setting — not per-student — since they're the parent's own toggles, not something each kid paces independently. `current_week` itself, by contrast, is per-student.
-- A reflection sent back for revision in a week the student has since advanced past won't reappear in her own view (which only ever shows her *current* week) — it still shows up in the parent's "Needs Your Eyes" queue regardless of week, but there's currently no way for her to reopen and resubmit it herself once she's moved on. Revisiting past weeks at all is out of scope here; the build spec calls it out as a separate, not-yet-built parent-view feature.
+- A reflection sent back for revision in a week the student has since advanced past won't reappear in her own view (which only ever shows her *current* week) — it still shows up in the parent's "Needs Your Eyes" queue regardless of week, but there's currently no way for her to reopen and resubmit it herself once she's moved on. The parent's past-week report is read-only by design (no Refire there either) — this is a known gap, not something either built feature currently solves.
 
 ## Local development
 

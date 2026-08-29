@@ -31,9 +31,22 @@
     <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
     <div class="progress-label" id="progressLabel"></div>
   </div>
-  <div class="due-control">
+  <div class="due-control" id="studentWeekControl">
     <span>Current week:</span>
     <span id="weekNumberText" class="due-status"></span>
+  </div>
+  <div class="due-control" id="weekNavControl" style="display:none;">
+    <span>Browsing:</span>
+    <button id="weekNavPrev" onclick="navPrevWeek()">‹</button>
+    <span id="weekNavLabel" class="due-status"></span>
+    <button id="weekNavNext" onclick="navNextWeek()">›</button>
+  </div>
+  <div class="due-control" id="exportControl" style="display:none;">
+    <span>Export weeks</span>
+    <input type="number" id="exportFromWeek" min="1" style="width:48px;flex:none;">
+    <span>to</span>
+    <input type="number" id="exportToWeek" min="1" style="width:48px;flex:none;">
+    <button class="btn primary" style="margin-top:0;" onclick="exportWeeksPdf()">Export PDF</button>
   </div>
   <div class="due-control" id="termFinalControl" style="display:none;">
     <span>Term Finals:</span>
@@ -47,6 +60,7 @@
   <div id="sentBackBanner"></div>
   <div class="stations" id="stationsGrid"></div>
   <div class="detail" id="detailPanel"></div>
+  <div class="week-report" id="weekReportPanel" style="display:none;"></div>
   <div class="review-queue" id="reviewQueue" style="display:none;">
     <h3>Review Bank</h3>
     <div id="reviewBank" style="margin-bottom:20px;"></div>
@@ -70,6 +84,7 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 </body>
