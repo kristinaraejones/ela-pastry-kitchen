@@ -60,7 +60,7 @@ A parent-facing "Export weeks — to — → Export PDF" control, for the curren
 
 ## What's real content vs. placeholder right now
 
-- **Kenley** — Week 1 / Month 1 real content for all five subjects (Vocab Set A, AAS Step 7, Month 1 four-level grammar analysis, MBS Pause Point 1, Writing Block 1).
+- **Kenley** — real content for all of Month 1, Weeks 1–5, across all five subjects (Vocab context-clue words, AAS Steps 7–11, four weeks of four-level grammar analysis on original sentences, MBS Chapters 1–39 — the whole book — with Plot Structure & POV discussion questions, and the full Writing Block 1 arc from taught lesson through capstone reflection). Weeks 2–5 were converted from `Month1_Weeks2-5_Grammar_Spelling_Writing.md` / `Month1_Weeks2-5_Reading_Vocab.md` by `apps-script/Month1Weeks2to5.gs` (see that file's header comment for exactly which bits are Claude's own drafted content — the four spelling rule explanations and Writing Week 2's practice-set examples — versus content pulled directly from the source docs).
 - **Adelyn** — placeholder shell only, same 5-subject structure, awaiting her curriculum docs and her separate vocab matching-game component.
 
 ## Known simplifications from the spec (intentional, documented here so they're not mistaken for bugs)

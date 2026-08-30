@@ -152,9 +152,12 @@ function buildChildFromBootstrap(resp) {
   SUBJECT_ORDER.forEach(subjectKey => {
     const tasksForSubject = resp.schedule.filter(t => t.subject_key === subjectKey);
     if (tasksForSubject.length === 0) return;
+    const tagsByWeek = {};
+    tasksForSubject.forEach(t => { tagsByWeek[Number(t.week_number) || 1] = t.subject_tag; });
     DATA[subjectKey] = {
       name: tasksForSubject[0].subject_name,
-      tag: tasksForSubject[0].subject_tag,
+      tag: tasksForSubject[0].subject_tag, // fallback for weeks with no dedicated tag (e.g. Adelyn's single-week placeholders)
+      tagsByWeek,
       tasks: tasksForSubject.map(t => Object.assign(
         { id: t.id, type: t.type, label: t.label, dynamic: t.dynamic, termFinal: t.termFinal, monthlyTest: t.monthlyTest, week_number: Number(t.week_number) || 1 },
         t.content || {}
@@ -244,6 +247,10 @@ async function switchChild(id) {
 // ---------- Settings: per-student current_week (completion-based, no dates) ----------
 
 function currentWeek() { return settings.weeks[currentChild] || 1; }
+// The subject's tag for the CURRENT active week (e.g. "AAS Level 7 · Step 8"
+// once she's on week 2) — falls back to whatever tag the subject's first
+// row carries, for subjects/weeks with no dedicated per-week tag.
+function subjectTag(key) { return DATA[key].tagsByWeek[currentWeek()] || DATA[key].tag; }
 function isMonthlyTestWeek() { return currentWeek() % 4 === 0; }
 function nextMonthlyTestWeek() {
   const w = currentWeek();
@@ -277,13 +284,15 @@ function isTaskLocked(t) {
 
 // ---------- Station status ----------
 
-// Tasks belonging to the currently-active week for this student, plus the
-// "unlocked whenever" monthly/term-test tasks that aren't tied to any one
-// week. Past/future week content just isn't part of this set at all — it's
-// not "locked," it's simply not this week's work.
+// Tasks belonging to the currently-active week for this student, plus any
+// "unlocked whenever" bank-driven task (monthly tests, term finals, and the
+// review-pool dictation drill) that isn't tied to any one week — matching
+// the data model's own "one row per week, or per 'unlocked whenever' for
+// banks" description. Past/future week content just isn't part of this set
+// at all — it's not "locked," it's simply not this week's work.
 function activeTasks(key) {
   const week = currentWeek();
-  return DATA[key].tasks.filter(t => t.monthlyTest || t.termFinal || t.week_number === week);
+  return DATA[key].tasks.filter(t => t.dynamic || t.week_number === week);
 }
 function unlockedActiveTasks(key) {
   return activeTasks(key).filter(t => !isTaskLocked(t));
@@ -322,20 +331,21 @@ function allSubjectsServed() {
 
 // ---------- Parent-only week navigator (past/current/upcoming) ----------
 
-// Monthly/term-test tasks are excluded from week-scoped views: they're
-// "unlocked whenever," not tied to one week, and Submissions only ever
-// keeps the latest attempt (no per-attempt history) — so attributing a
-// retaken test's current score to whichever week it happened to be
-// authored under would misrepresent that week's actual record. Their live
-// status still shows normally in the current-week dashboard, unchanged.
+// Bank-driven "unlocked whenever" tasks (monthly tests, term finals, the
+// review-pool drill) are excluded from week-scoped views: they're not tied
+// to one week, and Submissions only ever keeps the latest attempt (no
+// per-attempt history) — so attributing a retaken one's current score to
+// whichever week it happened to be authored under would misrepresent that
+// week's actual record. Their live status still shows normally in the
+// current-week dashboard, unchanged.
 function weekScopedTasks(key, week) {
-  return DATA[key] ? DATA[key].tasks.filter(t => t.week_number === week && !t.monthlyTest && !t.termFinal) : [];
+  return DATA[key] ? DATA[key].tasks.filter(t => t.week_number === week && !t.dynamic) : [];
 }
 function maxAuthoredWeek() {
   let max = currentWeek();
   Object.keys(DATA).forEach(key => {
     DATA[key].tasks.forEach(t => {
-      if (!t.monthlyTest && !t.termFinal && t.week_number > max) max = t.week_number;
+      if (!t.dynamic && t.week_number > max) max = t.week_number;
     });
   });
   return max;
@@ -357,7 +367,7 @@ function redoStation(key) {
     return `${t.label}: not completed`;
   });
   const record = {
-    station: DATA[key].name, tag: DATA[key].tag,
+    station: DATA[key].name, tag: subjectTag(key),
     date: new Date().toLocaleDateString(),
     reason: `Scored below 70% (${Math.round((stationScorePct(key) || 0) * 100)}%)`,
     items
@@ -571,7 +581,7 @@ function checkDictation(key, id) {
       if (isRight) correctCount++;
       results.push({ kind: "sentence", typed, answer: w.answer, grade });
       grade.wordResults.forEach(wr => {
-        if (!wr.spellingCorrect && wr.correctWord) logMiss(wr.correctWord, DATA[key].tag + " (in a sentence)", null);
+        if (!wr.spellingCorrect && wr.correctWord) logMiss(wr.correctWord, subjectTag(key) + " (in a sentence)", null);
       });
     } else {
       const typed = document.getElementById(`dict-${key}-${id}-${i}`).value.trim();
@@ -581,7 +591,7 @@ function checkDictation(key, id) {
       if (t.dynamic === "reviewPool") {
         logReviewResult(w.answer, isRight);
       } else if (!isRight) {
-        const source = t.dynamic === "spellingMonthBank" ? "Monthly Test" : t.dynamic === "examSpellingBank" ? "Term Exam" : DATA[key].tag;
+        const source = t.dynamic === "spellingMonthBank" ? "Monthly Test" : t.dynamic === "examSpellingBank" ? "Term Exam" : subjectTag(key);
         logMiss(w.answer, source, w.context);
       }
     }
@@ -1063,7 +1073,7 @@ function render() {
     const stampText = status === "served" ? "SERVED ✓" : status === "burning" ? "BURNING 🔥" : "";
     card.innerHTML = `
       ${sentBackTasks.length > 0 ? `<div class="sentback-badge">🔁 Refire (${sentBackTasks.length})</div>` : (currentView === "parent" && needsReview ? '<div class="review-badge">Review</div>' : "")}
-      <div class="station-tag">${DATA[key].tag}</div>
+      <div class="station-tag">${subjectTag(key)}</div>
       <div class="station-title">${DATA[key].name}</div>
       <div class="station-lesson">${active.length === 0 ? "Nothing loaded for this week yet" : `${unlockedTasks.length} item${unlockedTasks.length !== 1 ? "s" : ""} available${lockedCount > 0 ? ` · +${lockedCount} locked` : ""}`}</div>
       <div class="station-footer">
@@ -1132,7 +1142,7 @@ function render() {
     if (status === "burning") note = `<div class="burn-note">🔥 Burning — scored below 70%. Redoing will reset this section and log the original scores for your review.</div>`;
     panel.className = "detail open";
     panel.innerHTML = `<div class="detail-head">
-        <div><div class="detail-tag">${d.tag}</div><div class="detail-title">${d.name}</div>${note}</div>
+        <div><div class="detail-tag">${subjectTag(openStation)}</div><div class="detail-title">${d.name}</div>${note}</div>
         <div style="display:flex;gap:8px;align-items:flex-start;">
           ${status === "burning" ? `<button class="btn" style="margin-top:0;background:var(--saffron);border-color:var(--saffron);color:#5B4636;" onclick="redoStation('${openStation}')">Redo this section</button>` : ""}
           <button class="detail-close" onclick="openStationFn('${openStation}')">✕ close</button>

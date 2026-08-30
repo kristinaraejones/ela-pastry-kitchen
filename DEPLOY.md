@@ -26,6 +26,16 @@ If you ever change `Code.gs` or `Setup.gs` later, you'll need to create a **new 
 
 If your Sheet was set up before the due-date system was removed, its Settings tab still has old `dueDate` / `currentWeekNumber` rows. After pasting the updated `Code.gs` and `Setup.gs` and creating a new deployment version (see above), open the Apps Script editor, select **migrateToPerStudentWeeks** in the function dropdown, and click **Run** once. It removes the old rows and adds `kenley_current_week` / `adelyn_current_week`, both starting at week 1. Safe to run more than once.
 
+## 1b. Loading Kenley's Month 1, Weeks 2–5 content
+
+This is separate from `setupSheets()` and only needs to run once, after `setupSheets()` has already populated your Sheet:
+
+1. In the Apps Script editor, click the **+** next to "Files" and add a new script file named `Month1Weeks2to5`. Copy the full contents of this repo's [`apps-script/Month1Weeks2to5.gs`](apps-script/Month1Weeks2to5.gs) and paste it in. Save.
+2. Select **seedMonth1Weeks2to5_** in the function dropdown and click **Run**.
+3. You'll get a popup confirming how many rows were added. It's idempotent — running it again does nothing if it detects the content is already there (no duplicate rows).
+
+No new deployment version is needed for this one — it's a one-time data-loading function, not part of the live API surface (`Code.gs`), so it doesn't affect what the deployed Web App serves at all, only what's *in* the Sheet for it to read.
+
 ## 2. Frontend: GitHub Pages
 
 1. On GitHub, go to this repo's **Settings → Pages**.
