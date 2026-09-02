@@ -930,6 +930,9 @@ function renderPastTaskReport(key, t, s) {
     extra += `<div class="submitted-text">${s.answers.text}</div>`;
     if (s.parentComment) extra += `<div class="parent-feedback">📝 ${s.parentComment}</div>`;
   }
+  if (t.type === "reflection" && t.sampleAnswer) {
+    extra += `<div class="sample-answer"><b>Sample answer:</b> ${t.sampleAnswer}</div>`;
+  }
   return `<div class="review-item">
     <strong>${t.label}</strong>
     <div class="meta">${statusLabel(s)}${s.score ? " · Scored " + s.score : ""}</div>
@@ -937,13 +940,43 @@ function renderPastTaskReport(key, t, s) {
   </div>`;
 }
 
+// Renders the sentence with each word's correct part-of-speech tag beneath it.
+function renderPosTaggerPreview(t) {
+  const words = t.sentence.map((w, i) => `<span>${w}<br><span class="tag">${t.answers[i]}</span></span>`).join(" ");
+  return `<div class="preview-sentence">${words}</div>`;
+}
+
+// Renders the sentence plus each authored phrase/clause with its type and explanation.
+function renderPhraseTaggerPreview(t) {
+  const sentence = t.sentence.join(" ");
+  const items = (t.phrases || []).map(p => {
+    const text = t.sentence.slice(p.start, p.end + 1).join(" ");
+    return `<div class="preview-key-item">"${text}" — <b>${p.type}</b>. ${p.explanation || ""}</div>`;
+  }).join("");
+  return `<div class="preview-sentence">${sentence}</div><div class="preview-key">${items}</div>`;
+}
+
+// Lists each authored word/sentence with its correct spelling/answer for a dictation set.
+function renderDictationPreview(t) {
+  const promptHtml = t.prompt ? `<p>${t.prompt}</p>` : "";
+  if (!t.words || t.words.length === 0) {
+    return `<div class="lesson-text">${promptHtml}<p style="opacity:.75;">(pulled dynamically — not fixed content to preview)</p></div>`;
+  }
+  const items = t.words.map(w => `<div class="preview-key-item">${w.answer}${w.context ? ` <span class="tag">(context: ${w.context})</span>` : ""}</div>`).join("");
+  return `<div class="lesson-text">${promptHtml}</div><div class="preview-key">${items}</div>`;
+}
+
 function renderUpcomingTaskPreview(t) {
   let preview;
   if (t.type === "read") preview = t.content;
-  else if (t.type === "reflection") preview = `<div class="lesson-text"><p>${t.prompt}</p></div>`;
+  else if (t.type === "reflection") {
+    preview = `<div class="lesson-text"><p>${t.prompt}</p></div>${t.sampleAnswer ? `<div class="sample-answer"><b>Sample answer:</b> ${t.sampleAnswer}</div>` : ""}`;
+  }
   else if (t.type === "external") preview = `<div class="lesson-text">${t.note || ""}</div>`;
   else if (t.type === "graded-mc") preview = `<div class="lesson-text">${(t.questions || []).length} question(s)</div>`;
-  else if (t.type === "graded-dictation") preview = `<div class="lesson-text">${t.prompt || ""}</div>`;
+  else if (t.type === "graded-dictation") preview = renderDictationPreview(t);
+  else if (t.type === "pos-tagger") preview = renderPosTaggerPreview(t);
+  else if (t.type === "phrase-tagger") preview = renderPhraseTaggerPreview(t);
   else preview = `<div class="lesson-text">(interactive exercise — nothing to preview yet)</div>`;
   return `<div class="review-item"><strong>${t.label}</strong><div class="meta">${t.type}</div>${preview}</div>`;
 }
