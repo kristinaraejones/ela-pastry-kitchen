@@ -984,7 +984,7 @@ function renderUpcomingTaskPreview(t) {
 function renderWeekReportPanel() {
   const panel = document.getElementById("weekReportPanel");
   const week = parentNavWeek;
-  const isPast = week < currentWeek();
+  const isPast = week <= currentWeek();
   const sections = [];
   let anyContent = false;
   SUBJECT_ORDER.forEach(key => {
@@ -997,8 +997,9 @@ function renderWeekReportPanel() {
       sections.push(isPast ? renderPastTaskReport(key, t, s) : renderUpcomingTaskPreview(t));
     });
   });
+  const titleSuffix = week < currentWeek() ? "completed record" : week === currentWeek() ? "in progress" : "preview";
   panel.innerHTML = `
-    <div class="week-report-title">Week ${week} — ${isPast ? "completed record" : "preview"}</div>
+    <div class="week-report-title">Week ${week} — ${titleSuffix}</div>
     ${anyContent ? sections.join("") : `<div class="empty-note">Nothing planned yet for Week ${week}.</div>`}
   `;
 }
@@ -1065,7 +1066,7 @@ function render() {
   document.getElementById("reviewQueue").style.display = currentView === "parent" ? "block" : "none";
 
   if (currentView === "parent" && parentNavWeek === null) parentNavWeek = currentWeek();
-  const showingWeekReport = currentView === "parent" && parentNavWeek !== currentWeek();
+  const showingWeekReport = currentView === "parent";
 
   document.getElementById("studentWeekControl").style.display = currentView === "parent" ? "none" : "flex";
   const navCtrl = document.getElementById("weekNavControl");
