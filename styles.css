@@ -37,7 +37,7 @@ body{margin:0;background:var(--chalk-bg);background-image:radial-gradient(circle
 .station.done .stamp{opacity:0.9;}
 .station.burning .stamp{opacity:0.9;color:var(--saffron);border-color:var(--saffron);}
 .due-control{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--chalk-dim);margin-bottom:16px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:8px 12px;flex-wrap:wrap;}
-.due-control button{background:var(--rail);border:1px solid var(--card-border);color:var(--chalk-text);border-radius:5px;width:24px;height:24px;cursor:pointer;font-family:'JetBrains Mono',monospace;}
+.due-control button:not(.btn){background:var(--rail);border:1px solid var(--card-border);color:var(--chalk-text);border-radius:5px;width:24px;height:24px;cursor:pointer;font-family:'JetBrains Mono',monospace;}
 .due-status{font-weight:700;}
 .due-status.ok{color:var(--herb);}
 .review-badge{position:absolute;top:8px;right:8px;background:var(--saffron);color:#5B4636;font-family:'JetBrains Mono',monospace;font-size:0.58rem;font-weight:700;padding:2px 6px;border-radius:9px;text-transform:uppercase;}
@@ -87,7 +87,7 @@ input[type=text]{width:100%;background:#FFFFFF;border:1px solid var(--rail);bord
 input[type=number]{background:#FFFFFF;border:1px solid var(--rail);border-radius:5px;color:var(--chalk-text);font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:4px 6px;}
 .word-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
 .word-row label{font-size:0.8rem;color:var(--chalk-dim);width:150px;flex-shrink:0;}
-.btn{font-family:'JetBrains Mono',monospace;font-size:0.72rem;padding:7px 14px;border-radius:6px;border:1px solid var(--card-border);background:var(--rail);color:var(--chalk-text);cursor:pointer;margin-top:8px;}
+.btn{font-family:'JetBrains Mono',monospace;font-size:0.72rem;padding:7px 14px;border-radius:6px;border:1px solid var(--card-border);background:var(--rail);color:var(--chalk-text);cursor:pointer;margin-top:8px;white-space:nowrap;flex-shrink:0;}
 .btn.primary{background:var(--saffron);color:#5B4636;border-color:var(--saffron);font-weight:600;}
 .btn.done{background:var(--herb);color:#5B4636;border-color:var(--herb);}
 .btn:disabled{opacity:0.5;cursor:default;}
