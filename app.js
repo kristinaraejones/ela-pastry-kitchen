@@ -924,26 +924,13 @@ function taskBodyHTML(key, t) {
 
 // ---------- Past-week report / upcoming-week preview (read-only, no handlers) ----------
 
-function renderPastTaskReport(key, t, s) {
-  let extra = "";
-  if (t.type === "reflection" && s.answers && s.answers.text) {
-    extra += `<div class="submitted-text">${s.answers.text}</div>`;
-    if (s.parentComment) extra += `<div class="parent-feedback">📝 ${s.parentComment}</div>`;
-  }
-  if (t.type === "reflection" && t.sampleAnswer) {
-    extra += `<div class="sample-answer"><b>Sample answer:</b> ${t.sampleAnswer}</div>`;
-  }
-  return `<div class="review-item">
-    <strong>${t.label}</strong>
-    <div class="meta">${statusLabel(s)}${s.score ? " · Scored " + s.score : ""}</div>
-    ${extra}
-  </div>`;
-}
-
-// Renders the sentence with each word's correct part-of-speech tag beneath it.
+// Renders the sentence as word tiles with each word's correct part-of-speech tag underneath —
+// reuses the same tile look as the live interactive pos-tagger, just non-clickable and pre-filled.
 function renderPosTaggerPreview(t) {
-  const words = t.sentence.map((w, i) => `<span>${w}<br><span class="tag">${t.answers[i]}</span></span>`).join(" ");
-  return `<div class="preview-sentence">${words}</div>`;
+  const tiles = t.sentence.map((w, i) =>
+    `<div class="word-slot" style="cursor:default;"><span class="word-text">${w}</span><span class="word-label correct">${t.answers[i]}</span></div>`
+  ).join("");
+  return `<div class="pos-row">${tiles}</div>`;
 }
 
 // Renders the sentence plus each authored phrase/clause with its type and explanation.
@@ -966,19 +953,36 @@ function renderDictationPreview(t) {
   return `<div class="lesson-text">${promptHtml}</div><div class="preview-key">${items}</div>`;
 }
 
-function renderUpcomingTaskPreview(t) {
-  let preview;
-  if (t.type === "read") preview = t.content;
-  else if (t.type === "reflection") {
-    preview = `<div class="lesson-text"><p>${t.prompt}</p></div>${t.sampleAnswer ? `<div class="sample-answer"><b>Sample answer:</b> ${t.sampleAnswer}</div>` : ""}`;
+// Shared content renderer used by both the current/past-week report and the upcoming-week
+// preview — the lesson material itself doesn't depend on whether she's done it yet.
+function renderTaskContent(t) {
+  if (t.type === "read") return t.content;
+  if (t.type === "reflection") {
+    return `<div class="lesson-text"><p>${t.prompt}</p></div>${t.sampleAnswer ? `<div class="sample-answer"><b>Sample answer:</b> ${t.sampleAnswer}</div>` : ""}`;
   }
-  else if (t.type === "external") preview = `<div class="lesson-text">${t.note || ""}</div>`;
-  else if (t.type === "graded-mc") preview = `<div class="lesson-text">${(t.questions || []).length} question(s)</div>`;
-  else if (t.type === "graded-dictation") preview = renderDictationPreview(t);
-  else if (t.type === "pos-tagger") preview = renderPosTaggerPreview(t);
-  else if (t.type === "phrase-tagger") preview = renderPhraseTaggerPreview(t);
-  else preview = `<div class="lesson-text">(interactive exercise — nothing to preview yet)</div>`;
-  return `<div class="review-item"><strong>${t.label}</strong><div class="meta">${t.type}</div>${preview}</div>`;
+  if (t.type === "external") return `<div class="lesson-text">${t.note || ""}</div>`;
+  if (t.type === "graded-mc") return `<div class="lesson-text">${(t.questions || []).length} question(s)</div>`;
+  if (t.type === "graded-dictation") return renderDictationPreview(t);
+  if (t.type === "pos-tagger") return renderPosTaggerPreview(t);
+  if (t.type === "phrase-tagger") return renderPhraseTaggerPreview(t);
+  return `<div class="lesson-text">(interactive exercise — nothing to preview yet)</div>`;
+}
+
+function renderPastTaskReport(key, t, s) {
+  let extra = renderTaskContent(t);
+  if (t.type === "reflection" && s.answers && s.answers.text) {
+    extra += `<div class="submitted-text">${s.answers.text}</div>`;
+    if (s.parentComment) extra += `<div class="parent-feedback">📝 ${s.parentComment}</div>`;
+  }
+  return `<div class="review-item">
+    <strong>${t.label}</strong>
+    <div class="meta">${statusLabel(s)}${s.score ? " · Scored " + s.score : ""}</div>
+    ${extra}
+  </div>`;
+}
+
+function renderUpcomingTaskPreview(t) {
+  return `<div class="review-item"><strong>${t.label}</strong><div class="meta">${t.type}</div>${renderTaskContent(t)}</div>`;
 }
 
 function renderWeekReportPanel() {
