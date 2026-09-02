@@ -953,6 +953,20 @@ function renderDictationPreview(t) {
   return `<div class="lesson-text">${promptHtml}</div><div class="preview-key">${items}</div>`;
 }
 
+// Lists each question with its options, marking the correct one and showing any explanation.
+function renderGradedMcPreview(t) {
+  if (!t.questions || t.questions.length === 0) {
+    return `<div class="lesson-text"><p style="opacity:.75;">(pulled dynamically — not fixed content to preview)</p></div>`;
+  }
+  return t.questions.map(q => {
+    const opts = (q.options || []).map((o, i) =>
+      `<div class="preview-key-item"${i === q.correct ? "" : ` style="opacity:.6;border-left-color:var(--rail);"`}>${i === q.correct ? "✓ " : ""}${o}</div>`
+    ).join("");
+    const explanation = q.explanation ? `<div class="sample-answer"><b>Why:</b> ${q.explanation}</div>` : "";
+    return `<div class="lesson-text"><p>${q.q}</p></div><div class="preview-key">${opts}</div>${explanation}`;
+  }).join(`<hr style="border:none;border-top:1px solid var(--card-border);margin:10px 0;">`);
+}
+
 // Shared content renderer used by both the current/past-week report and the upcoming-week
 // preview — the lesson material itself doesn't depend on whether she's done it yet.
 function renderTaskContent(t) {
@@ -961,7 +975,7 @@ function renderTaskContent(t) {
     return `<div class="lesson-text"><p>${t.prompt}</p></div>${t.sampleAnswer ? `<div class="sample-answer"><b>Sample answer:</b> ${t.sampleAnswer}</div>` : ""}`;
   }
   if (t.type === "external") return `<div class="lesson-text">${t.note || ""}</div>`;
-  if (t.type === "graded-mc") return `<div class="lesson-text">${(t.questions || []).length} question(s)</div>`;
+  if (t.type === "graded-mc") return renderGradedMcPreview(t);
   if (t.type === "graded-dictation") return renderDictationPreview(t);
   if (t.type === "pos-tagger") return renderPosTaggerPreview(t);
   if (t.type === "phrase-tagger") return renderPhraseTaggerPreview(t);
