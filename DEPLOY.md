@@ -56,6 +56,16 @@ Same idea again, for Adelyn's Spelling — All About Spelling Level 5, Steps 2�
 
 No new deployment version is needed for this one either — it's a one-time data-loading function, same as 1b/1c.
 
+## 1e. Loading Adelyn's Grammar content (Unit 1 only — Weeks 1-10)
+
+Adelyn's Grammar Town runs 36 weeks across 5 units with an evolving four-level sentence-analysis system (parts of speech, then sentence parts, then phrases, then clauses). Only Unit 1 (the eight parts of speech, Weeks 1-10) has been converted so far — see the build notes at the top of `AdelynGrammarUnit1.gs` for why the rest is a deliberate follow-up rather than an oversight. Only needs to run once, after `setupSheets()` has already populated your Sheet:
+
+1. In the Apps Script editor, click the **+** next to "Files" and add a new script file named `AdelynGrammarUnit1`. Copy the full contents of this repo's [`apps-script/AdelynGrammarUnit1.gs`](apps-script/AdelynGrammarUnit1.gs) and paste it in. Save.
+2. Select **seedAdelynGrammarUnit1_** in the function dropdown and click **Run**.
+3. You'll get a popup confirming how many rows were added. It's idempotent — running it again does nothing if it detects the content is already there (no duplicate rows). It also automatically removes Adelyn's old "waiting on curriculum" placeholder row for Grammar.
+
+No new deployment version is needed for this one either — it's a one-time data-loading function, same as 1b/1c/1d.
+
 ## 2. Frontend: GitHub Pages
 
 1. On GitHub, go to this repo's **Settings → Pages**.
