@@ -36,6 +36,16 @@ This is separate from `setupSheets()` and only needs to run once, after `setupSh
 
 No new deployment version is needed for this one — it's a one-time data-loading function, not part of the live API surface (`Code.gs`), so it doesn't affect what the deployed Web App serves at all, only what's *in* the Sheet for it to read.
 
+## 1c. Loading Adelyn's Vocabulary & Reading content (all 36 weeks)
+
+Same idea as 1b, but for Adelyn — her full year of Vocabulary and Reading, converted from her own course documents. Only needs to run once, after `setupSheets()` has already populated your Sheet:
+
+1. In the Apps Script editor, click the **+** next to "Files" and add a new script file named `AdelynVocabReading`. Copy the full contents of this repo's [`apps-script/AdelynVocabReading.gs`](apps-script/AdelynVocabReading.gs) and paste it in. Save.
+2. Select **seedAdelynVocabReading_** in the function dropdown and click **Run**.
+3. You'll get a popup confirming how many rows were added. It's idempotent — running it again does nothing if it detects the content is already there (no duplicate rows). It also automatically removes Adelyn's old "waiting on curriculum" placeholder rows for Vocabulary and Reading, so she won't see both the placeholder and the real content at once.
+
+No new deployment version is needed for this one either — it's a one-time data-loading function, same as 1b.
+
 ## 2. Frontend: GitHub Pages
 
 1. On GitHub, go to this repo's **Settings → Pages**.

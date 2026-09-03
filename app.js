@@ -541,6 +541,25 @@ function speakSequence(parts) {
 }
 function speakWordInContext(word, context) { speakSequence([word, context, word]); }
 
+// Reads aloud whatever text is currently in the DOM element with this id —
+// used for "read this to me" buttons on lesson content and instructions,
+// where the text is long/HTML-bearing and not safe to inline into an
+// onclick attribute the way the short dictation words above are.
+function speakElementText(elId) {
+  if (!("speechSynthesis" in window)) return;
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const text = (el.innerText || el.textContent || "").trim();
+  if (!text) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.9;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+function readAloudButton(elId, label) {
+  return `<button class="btn read-aloud-btn" onclick="speakElementText('${elId}')">🔊 ${label || "Read this to me"}</button>`;
+}
+
 function gradeSentence(correctText, typedText) {
   const tokenize = s => s.match(/[A-Za-z']+/g) || [];
   const correctWords = tokenize(correctText);
@@ -734,16 +753,23 @@ function taskBodyHTML(key, t) {
   const s = state[key].tasks[t.id];
   let inner = "";
   if (t.type === "read") {
-    inner = t.content + (s.done ? `` : `<button class="btn primary" onclick="markRead('${key}','${t.id}')">Mark as read</button>`);
+    const contentId = `read-content-${key}-${t.id}`;
+    inner = `<div id="${contentId}">${t.content}</div>
+      ${readAloudButton(contentId)}
+      ${s.done ? `` : `<button class="btn primary" onclick="markRead('${key}','${t.id}')">Mark as read</button>`}`;
   } else if (t.type === "external") {
+    const noteId = `ext-note-${key}-${t.id}`;
     inner = `<a class="ext-link" href="#" onclick="return false;">${t.linkText} ↗</a>
-      <div class="lesson-text" style="opacity:.75;font-size:0.78rem;">${t.note}</div>
+      <div class="lesson-text" id="${noteId}" style="opacity:.75;font-size:0.78rem;">${t.note}</div>
+      ${readAloudButton(noteId)}
       <label style="font-size:0.82rem;display:flex;align-items:center;gap:8px;">
         <input type="checkbox" ${s.done ? "checked" : ""} onchange="markExternal('${key}','${t.id}',this.checked)"> Mark complete
       </label>`;
   } else if (t.type === "reflection") {
+    const promptId = `refl-prompt-${key}-${t.id}`;
     const feedbackNote = s.parentComment ? `<div class="parent-feedback">📝 ${s.reviewed ? "Feedback from parent:" : "Refired — please revise:"} ${s.parentComment}</div>` : "";
-    inner = `<div class="lesson-text"><p>${t.prompt}</p></div>
+    inner = `<div class="lesson-text" id="${promptId}"><p>${t.prompt}</p></div>
+      ${readAloudButton(promptId, "Read the question to me")}
       ${feedbackNote}
       <textarea id="ta-${key}-${t.id}" placeholder="Type your answer here..." ${s.done ? "disabled" : ""}>${s.answers.text || ""}</textarea>
       ${s.done ? `<div class="graded-note">Submitted — waiting on parent review.</div>` : `<button class="btn primary" onclick="submitReflection('${key}','${t.id}')">${s.sentBack ? "Refire" : "Submit"}</button>`}`;
@@ -760,7 +786,8 @@ function taskBodyHTML(key, t) {
       if (!s.done) { words = sampleExamSpellingWords(banks.spelling || [], Math.min(30, (banks.spelling || []).length)); state[key].tasks[t.id]._reviewWords = words; }
       else words = state[key].tasks[t.id]._reviewWords || [];
     }
-    inner = `<div class="lesson-text"><p>${t.prompt}</p></div>`;
+    const dictPromptId = `dict-prompt-${key}-${t.id}`;
+    inner = `<div class="lesson-text" id="${dictPromptId}"><p>${t.prompt}</p></div>${readAloudButton(dictPromptId, "Read the instructions to me")}`;
     if (s.done && s.results) {
       inner += s.results.map(r => {
         if (r.kind === "sentence") {
@@ -899,7 +926,8 @@ function taskBodyHTML(key, t) {
       inner += `<div class="lesson-text" style="opacity:.75;font-size:0.78rem;">${hint || ""}</div>`;
     }
     questions.forEach((q, qi) => {
-      inner += `<div class="lesson-text"><p>${qi + 1}. ${q.q}</p></div><div class="mc-options">`;
+      const qId = `mc-q-${key}-${t.id}-${qi}`;
+      inner += `<div id="${qId}"><div class="lesson-text"><p>${qi + 1}. ${q.q}</p></div><div class="mc-options">`;
       q.options.forEach((opt, oi) => {
         const sel = s.answers.mc && s.answers.mc[qi] === oi;
         let cls = sel ? "selected" : "";
@@ -909,7 +937,7 @@ function taskBodyHTML(key, t) {
         }
         inner += `<div class="mc-option ${cls}" onclick="selectMC('${key}','${t.id}',${qi},${oi})">${opt}</div>`;
       });
-      inner += `</div>`;
+      inner += `</div></div>${readAloudButton(qId, "Read this question and choices to me")}`;
       if (s.done && q.explanation) inner += `<div class="tag-review-item" style="margin-top:6px;">${q.explanation}</div>`;
     });
     if (s.done) {
