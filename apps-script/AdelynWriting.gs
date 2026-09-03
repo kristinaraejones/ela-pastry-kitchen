@@ -1,0 +1,198 @@
+/**
+ * The ELA Pastry Kitchen — Adelyn's Writing Workshop, Weeks 1-4
+ * ("Sentence Play" — the only phase fully written up so far).
+ *
+ * Adds net-new Schedule rows for Adelyn's "writing" subject, converted
+ * from Adelyns_Writing_Workshop_Year1_v3.docx. Does NOT touch
+ * setupSheets(), Month1Weeks2to5.gs, AdelynVocabReading.gs,
+ * AdelynSpelling.gs, AdelynGrammarUnit1.gs, or any Kenley rows — purely
+ * additive, and only touches Adelyn's placeholder "writing" row.
+ *
+ * THIS IS A PARTIAL SEED, BY DESIGN — NOT AN OVERSIGHT. The source
+ * document itself only has detailed weekly sessions written for Weeks
+ * 1-4 ("Sentence Play"). Weeks 5-14 continue that same sentence-level
+ * phase but are explicitly marked "to be written once you let me know
+ * how this month goes" — the curriculum is meant to be built adaptively
+ * around how Adelyn actually responds to these first four weeks, not
+ * front-loaded. Weeks 15-22 ("Building the Paragraph") exist only as a
+ * one-paragraph-per-week preview table in the source doc, not full
+ * sessions. Weeks 23-36 aren't detailed at all yet. Re-open the source
+ * docx for Weeks 5+ once Kristina has more of it written.
+ *
+ * Content structure per week (each week is fundamentally a PARENT-LED,
+ * mostly-oral session — Adelyn's own screen time is just the last step):
+ *   A "read" task carrying the week's full session plan pretty much
+ *     verbatim from the source doc — the "Hi Adelyn!" callout is written
+ *     directly to her, but the rest (Before You Sit Down, Step-by-Step
+ *     Session, Playful Practice) is written in second person to the
+ *     parent ("say something like...", "ask her..."). It's included as-is
+ *     rather than rewritten into kid-voice, the same way Kenley's lesson
+ *     content sometimes carries parent-facing asides (e.g. RULE BREAKER
+ *     notes) — Adelyn seeing "here's what to say to her" is harmless, and
+ *     rewriting it would risk losing fidelity to the actual session plan
+ *     Kristina needs to run.
+ *   A "reflection" task for "Adelyn's Turn — Independent Writing" — her
+ *     actual turn to write, offered as 1-3 open-ended choices exactly as
+ *     the doc presents them. Deliberately NO answer key: this program's
+ *     whole philosophy is that there is no single correct sentence or
+ *     paragraph. The task's sampleAnswer field instead carries that
+ *     week's "Coaching Notes for You" verbatim, framed explicitly as
+ *     coaching guidance rather than a model answer, so it still shows up
+ *     for the parent in the Approve/Refire review flow when it's useful
+ *     (what to praise, what NOT to correct, what's a false alarm vs. a
+ *     real stuck point) without implying there's a "right" response to
+ *     grade against.
+ *
+ * Run seedAdelynWriting_() ONCE from the function dropdown, after
+ * setupSheets() has already been run at least once. It's idempotent: if
+ * it detects task_id "awl1" already in the Schedule sheet, it assumes
+ * this has already run and does nothing. It also removes Adelyn's
+ * original single placeholder row for "writing" ("aw1" waiting-shell —
+ * note the real content below reuses "aw1" for Week 1's actual
+ * independent-writing task, so that old placeholder is deleted by label
+ * match before the new rows are added, to avoid an id collision).
+ */
+
+function seedAdelynWriting_() {
+  var sh = getSheet_('Schedule');
+  var existing = sheetToObjects_(sh);
+  if (existing.some(function (r) { return r.task_id === 'awl1'; })) {
+    SpreadsheetApp.getUi().alert('Adelyn\'s Writing content already appears to be seeded (found task awl1) — skipping to avoid duplicates.');
+    return;
+  }
+
+  // Remove Adelyn's original single placeholder row for writing
+  // ("aw1" waiting-shell) so it doesn't collide with the new "aw1"
+  // (Week 1's real independent-writing task).
+  var toDelete = existing.filter(function (r) {
+    return r.student === 'adelyn' && r.subject_key === 'writing' && r.task_id === 'aw1' && r.label.indexOf('Waiting') !== -1;
+  });
+  toDelete.sort(function (a, b) { return b._row - a._row; }).forEach(function (r) { sh.deleteRow(r._row); });
+
+  var rows = [];
+  function addTasks(subjectKey, subjectName, subjectTag, weekNumber, tasks) {
+    tasks.forEach(function (t) {
+      var content = {};
+      Object.keys(t).forEach(function (k) {
+        if (['id', 'label', 'type', 'dynamic', 'termFinal', 'monthlyTest'].indexOf(k) === -1) content[k] = t[k];
+      });
+      rows.push([
+        'adelyn', subjectKey, subjectName, subjectTag, weekNumber,
+        t.id, t.type, t.label, JSON.stringify(content),
+        t.dynamic || '', !!t.termFinal, !!t.monthlyTest
+      ]);
+    });
+  }
+
+  ADELYN_WRITING_WEEKS.forEach(function (week) {
+    Object.keys(week.subjects).forEach(function (subjectKey) {
+      var subj = week.subjects[subjectKey];
+      addTasks(subjectKey, subj.name, subj.tag, week.week_number, subj.tasks);
+    });
+  });
+
+  var headers = SHEET_HEADERS.Schedule;
+  sh.getRange(sh.getLastRow() + 1, 1, rows.length, headers.length).setValues(rows);
+  SpreadsheetApp.getUi().alert('Added ' + rows.length + ' new Schedule rows for Adelyn — Writing, Weeks 1-4 (Sentence Play).');
+}
+
+// ---------- Content ----------
+
+var ADELYN_WRITING_WEEKS = [
+  {
+    "week_number": 1,
+    "subjects": {
+      "writing": {
+        "name": "Writing",
+        "tag": "Sentence Play · Week 1",
+        "tasks": [
+          {
+            "id": "awl1",
+            "label": "Week 1 Lesson: Warming Up — One Sentence, Lots of Outfits",
+            "type": "read",
+            "content": "<div class=\"lesson-text\"><p><b>Week 1: Warming Up — One Sentence, Lots of Outfits</b></p><p style=\"opacity:.75;font-size:0.82rem;\">A bare sentence gets \"dressed up\" with describing words, and Adelyn sees that there are many good ways to do it, not one right way.</p><p style=\"opacity:.7;font-size:0.78rem;\">Time: 15–20 minutes, 2–3 times this week</p><p><b>Before You Sit Down</b></p><ul><li>You need: a notebook for Adelyn (this becomes her Sentence &amp; Story Notebook for the whole year), a pencil, and this page.</li><li>You do not need to know grammar terms to teach this well. If she asks \"what's an adjective?\" you can simply say \"a word that describes something — like tall, wobbly, or delicious.\" That's enough.</li><li>Your only job this week is to react with genuine delight to her word choices. There is no wrong answer as long as the sentence still makes sense.</li></ul><p><b>The Idea, In Plain Words</b></p><p>A short sentence like \"The dog ran\" is already 100% correct — nothing is wrong with it. But it's also a little bit plain, like a stick figure with no face or clothes. This week, Adelyn learns that she can \"dress up\" any plain sentence by adding a couple of describing words, and that there are dozens of good outfits for the same sentence, not just one.</p><p><b>🎙️ Hi Adelyn!</b></p><p style=\"opacity:.9;\">Here's a secret: grown-up authors do this same trick all the time. They start with a plain idea — a dog ran — and then they play dress-up with it until it sounds like THEM. This week isn't about finding the \"right\" describing words. It's about trying on a few and picking the ones that sound most like something you would say.</p><p><b>Step-by-Step Session</b></p><ol><li>Warm up out loud, no pencils yet (3–5 min). Say a plain sentence and toss it back and forth, each of you adding one describing word at a time, like a game of catch. Say something like: \"I'm going to say a plain, boring sentence, and we're going to take turns dressing it up. Ready? 'The ball rolled.' Your turn — what's one word we could add?\" If she says \"bouncy,\" respond with real enthusiasm (\"Oh, I can SEE it bouncing now!\"), then add your own word, and hand it back to her. Do this for 2–3 rounds, then try a second plain sentence.</li><li>Show her the idea that there's more than one good answer (2 min). This is the heart of the whole philosophy behind this program — make sure she hears it explicitly. Show her these three different \"outfits\" for the exact same plain sentence, side by side, and ask which one she likes best and why. There is no correct choice — the point of showing three is proving that all three work: <i>The dog ran.</i> (plain) / <i>The fluffy, brown dog ran.</i> (describes how it looked) / <i>The tired, muddy dog ran.</i> (describes how it felt) / <i>The silly, spotted dog ran.</i> (just plain fun!)</li><li>Guided practice together (5–8 min). Now open her notebook. Write today's date at the top. Read each plain sentence out loud together, and have Adelyn dress up EACH one out loud before she writes anything down — talking first, writing second, always. Plain sentences to dress up (say them, don't just point at them): \"The dog ran.\" / \"The girl practiced.\" / \"The chef cooked dinner.\" / \"The gymnast landed.\" / \"The book fell.\" For each one, ask a concrete, curious question rather than \"add an adjective\" — \"What did it look like?\" \"How many were there?\" \"What would make this sentence sound more like something YOU would write?\"</li><li>Adelyn writes her favorite version of each sentence into her notebook, in her own handwriting. This is the only \"writing\" required this week — short and low-pressure on purpose.</li></ol><p><b>Playful Practice (Optional — if she's having fun, keep going)</b></p><p>\"Sentence Dress-Up Game\": write 4–5 plain sentences about things Adelyn loves — gymnastics, cooking, a place you've traveled — on separate slips of paper. She picks one at random and has 30 seconds to say the fanciest, silliest, or most beautiful dressed-up version she can think of, out loud. No writing required — pure oral play. Example plain sentences: \"The gymnast flipped.\" \"The soup simmered.\" \"The plane landed.\" \"The market buzzed.\"</p></div>"
+          },
+          {
+            "id": "aw1",
+            "label": "Adelyn's Turn — Independent Writing",
+            "type": "reflection",
+            "prompt": "Pick ONE and write it (in your notebook, or right here!):<ul><li>Write 3 plain sentences about something from today, then dress each one up.</li><li>Write 3 already-dressed-up sentences about your favorite gymnastics move, straight from your imagination.</li><li>Write about anything at all — as long as at least 2 of your sentences have describing words you're proud of.</li></ul>",
+            "sampleAnswer": "There's no single correct answer here — this is a coaching note for you, not an answer key: The single biggest skill you're building this week isn't Adelyn's — it's yours: reacting to her writing with specific delight instead of correction. Try to say the exact words or phrases you loved out loud (\"I love that you called it a wobbly cartwheel — I can totally picture it!\") rather than a generic \"good job.\" Resist fixing spelling or grammar during writing time this week — that's what her spelling and grammar lessons are for. If she writes something wildly different from the examples (a poem, a silly list, a made-up creature), that's a win, not a detour — the goal is a sentence SHE is proud of, not a sentence that matches a template. If she gets stuck and says \"I don't know what to add,\" that's your cue to ask a concrete sensory question (What did it look/sound/feel like?) rather than supplying the word yourself."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "week_number": 2,
+    "subjects": {
+      "writing": {
+        "name": "Writing",
+        "tag": "Sentence Play · Week 2",
+        "tasks": [
+          {
+            "id": "awl2",
+            "label": "Week 2 Lesson: Action Words With Personality",
+            "type": "read",
+            "content": "<div class=\"lesson-text\"><p><b>Week 2: Action Words With Personality</b></p><p style=\"opacity:.75;font-size:0.82rem;\">Swapping tired, overused verbs (went, got, did) for verbs that show exactly HOW something happened — which naturally makes describing-word-only sentences even more vivid.</p><p style=\"opacity:.7;font-size:0.78rem;\">Time: 15–20 minutes, 2–3 times this week</p><p><b>Before You Sit Down</b></p><ul><li>Bring last week's notebook — start by reading 1–2 of her dressed-up sentences from Week 1 back to her. Starting with a win builds momentum.</li><li>No new vocabulary required from you. If she asks what an \"adverb\" is, \"a word that tells how, when, or where something happened\" is plenty.</li></ul><p><b>The Idea, In Plain Words</b></p><p>Some verbs (action words) do all the heavy lifting in English — \"went,\" \"got,\" \"did,\" \"was\" — and because they're used for EVERYTHING, they don't paint much of a picture. This week is about noticing when a sentence is leaning on a tired verb, and trying a more specific one instead. It's less a rule and more a habit of noticing.</p><p><b>🎙️ Hi Adelyn!</b></p><p style=\"opacity:.9;\">'Went' is one very overworked word — it gets used for walking, running, flying, sneaking, ALL of it. Let's give 'went' a little vacation this week. Instead of 'Adelyn went to the mat,' how did she actually get there? Did she skip? Race? Tiptoe? Cartwheel the whole way there?</p><p><b>Step-by-Step Session</b></p><ol><li>Warm up with \"Ban the Boring Verb\" (3–5 min, oral only). Say a sentence using \"went\" or \"got,\" and ask her for three different, more specific verbs that could replace it — collect all three before judging any of them. Say something like: \"Adelyn went to the kitchen. Give me three different words we could use instead of 'went' — they can be totally different moods, silly or serious.\" Example possible answers to have in your back pocket if she gets stuck (don't lead with these — offer only if she's truly stuck): tiptoed, raced, wandered, skipped, marched.</li><li>Show, don't just tell (2 min). Read these three versions of the same sentence aloud and ask which one she can \"feel\" the most: <i>Adelyn went to the mat.</i> / <i>Adelyn sprinted eagerly to the mat.</i> / <i>Adelyn crept nervously to the mat.</i> Point out (lightly, not as a rule) that the little extra word at the end — eagerly, nervously — tells us HOW she moved, and it completely changes the feeling of the sentence even though the verb changed too. If this connection doesn't land today, that's fine; it will come back around all year.</li><li>Guided practice together (5–8 min). For each sentence, ask her to say it out loud two or three different ways before choosing her favorite to write down: \"Adelyn went to the mat.\" / \"Kenley made the soup.\" / \"The cat was on the chair.\" / \"Adelyn did a flip.\" / \"The family went to the market.\" Prompting questions: \"How do you think she actually moved?\" \"Was she in a hurry, or taking her time?\" \"What's a funnier way to say that?\"</li></ol><p><b>Playful Practice (Optional — if she's having fun, keep going)</b></p><p>\"Verb Charades\": act out walking five different ways (tiptoeing, marching, stomping, sneaking, skipping) and have Adelyn name the verb for each. Then flip it — she acts, you name it. This builds a bank of specific verbs without any writing at all, which is exactly the point at this stage.</p></div>"
+          },
+          {
+            "id": "aw2",
+            "label": "Adelyn's Turn — Independent Writing",
+            "type": "reflection",
+            "prompt": "Pick ONE and write it (in your notebook, or right here!):<ul><li>Pick 3 sentences from Week 1's notebook page and give each one a punchier, more specific verb.</li><li>Write 3 brand-new sentences about cooking or gymnastics, choosing your verb first, on purpose, before anything else.</li></ul>",
+            "sampleAnswer": "There's no single correct answer here — this is a coaching note for you, not an answer key: If Adelyn keeps choosing –ly adverbs every single time (quickly, slowly, happily), that's completely fine for now — sentence-opener variety and reducing adverb reliance is a much later-year skill, not this week's job. Watch for verb swaps that no longer fit the sentence's meaning (e.g., 'went' → 'flew' only makes sense if she's imagining something that can fly). If it happens, get curious rather than correcting: 'Ooh, tell me about that — is she flying?' Sometimes the surprising answer is more interesting than the 'accurate' one, and that's voice, not error. Keep celebrating specific word choices out loud. This is still the most important coaching move in the whole program."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "week_number": 3,
+    "subjects": {
+      "writing": {
+        "name": "Writing",
+        "tag": "Sentence Play · Week 3",
+        "tasks": [
+          {
+            "id": "awl3",
+            "label": "Week 3 Lesson: Painting the Scene — Where and When",
+            "type": "read",
+            "content": "<div class=\"lesson-text\"><p><b>Week 3: Painting the Scene — Where and When</b></p><p style=\"opacity:.75;font-size:0.82rem;\">Adding a short phrase that tells the reader WHERE or WHEN something happened, so a sentence feels like a scene instead of floating in empty space.</p><p style=\"opacity:.7;font-size:0.78rem;\">Time: 15–20 minutes, 2–3 times this week</p><p><b>Before You Sit Down</b></p><ul><li>No grammar terms needed this week at all — avoid the phrase \"prepositional phrase\" even if you know it; Adelyn will meet that term later, on Grammar Town's own schedule, and it will feel like recognizing an old friend rather than new homework.</li><li>If it's practical, do this session somewhere with a view — a balcony, a market, a park bench — since \"noticing the scene around you\" is literally the week's skill.</li></ul><p><b>The Idea, In Plain Words</b></p><p>A sentence with no sense of place is like a play with actors but no set — we can see the characters, but where even are they? This week, Adelyn adds a short \"where\" or \"when\" phrase to sentences so a reader can picture the whole scene, not just the action.</p><p><b>🎙️ Hi Adelyn!</b></p><p style=\"opacity:.9;\">Close your eyes for a second. I'm going to say a sentence, and I want you to tell me: can you actually SEE where this is happening? 'Adelyn stretched.' ... Can you? Now: 'Adelyn stretched on the balance beam, just before the judges walked in.' Big difference, right? This week we're building sets for our sentences.</p><p><b>Step-by-Step Session</b></p><ol><li>Warm up by noticing your real surroundings (3–5 min, oral). Wherever you're sitting, take turns finishing the sentence \"I am sitting...\" with a different true place-phrase each time. Say something like: \"I am sitting... near the window. Your turn — finish it a different way. Now a different way again.\" A short, friendly word bank to have ready if she's stuck for a starter word: in, on, at, near, under, behind, beside, before, after.</li><li>Show three scene-setting choices for one sentence (2 min): <i>The determined gymnast stretched.</i> (plain) / <i>The determined gymnast stretched on the cool tile floor.</i> / <i>The determined gymnast stretched before the big competition.</i> Ask which one she can picture best, and why — there's no wrong answer, and \"I just like it better\" is a completely acceptable reason at this age.</li><li>Guided practice together (5–8 min). These sentences already have describing words and strong verbs from the last two weeks — her only job is adding a where/when phrase to finish the scene: \"The determined gymnast stretched.\" / \"Kenley chopped the ripe mangoes.\" / \"Adelyn practiced her cartwheel.\" / \"The tired travelers rested.\" / \"The warm bread cooled.\" Prompting question: \"Where do you picture this happening?\" or \"When do you think this is?\"</li></ol><p><b>Playful Practice (Optional — if she's having fun, keep going)</b></p><p>\"Postcard Sentences\": since you're traveling, this is a natural fit — have Adelyn write 1–2 sentences that could go on a postcard from somewhere you've actually visited, making sure each one names a real place or time (\"near the old fountain,\" \"right before sunset\"). If she enjoys it, let her actually decorate a postcard-shaped paper with it.</p></div>"
+          },
+          {
+            "id": "aw3",
+            "label": "Adelyn's Turn — Independent Writing",
+            "type": "reflection",
+            "prompt": "Pick ONE and write it (in your notebook, or right here!):<ul><li>Write 3 sentences about a favorite place (real or from a trip), making sure every sentence has a where or when phrase.</li><li>Describe your gymnastics gym or your kitchen at home as if you're giving someone a tour in sentences.</li></ul>",
+            "sampleAnswer": "There's no single correct answer here — this is a coaching note for you, not an answer key: Any reasonable place or time phrase counts as a win — 'before breakfast,' 'in Portugal,' and 'near the fountain' are all equally correct. There is genuinely no single right answer here. This is intentionally not being labeled grammatically yet — that comes later, from Grammar Town, on its own timeline. Let the writing skill land on its own first. If a session feels rushed or she seems tired of a topic, it's completely fine to do just steps 1 and 2 orally and skip the written practice that day. Consistency matters far more than completing every single sentence."
+          }
+        ]
+      }
+    }
+  },
+  {
+    "week_number": 4,
+    "subjects": {
+      "writing": {
+        "name": "Writing",
+        "tag": "Sentence Play · Week 4",
+        "tasks": [
+          {
+            "id": "awl4",
+            "label": "Week 4 Lesson: All the Tools Together — Her First Real Paragraph",
+            "type": "read",
+            "content": "<div class=\"lesson-text\"><p><b>Week 4: All the Tools Together — Her First Real Paragraph</b></p><p style=\"opacity:.75;font-size:0.82rem;\">Combining describing words, lively verbs, and scene-setting phrases into full, rich sentences, then stringing several together into Adelyn's very first short paragraph in her own voice.</p><p style=\"opacity:.7;font-size:0.78rem;\">Time: 20–25 minutes, 2–3 times this week</p><p><b>Before You Sit Down</b></p><ul><li>This is a celebration week, not a test. Frame it that way to Adelyn explicitly: she's spent three weeks collecting tools, and now she gets to use all of them at once, like a chef finally using every ingredient in one dish.</li><li>Have her Week 1 notebook page handy — you'll compare it to what she writes this week, and that comparison is the whole point of the month.</li></ul><p><b>The Idea, In Plain Words</b></p><p>Adelyn now has four tools: describing words, lively verbs, where/when phrases, and (new this week) a fifth sense-based tool — noticing what something looked, sounded, smelled, tasted, or felt like. This week she uses several of these tools in the SAME sentence, and then puts a handful of those sentences together into a short paragraph about one experience.</p><p><b>🎙️ Hi Adelyn!</b></p><p style=\"opacity:.9;\">You've collected four tools this month, and today you get to use them ALL at once — like a painter finally using every color in the box. There's also a bonus fifth tool: your five senses. Instead of telling me a place was 'nice,' show me what MADE it nice — what did you see there? Hear? Smell?</p><p><b>Step-by-Step Session</b></p><ol><li>Rebuild one sentence together, live, adding one tool at a time out loud, counting them together as you go (5 min): \"The pot boiled.\" → \"The old pot boiled.\" (+describing word) → \"The old, dented pot bubbled.\" (+lively verb) → \"The old, dented pot bubbled loudly.\" (+how) → \"The old, dented pot bubbled loudly on the stove.\" (+where)</li><li>Introduce the fifth tool — senses (3–5 min). Ask her to describe a place she loves (the gym, the kitchen, a favorite market) using ONLY sense words, no other detail, just to practice the muscle. Say something like: \"Don't tell me if it was nice. Tell me: what did it smell like? What did you hear? What did it feel like under your feet?\"</li><li>Guided sentence practice (5–8 min). Using everything so far, fully dress up each plain sentence below, trying for at least 3 of the 4 tools (describing word, lively verb, when/where, and a sense detail if it fits): \"The market was busy.\" / \"Adelyn landed the jump.\" / \"The soup was ready.\" / \"The plane arrived.\"</li><li>Write the first real paragraph (10–15 min, can be its own separate sitting). Adelyn writes 4–5 fully dressed-up sentences, all about ONE experience — not four unrelated sentences, but one little story or description with a beginning, middle, and end feeling to it. Good topic choices (let her pick, or suggest all three and let her choose): a gymnastics class or a trick she's working on; cooking or eating a favorite dish; a place from your travels that stuck in her memory.</li></ol><p><b>🗣️ Try This Conversation</b></p><p>The Big Moment — Comparing Week 1 to Week 4: Pull out her very first Week 1 sentence and this week's paragraph and read them side by side, out loud, in her voice if she'll read them herself. Say something like: \"Listen to this sentence from three weeks ago, and now listen to this paragraph. You did that. Can you hear how much more I can picture now?\" This single conversation — naming her own growth in her own words — matters more at this age than any grade, score, or sticker chart could.</p></div>"
+          },
+          {
+            "id": "aw4",
+            "label": "Adelyn's Turn — Independent Writing",
+            "type": "reflection",
+            "prompt": "Write it in your notebook, or right here: Write 4–5 fully dressed-up sentences about ONE experience (a gymnastics class, cooking a favorite dish, or a place from your travels) — your very first real paragraph.",
+            "sampleAnswer": "There's no single correct answer here — this is a coaching note for you, not an answer key: End-of-Month Checkpoint: Do not expect a formal topic sentence or tidy paragraph structure yet — that's the explicit, gentler focus starting around Week 15, once she has real sentence-level tools to build with. This month's paragraph is allowed to be a loose, joyful string of good sentences about one idea. If Weeks 1–4 felt easy and fast, you can move a little quicker through the next stretch; if any single tool (describing words, verbs, phrases, senses) still feels shaky, it is completely fine to slow down and repeat a similar week before moving forward. There is no prize for speed here. Keep protecting this time from correction. If you notice a grammar or spelling pattern worth addressing, jot it down for her separate grammar or spelling lesson rather than fixing it here — this notebook should always feel like a safe, uncorrected space for her ideas."
+          }
+        ]
+      }
+    }
+  }
+];

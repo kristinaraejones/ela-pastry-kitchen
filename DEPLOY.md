@@ -66,6 +66,16 @@ Adelyn's Grammar Town runs 36 weeks across 5 units with an evolving four-level s
 
 No new deployment version is needed for this one either — it's a one-time data-loading function, same as 1b/1c/1d.
 
+## 1f. Loading Adelyn's Writing content (Weeks 1-4 — "Sentence Play")
+
+Adelyn's Writing Workshop is fundamentally a parent-led, mostly-oral program; the source document itself only has full weekly sessions written for Weeks 1-4 (Weeks 5-36 are previewed or not yet written, deliberately — see the build notes at the top of `AdelynWriting.gs`). Each week has a lesson (the parent-facing session script, run mostly away from the screen) and one independent-writing task Adelyn actually types into the app. There's no answer key by design — the program's philosophy is that there's no single correct sentence — so the parent-review flow instead shows that week's coaching notes (what to praise, what not to correct). Only needs to run once, after `setupSheets()` has already populated your Sheet:
+
+1. In the Apps Script editor, click the **+** next to "Files" and add a new script file named `AdelynWriting`. Copy the full contents of this repo's [`apps-script/AdelynWriting.gs`](apps-script/AdelynWriting.gs) and paste it in. Save.
+2. Select **seedAdelynWriting_** in the function dropdown and click **Run**.
+3. You'll get a popup confirming how many rows were added. It's idempotent — running it again does nothing if it detects the content is already there (no duplicate rows). It also automatically removes Adelyn's old "waiting on curriculum" placeholder row for Writing.
+
+No new deployment version is needed for this one either — it's a one-time data-loading function, same as 1b/1c/1d/1e.
+
 ## 2. Frontend: GitHub Pages
 
 1. On GitHub, go to this repo's **Settings → Pages**.
