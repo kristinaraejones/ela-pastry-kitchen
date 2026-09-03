@@ -46,6 +46,16 @@ Same idea as 1b, but for Adelyn — her full year of Vocabulary and Reading, con
 
 No new deployment version is needed for this one either — it's a one-time data-loading function, same as 1b.
 
+## 1d. Loading Adelyn's Spelling content (all 27 weeks)
+
+Same idea again, for Adelyn's Spelling — All About Spelling Level 5, Steps 2–28, converted from her own course PDF plus her checkpoint-quiz/final-exam document. Only needs to run once, after `setupSheets()` has already populated your Sheet:
+
+1. In the Apps Script editor, click the **+** next to "Files" and add a new script file named `AdelynSpelling`. Copy the full contents of this repo's [`apps-script/AdelynSpelling.gs`](apps-script/AdelynSpelling.gs) and paste it in. Save.
+2. Select **seedAdelynSpelling_** in the function dropdown and click **Run**.
+3. You'll get a popup confirming how many rows were added. It's idempotent — running it again does nothing if it detects the content is already there (no duplicate rows). It also automatically removes Adelyn's old "waiting on curriculum" placeholder row for Spelling.
+
+No new deployment version is needed for this one either — it's a one-time data-loading function, same as 1b/1c.
+
 ## 2. Frontend: GitHub Pages
 
 1. On GitHub, go to this repo's **Settings → Pages**.
