@@ -33,14 +33,20 @@
  *     Kristina needs to run.
  *   A "reflection" task for "Adelyn's Turn — Independent Writing" — her
  *     actual turn to write, offered as 1-3 open-ended choices exactly as
- *     the doc presents them. Deliberately NO answer key: this program's
- *     whole philosophy is that there is no single correct sentence or
- *     paragraph. The task's sampleAnswer field instead carries that
- *     week's "Coaching Notes for You" verbatim, framed explicitly as
- *     coaching guidance rather than a model answer, so it still shows up
- *     for the parent in the Approve/Refire review flow when it's useful
- *     (what to praise, what NOT to correct, what's a false alarm vs. a
- *     real stuck point) without implying there's a "right" response to
+ *     the doc presents them. Deliberately NO fixed answer key: this
+ *     program's whole philosophy is that there is no single correct
+ *     sentence or paragraph. The task's sampleAnswer field instead
+ *     carries two things for the parent-review flow: (1) a short
+ *     illustrative example Claude wrote for this build — explicitly
+ *     labeled as an example of the shape/level to expect, not a target
+ *     to match — since the source doc's own "outfits" examples are
+ *     addressed to the parent to read aloud DURING the session, not
+ *     meant as a grading rubric afterward; and (2) that week's "Coaching
+ *     Notes for You" verbatim, framed explicitly as coaching guidance
+ *     rather than a model answer. Together these are useful in the
+ *     Approve/Refire flow (what to praise, what NOT to correct, what's a
+ *     false alarm vs. a real stuck point) without implying there's a
+ *     "right" response to
  *     grade against.
  *
  * Run seedAdelynWriting_() ONCE from the function dropdown, after
@@ -117,7 +123,7 @@ var ADELYN_WRITING_WEEKS = [
             "label": "Adelyn's Turn — Independent Writing",
             "type": "reflection",
             "prompt": "Pick ONE and write it (in your notebook, or right here!):<ul><li>Write 3 plain sentences about something from today, then dress each one up.</li><li>Write 3 already-dressed-up sentences about your favorite gymnastics move, straight from your imagination.</li><li>Write about anything at all — as long as at least 2 of your sentences have describing words you're proud of.</li></ul>",
-            "sampleAnswer": "There's no single correct answer here — this is a coaching note for you, not an answer key: The single biggest skill you're building this week isn't Adelyn's — it's yours: reacting to her writing with specific delight instead of correction. Try to say the exact words or phrases you loved out loud (\"I love that you called it a wobbly cartwheel — I can totally picture it!\") rather than a generic \"good job.\" Resist fixing spelling or grammar during writing time this week — that's what her spelling and grammar lessons are for. If she writes something wildly different from the examples (a poem, a silly list, a made-up creature), that's a win, not a detour — the goal is a sentence SHE is proud of, not a sentence that matches a template. If she gets stuck and says \"I don't know what to add,\" that's your cue to ask a concrete sensory question (What did it look/sound/feel like?) rather than supplying the word yourself."
+            "sampleAnswer": "<i>An illustrative example only (Claude wrote this to show the shape/level a good answer might take — it's not a target, and her own answer succeeding should look nothing like it if her voice takes it somewhere different):</i><br>The gymnast flipped. → <i>The fearless, sweaty gymnast flipped.</i><br>The soup simmered. → <i>The spicy, bubbling soup simmered.</i><br>The plane landed. → <i>The huge, silver plane landed.</i><br><br><b>Coaching note for you</b> (not an answer key — there's no single correct answer here): The single biggest skill you're building this week isn't Adelyn's — it's yours: reacting to her writing with specific delight instead of correction. Try to say the exact words or phrases you loved out loud (\"I love that you called it a wobbly cartwheel — I can totally picture it!\") rather than a generic \"good job.\" Resist fixing spelling or grammar during writing time this week — that's what her spelling and grammar lessons are for. If she writes something wildly different from the examples (a poem, a silly list, a made-up creature), that's a win, not a detour — the goal is a sentence SHE is proud of, not a sentence that matches a template. If she gets stuck and says \"I don't know what to add,\" that's your cue to ask a concrete sensory question (What did it look/sound/feel like?) rather than supplying the word yourself."
           }
         ]
       }
@@ -141,7 +147,7 @@ var ADELYN_WRITING_WEEKS = [
             "label": "Adelyn's Turn — Independent Writing",
             "type": "reflection",
             "prompt": "Pick ONE and write it (in your notebook, or right here!):<ul><li>Pick 3 sentences from Week 1's notebook page and give each one a punchier, more specific verb.</li><li>Write 3 brand-new sentences about cooking or gymnastics, choosing your verb first, on purpose, before anything else.</li></ul>",
-            "sampleAnswer": "There's no single correct answer here — this is a coaching note for you, not an answer key: If Adelyn keeps choosing –ly adverbs every single time (quickly, slowly, happily), that's completely fine for now — sentence-opener variety and reducing adverb reliance is a much later-year skill, not this week's job. Watch for verb swaps that no longer fit the sentence's meaning (e.g., 'went' → 'flew' only makes sense if she's imagining something that can fly). If it happens, get curious rather than correcting: 'Ooh, tell me about that — is she flying?' Sometimes the surprising answer is more interesting than the 'accurate' one, and that's voice, not error. Keep celebrating specific word choices out loud. This is still the most important coaching move in the whole program."
+            "sampleAnswer": "<i>An illustrative example only (Claude wrote this to show the shape/level a good answer might take — it's not a target, and her own answer succeeding should look nothing like it if her voice takes it somewhere different):</i><br>Adelyn went to the mat. → <i>Adelyn cartwheeled to the mat.</i><br>Kenley made the soup. → <i>Kenley whisked the soup.</i><br>The cat was on the chair. → <i>The cat curled up on the chair.</i><br><br><b>Coaching note for you</b> (not an answer key — there's no single correct answer here): If Adelyn keeps choosing –ly adverbs every single time (quickly, slowly, happily), that's completely fine for now — sentence-opener variety and reducing adverb reliance is a much later-year skill, not this week's job. Watch for verb swaps that no longer fit the sentence's meaning (e.g., 'went' → 'flew' only makes sense if she's imagining something that can fly). If it happens, get curious rather than correcting: 'Ooh, tell me about that — is she flying?' Sometimes the surprising answer is more interesting than the 'accurate' one, and that's voice, not error. Keep celebrating specific word choices out loud. This is still the most important coaching move in the whole program."
           }
         ]
       }
@@ -165,7 +171,7 @@ var ADELYN_WRITING_WEEKS = [
             "label": "Adelyn's Turn — Independent Writing",
             "type": "reflection",
             "prompt": "Pick ONE and write it (in your notebook, or right here!):<ul><li>Write 3 sentences about a favorite place (real or from a trip), making sure every sentence has a where or when phrase.</li><li>Describe your gymnastics gym or your kitchen at home as if you're giving someone a tour in sentences.</li></ul>",
-            "sampleAnswer": "There's no single correct answer here — this is a coaching note for you, not an answer key: Any reasonable place or time phrase counts as a win — 'before breakfast,' 'in Portugal,' and 'near the fountain' are all equally correct. There is genuinely no single right answer here. This is intentionally not being labeled grammatically yet — that comes later, from Grammar Town, on its own timeline. Let the writing skill land on its own first. If a session feels rushed or she seems tired of a topic, it's completely fine to do just steps 1 and 2 orally and skip the written practice that day. Consistency matters far more than completing every single sentence."
+            "sampleAnswer": "<i>An illustrative example only (Claude wrote this to show the shape/level a good answer might take — it's not a target, and her own answer succeeding should look nothing like it if her voice takes it somewhere different):</i><br>The determined gymnast stretched. → <i>The determined gymnast stretched before the big competition.</i><br>Kenley chopped the ripe mangoes. → <i>Kenley chopped the ripe mangoes on the wooden cutting board.</i><br>The warm bread cooled. → <i>The warm bread cooled by the open window.</i><br><br><b>Coaching note for you</b> (not an answer key — there's no single correct answer here): Any reasonable place or time phrase counts as a win — 'before breakfast,' 'in Portugal,' and 'near the fountain' are all equally correct. There is genuinely no single right answer here. This is intentionally not being labeled grammatically yet — that comes later, from Grammar Town, on its own timeline. Let the writing skill land on its own first. If a session feels rushed or she seems tired of a topic, it's completely fine to do just steps 1 and 2 orally and skip the written practice that day. Consistency matters far more than completing every single sentence."
           }
         ]
       }
@@ -189,7 +195,7 @@ var ADELYN_WRITING_WEEKS = [
             "label": "Adelyn's Turn — Independent Writing",
             "type": "reflection",
             "prompt": "Write it in your notebook, or right here: Write 4–5 fully dressed-up sentences about ONE experience (a gymnastics class, cooking a favorite dish, or a place from your travels) — your very first real paragraph.",
-            "sampleAnswer": "There's no single correct answer here — this is a coaching note for you, not an answer key: End-of-Month Checkpoint: Do not expect a formal topic sentence or tidy paragraph structure yet — that's the explicit, gentler focus starting around Week 15, once she has real sentence-level tools to build with. This month's paragraph is allowed to be a loose, joyful string of good sentences about one idea. If Weeks 1–4 felt easy and fast, you can move a little quicker through the next stretch; if any single tool (describing words, verbs, phrases, senses) still feels shaky, it is completely fine to slow down and repeat a similar week before moving forward. There is no prize for speed here. Keep protecting this time from correction. If you notice a grammar or spelling pattern worth addressing, jot it down for her separate grammar or spelling lesson rather than fixing it here — this notebook should always feel like a safe, uncorrected space for her ideas."
+            "sampleAnswer": "<i>An illustrative example only (Claude wrote this to show the shape/level a good answer might take — it's not a target, and her own answer succeeding should look nothing like it if her voice takes it somewhere different):</i><br><i>The old, dented pot bubbled loudly on the stove. Steam curled up and smelled like garlic and warm spices. Kenley stirred it slowly with a wooden spoon, tasting a little bit every few minutes. Right before dinner, she added one more pinch of salt and smiled. The whole kitchen felt warm and cozy, like a hug you could smell.</i><br><br><b>Coaching note for you</b> (not an answer key — there's no single correct answer here): End-of-Month Checkpoint: Do not expect a formal topic sentence or tidy paragraph structure yet — that's the explicit, gentler focus starting around Week 15, once she has real sentence-level tools to build with. This month's paragraph is allowed to be a loose, joyful string of good sentences about one idea. If Weeks 1–4 felt easy and fast, you can move a little quicker through the next stretch; if any single tool (describing words, verbs, phrases, senses) still feels shaky, it is completely fine to slow down and repeat a similar week before moving forward. There is no prize for speed here. Keep protecting this time from correction. If you notice a grammar or spelling pattern worth addressing, jot it down for her separate grammar or spelling lesson rather than fixing it here — this notebook should always feel like a safe, uncorrected space for her ideas."
           }
         ]
       }
