@@ -19,6 +19,7 @@ let currentChild = "kenley";
 let currentView = "kenley";
 let openStation = null;
 let posPopupOpen = null;
+let conceptPopupOpen = null;
 let phraseRangeStart = null;
 let pendingPhraseRange = null;
 let parentNavWeek = null;      // parent-only week browser; null = not yet landed on current week
@@ -187,6 +188,7 @@ function buildChildFromBootstrap(resp) {
       };
       if (t.type === "pos-tagger") base.labels = a.labels || new Array(t.sentence.length).fill(null);
       if (t.type === "phrase-tagger") base.selections = a.selections || [];
+      if (t.type === "concept-check") base.labels = a.labels || {};
       state[key].tasks[t.id] = base;
     });
   });
@@ -239,7 +241,7 @@ async function switchChild(id) {
   }
   DATA = childrenCache[id].DATA;
   state = childrenCache[id].state;
-  openStation = null; posPopupOpen = null; phraseRangeStart = null; pendingPhraseRange = null;
+  openStation = null; posPopupOpen = null; conceptPopupOpen = null; phraseRangeStart = null; pendingPhraseRange = null;
   parentNavWeek = null; exportControlsReady = false;
   render();
 }
@@ -624,6 +626,25 @@ function checkDictation(key, id) {
 }
 function tagAbbrev(type) { return TAG_ABBREV[type] || type.slice(0, 4).toUpperCase(); }
 
+// ---------- Reading fluency check (parent listens, marks each word) ----------
+
+function markFluencyWord(key, id, idx, correct) {
+  const s = state[key].tasks[id];
+  if (!s.answers.fluency) s.answers.fluency = {};
+  s.answers.fluency[idx] = correct;
+  render();
+}
+function checkFluency(key, id) {
+  const t = DATA[key].tasks.find(x => x.id === id);
+  const s = state[key].tasks[id];
+  const marks = s.answers.fluency || {};
+  const correctCount = t.words.filter((w, i) => marks[i] === true).length;
+  s.score = `${correctCount}/${t.words.length}`;
+  s.done = true;
+  persistTask(key, id);
+  render();
+}
+
 function openPosPopup(key, id, idx) {
   posPopupOpen = (posPopupOpen && posPopupOpen.key === key && posPopupOpen.id === id && posPopupOpen.idx === idx) ? null : { key, id, idx };
   render();
@@ -639,6 +660,25 @@ function checkPosTagging(key, id) {
   let correct = 0;
   s.labels.forEach((l, i) => { if (l === t.answers[i]) correct++; });
   s.score = `${correct}/${t.answers.length}`;
+  s.done = true;
+  persistTask(key, id);
+  render();
+}
+function openConceptPopup(key, id, idx) {
+  conceptPopupOpen = (conceptPopupOpen && conceptPopupOpen.key === key && conceptPopupOpen.id === id && conceptPopupOpen.idx === idx) ? null : { key, id, idx };
+  render();
+}
+function selectConceptAnswer(key, id, idx, option) {
+  state[key].tasks[id].labels[idx] = option;
+  conceptPopupOpen = null;
+  render();
+}
+function checkConceptCheck(key, id) {
+  const t = DATA[key].tasks.find(x => x.id === id);
+  const s = state[key].tasks[id];
+  let correct = 0;
+  t.targets.forEach(tg => { if (s.labels[tg.index] === tg.answer) correct++; });
+  s.score = `${correct}/${t.targets.length}`;
   s.done = true;
   persistTask(key, id);
   render();
@@ -754,22 +794,25 @@ function taskBodyHTML(key, t) {
   let inner = "";
   if (t.type === "read") {
     const contentId = `read-content-${key}-${t.id}`;
-    inner = `<div id="${contentId}">${t.content}</div>
-      ${readAloudButton(contentId)}
+    const parentNotesHtml = (t.parentNotes && currentView === "parent")
+      ? `<div class="parent-notes"><b>👪 Notes for you</b>${t.parentNotes}</div>` : "";
+    inner = `${readAloudButton(contentId, "Read this to me")}
+      <div id="${contentId}">${t.content}</div>
+      ${parentNotesHtml}
       ${s.done ? `` : `<button class="btn primary" onclick="markRead('${key}','${t.id}')">Mark as read</button>`}`;
   } else if (t.type === "external") {
     const noteId = `ext-note-${key}-${t.id}`;
-    inner = `<a class="ext-link" href="#" onclick="return false;">${t.linkText} ↗</a>
+    inner = `${readAloudButton(noteId)}
+      <a class="ext-link" href="#" onclick="return false;">${t.linkText} ↗</a>
       <div class="lesson-text" id="${noteId}" style="opacity:.75;font-size:0.78rem;">${t.note}</div>
-      ${readAloudButton(noteId)}
       <label style="font-size:0.82rem;display:flex;align-items:center;gap:8px;">
         <input type="checkbox" ${s.done ? "checked" : ""} onchange="markExternal('${key}','${t.id}',this.checked)"> Mark complete
       </label>`;
   } else if (t.type === "reflection") {
     const promptId = `refl-prompt-${key}-${t.id}`;
     const feedbackNote = s.parentComment ? `<div class="parent-feedback">📝 ${s.reviewed ? "Feedback from parent:" : "Refired — please revise:"} ${s.parentComment}</div>` : "";
-    inner = `<div class="lesson-text" id="${promptId}"><p>${t.prompt}</p></div>
-      ${readAloudButton(promptId, "Read the question to me")}
+    inner = `${readAloudButton(promptId, "Read the question to me")}
+      <div class="lesson-text" id="${promptId}"><p>${t.prompt}</p></div>
       ${feedbackNote}
       <textarea id="ta-${key}-${t.id}" placeholder="Type your answer here..." ${s.done ? "disabled" : ""}>${s.answers.text || ""}</textarea>
       ${s.done ? `<div class="graded-note">Submitted — waiting on parent review.</div>` : `<button class="btn primary" onclick="submitReflection('${key}','${t.id}')">${s.sentBack ? "Refire" : "Submit"}</button>`}`;
@@ -787,7 +830,7 @@ function taskBodyHTML(key, t) {
       else words = state[key].tasks[t.id]._reviewWords || [];
     }
     const dictPromptId = `dict-prompt-${key}-${t.id}`;
-    inner = `<div class="lesson-text" id="${dictPromptId}"><p>${t.prompt}</p></div>${readAloudButton(dictPromptId, "Read the instructions to me")}`;
+    inner = `${readAloudButton(dictPromptId, "Read the instructions to me")}<div class="lesson-text" id="${dictPromptId}"><p>${t.prompt}</p></div>`;
     if (s.done && s.results) {
       inner += s.results.map(r => {
         if (r.kind === "sentence") {
@@ -830,8 +873,38 @@ function taskBodyHTML(key, t) {
       });
       inner += `<button class="btn primary" onclick="checkDictation('${key}','${t.id}')">Check my spelling</button>`;
     }
+  } else if (t.type === "fluency-read") {
+    const fluencyPromptId = `fluency-prompt-${key}-${t.id}`;
+    inner = `${readAloudButton(fluencyPromptId, "Read the instructions to me")}<div class="lesson-text" id="${fluencyPromptId}"><p>${t.prompt}</p></div>`;
+    if (s.done) {
+      inner += t.words.map((w, i) => {
+        const mark = s.answers.fluency ? s.answers.fluency[i] : false;
+        return `<div class="fluency-row ${mark ? "correct" : "incorrect"}">
+          <span class="fluency-word">${w.answer}</span>
+          <span class="fluency-icon">${mark ? "✓" : "✗"}</span>
+        </div>`;
+      }).join("");
+      inner += `<div class="score-result ${(s.answers.fluency ? Object.values(s.answers.fluency).filter(Boolean).length : 0) / t.words.length >= 0.7 ? "pass" : "retry"}">Marked by a grown-up: ${s.score}</div>`;
+    } else {
+      inner += `<div class="lesson-text" style="opacity:.75;font-size:0.78rem;">Read each word out loud. Not sure of one? Tap 🔊 to hear it. When she's read them all, a grown-up marks each one and taps Save.</div>`;
+      inner += t.words.map((w, i) => {
+        const mark = s.answers.fluency ? s.answers.fluency[i] : undefined;
+        const playFn = `speakWord('${w.answer.replace(/'/g, "\\'")}')`;
+        return `<div class="fluency-row">
+          <span class="fluency-word">${w.answer}</span>
+          <button class="btn" onclick="${playFn}">🔊 Hear it</button>
+          <button class="btn ${mark === true ? "done" : ""}" onclick="markFluencyWord('${key}','${t.id}',${i},true)">✓ Read it right</button>
+          <button class="btn ${mark === false ? "done" : ""}" onclick="markFluencyWord('${key}','${t.id}',${i},false)">Needs practice</button>
+        </div>`;
+      }).join("");
+      inner += `<button class="btn primary" onclick="checkFluency('${key}','${t.id}')">Save results</button>`;
+    }
   } else if (t.type === "pos-tagger") {
-    inner = `<div class="lesson-text"><p>Tap a word, then tap its part of speech.</p></div><div class="pos-row">`;
+    const posSentenceId = `pos-sentence-${key}-${t.id}`;
+    inner = `<div class="lesson-text"><p>Tap a word, then tap its part of speech.</p></div>
+      ${readAloudButton(posSentenceId, "Read the sentence to me")}
+      <div id="${posSentenceId}" style="opacity:.75;font-size:0.82rem;">${t.sentence.join(" ")}</div>
+      <div class="pos-row">`;
     t.sentence.forEach((word, i) => {
       const label = s.labels[i];
       let cls = "", shownLabel = label;
@@ -858,7 +931,11 @@ function taskBodyHTML(key, t) {
       inner += `<button class="btn primary" ${allLabeled ? "" : "disabled"} onclick="checkPosTagging('${key}','${t.id}')">Check my tagging</button>`;
     }
   } else if (t.type === "phrase-tagger") {
-    inner = `<div class="lesson-text"><p>Tap the first word, then the last word of a chunk, then choose what it is. (Tap the same word twice for a single-word chunk.)</p></div><div class="pos-row">`;
+    const phraseSentenceId = `phrase-sentence-${key}-${t.id}`;
+    inner = `<div class="lesson-text"><p>Tap the first word, then the last word of a chunk, then choose what it is. (Tap the same word twice for a single-word chunk.)</p></div>
+      ${readAloudButton(phraseSentenceId, "Read the sentence to me")}
+      <div id="${phraseSentenceId}" style="opacity:.75;font-size:0.82rem;">${t.sentence.join(" ")}</div>
+      <div class="pos-row">`;
     t.sentence.forEach((word, i) => {
       const sel = s.selections.find(sel => i >= sel.start && i <= sel.end);
       let cls = "", tagLabel = "";
@@ -912,6 +989,42 @@ function taskBodyHTML(key, t) {
         <button class="btn primary" onclick="checkPhraseTagging('${key}','${t.id}')">Check my answers</button>
       </div>`;
     }
+  } else if (t.type === "concept-check") {
+    // Follow-up to a pos-tagger sentence: only the words the lesson is
+    // actually teaching (t.targets) are tappable; everything else is plain
+    // context so the sentence still reads naturally.
+    const conceptPromptId = `concept-prompt-${key}-${t.id}`;
+    inner = `${readAloudButton(conceptPromptId)}<div class="lesson-text" id="${conceptPromptId}"><p>${t.prompt}</p></div><div class="pos-row">`;
+    t.sentence.forEach((word, i) => {
+      const target = t.targets.find(tg => tg.index === i);
+      if (!target) {
+        inner += `<div class="word-slot plain-word"><div class="word-text">${word}</div></div>`;
+        return;
+      }
+      const label = s.labels[i];
+      let cls = "", shownLabel = label;
+      if (s.done) {
+        cls = label === target.answer ? "correct" : "incorrect";
+        if (label !== target.answer) shownLabel = `${label || "—"} → ${target.answer}`;
+      }
+      const popupOpen = !s.done && conceptPopupOpen && conceptPopupOpen.key === key && conceptPopupOpen.id === t.id && conceptPopupOpen.idx === i;
+      inner += `<div class="word-slot" onclick="${s.done ? "" : `openConceptPopup('${key}','${t.id}',${i})`}">
+        <div class="word-text">${word}</div>
+        <div class="word-label ${cls}">${shownLabel || "+ tag"}</div>
+        ${popupOpen ? `<div class="pos-popup">${t.options.map(o => `<button onclick="event.stopPropagation();selectConceptAnswer('${key}','${t.id}',${i},'${o}')">${o}</button>`).join("")}</div>` : ""}
+      </div>`;
+    });
+    inner += `</div>`;
+    if (s.done) {
+      const misses = t.targets.filter(tg => s.labels[tg.index] !== tg.answer);
+      if (misses.length) {
+        inner += `<div class="tag-review">${misses.map(tg => `<div class="tag-review-item"><b>${t.sentence[tg.index]}</b> — you said ${s.labels[tg.index] || "nothing"}, it's actually <b>${tg.answer}</b>.</div>`).join("")}</div>`;
+      }
+      inner += `<div class="score-result ${s.score.split("/")[0] === s.score.split("/")[1] ? "pass" : "retry"}">Scored automatically: ${s.score}</div>`;
+    } else {
+      const allLabeled = t.targets.every(tg => s.labels[tg.index] !== undefined && s.labels[tg.index] !== null);
+      inner += `<button class="btn primary" ${allLabeled ? "" : "disabled"} onclick="checkConceptCheck('${key}','${t.id}')">Check my answers</button>`;
+    }
   } else if (t.type === "graded-mc") {
     const questions = getTaskQuestions(key, t.id);
     if (t.dynamic) {
@@ -961,6 +1074,17 @@ function renderPosTaggerPreview(t) {
   return `<div class="pos-row">${tiles}</div>`;
 }
 
+// Shows the full sentence with only the taught-concept target words tiled
+// with their correct subtype answer; other words render as plain text.
+function renderConceptCheckPreview(t) {
+  const tiles = t.sentence.map((w, i) => {
+    const target = t.targets.find(tg => tg.index === i);
+    if (!target) return `<div class="word-slot plain-word"><span class="word-text">${w}</span></div>`;
+    return `<div class="word-slot" style="cursor:default;"><span class="word-text">${w}</span><span class="word-label correct">${target.answer}</span></div>`;
+  }).join("");
+  return `<div class="lesson-text"><p>${t.prompt}</p></div><div class="pos-row">${tiles}</div>`;
+}
+
 // Renders the sentence plus each authored phrase/clause with its type and explanation.
 function renderPhraseTaggerPreview(t) {
   const sentence = t.sentence.join(" ");
@@ -998,15 +1122,17 @@ function renderGradedMcPreview(t) {
 // Shared content renderer used by both the current/past-week report and the upcoming-week
 // preview — the lesson material itself doesn't depend on whether she's done it yet.
 function renderTaskContent(t) {
-  if (t.type === "read") return t.content;
+  if (t.type === "read") return t.content + (t.parentNotes ? `<div class="parent-notes"><b>👪 Notes for you</b>${t.parentNotes}</div>` : "");
   if (t.type === "reflection") {
     return `<div class="lesson-text"><p>${t.prompt}</p></div>${t.sampleAnswer ? `<div class="sample-answer"><b>Sample answer:</b> ${t.sampleAnswer}</div>` : ""}`;
   }
   if (t.type === "external") return `<div class="lesson-text">${t.note || ""}</div>`;
   if (t.type === "graded-mc") return renderGradedMcPreview(t);
   if (t.type === "graded-dictation") return renderDictationPreview(t);
+  if (t.type === "fluency-read") return renderDictationPreview(t);
   if (t.type === "pos-tagger") return renderPosTaggerPreview(t);
   if (t.type === "phrase-tagger") return renderPhraseTaggerPreview(t);
+  if (t.type === "concept-check") return renderConceptCheckPreview(t);
   return `<div class="lesson-text">(interactive exercise — nothing to preview yet)</div>`;
 }
 
@@ -1275,6 +1401,33 @@ function render() {
           </div>
         </div>`).join("");
   }
+
+  positionOpenPopup();
+}
+
+// Keeps any open tap-to-tag popup (pos-tagger) fully on-screen, regardless
+// of where its word sits in the wrapped sentence layout — a fixed-position
+// popup placed with getBoundingClientRect math instead of pure CSS
+// anchoring, since CSS-anchored popups near a screen edge were getting
+// clipped/hidden.
+function positionOpenPopup() {
+  const popup = document.querySelector(".pos-popup");
+  if (!popup) return;
+  const anchor = popup.parentElement;
+  const wordRect = anchor.getBoundingClientRect();
+  popup.style.position = "fixed";
+  popup.style.margin = "0";
+  const popupRect = popup.getBoundingClientRect();
+  const margin = 8;
+  let left = wordRect.left + wordRect.width / 2 - popupRect.width / 2;
+  left = Math.max(margin, Math.min(left, window.innerWidth - popupRect.width - margin));
+  let top = wordRect.bottom + 4;
+  if (top + popupRect.height + margin > window.innerHeight) {
+    top = wordRect.top - popupRect.height - 4;
+    if (top < margin) top = margin;
+  }
+  popup.style.left = `${left}px`;
+  popup.style.top = `${top}px`;
 }
 
 init();

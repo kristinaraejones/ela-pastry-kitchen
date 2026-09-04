@@ -68,16 +68,13 @@
 function seedAdelynGrammarUnit1_() {
   var sh = getSheet_('Schedule');
   var existing = sheetToObjects_(sh);
-  if (existing.some(function (r) { return r.task_id === 'agl1'; })) {
-    var alreadyMsg = 'Adelyn\'s Grammar Unit 1 content already appears to be seeded (found task agl1) — skipping to avoid duplicates.';
-    try { SpreadsheetApp.getUi().alert(alreadyMsg); } catch (e) { Logger.log(alreadyMsg); }
-    return;
-  }
 
-  // Remove Adelyn's original single placeholder row for grammar
-  // ("ag1" waiting-shell) so it doesn't sit alongside the real content.
+  // Delete EVERY existing Adelyn row for grammar — old placeholder, an
+  // older version of this same content, anything — and rebuild fresh from
+  // ADELYN_GRAMMAR_UNIT1_WEEKS below. Safe to re-run any time this content
+  // is updated; it always fully replaces rather than skipping.
   var toDelete = existing.filter(function (r) {
-    return r.student === 'adelyn' && r.subject_key === 'grammar' && r.task_id === 'ag1' && r.label.indexOf('Waiting') !== -1;
+    return r.student === 'adelyn' && r.subject_key === 'grammar';
   });
   toDelete.sort(function (a, b) { return b._row - a._row; }).forEach(function (r) { sh.deleteRow(r._row); });
 
@@ -123,7 +120,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl1",
             "label": "Week 1 Lesson: Nouns Refresher — Plus Collective & Compound Nouns",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 1: Nouns Refresher — Plus Collective &amp; Compound Nouns</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.6 (academic vocabulary); foundation for L.4.1</p><p>Hi Adelyn! You already know nouns from Grammar Island — a noun names a person, place, thing, or idea, and it's either common (any old gym) or proper (one specific place, like Portugal). Quick refresher, then we add something new.NEW: a COLLECTIVE noun names a whole group acting as one unit — team, family, herd, class. A COMPOUND noun is two words smooshed into one noun idea — handstand, backflip, breakfast.This year we're using the same four-level analysis system from Island, but we're going to go faster and deeper — like moving from tricycle to bicycle. Same balance skills, more speed.Ready? Let's find some nouns, including a few sneaky new kinds.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 1: Nouns Refresher — Plus Collective &amp; Compound Nouns</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.6 (academic vocabulary); foundation for L.4.1</p><p>Hi Adelyn!</p><p>You already know nouns from Grammar Island — a noun names a person, place, thing, or idea, and it's either common (any old gym) or proper (one specific place, like Portugal).</p><p>Quick refresher, then we add something new.</p><p><b>NEW</b>: a <b>COLLECTIVE</b> noun names a whole group acting as one unit — team, family, herd, class.</p><p>A <b>COMPOUND</b> noun is two words smooshed into one noun idea — handstand, backflip, breakfast.</p><p>This year we're using the same four-level analysis system from Island, but we're going to go faster and deeper — like moving from tricycle to bicycle.</p><p>Same balance skills, more speed.</p><p>Ready?</p><p>Let's find some nouns, including a few sneaky new kinds.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
           },
           {
             "id": "ag1_1",
@@ -186,6 +183,36 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             ]
           },
           {
+            "id": "ag1_1c",
+            "label": "Sentence 1 — Noun Check",
+            "type": "concept-check",
+            "sentence": [
+              "Adelyn's",
+              "gymnastics",
+              "team",
+              "practiced",
+              "a",
+              "new",
+              "handstand",
+              "in",
+              "the",
+              "courtyard",
+              "of",
+              "the",
+              "castle."
+            ],
+            "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
+            "options": ["Common", "Proper", "Collective", "Compound"],
+            "targets": [
+              { "index": 0, "answer": "Proper" },
+              { "index": 1, "answer": "Common" },
+              { "index": 2, "answer": "Collective" },
+              { "index": 6, "answer": "Compound" },
+              { "index": 9, "answer": "Common" },
+              { "index": 12, "answer": "Common" }
+            ]
+          },
+          {
             "id": "ag1_2",
             "label": "Sentence 2",
             "type": "pos-tagger",
@@ -234,6 +261,31 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "possessive proper noun",
               "noun used as an adjective (describes class)",
               "common noun"
+            ]
+          },
+          {
+            "id": "ag1_2c",
+            "label": "Sentence 2 — Noun Check",
+            "type": "concept-check",
+            "sentence": [
+              "The",
+              "whole",
+              "family",
+              "gathered",
+              "for",
+              "breakfast",
+              "before",
+              "Kenley's",
+              "cooking",
+              "class."
+            ],
+            "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
+            "options": ["Common", "Proper", "Collective", "Compound"],
+            "targets": [
+              { "index": 2, "answer": "Collective" },
+              { "index": 5, "answer": "Compound" },
+              { "index": 7, "answer": "Proper" },
+              { "index": 9, "answer": "Common" }
             ]
           },
           {
@@ -288,6 +340,32 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "preposition",
               "adjective",
               "common noun"
+            ]
+          },
+          {
+            "id": "ag1_3c",
+            "label": "Sentence 3 — Noun Check",
+            "type": "concept-check",
+            "sentence": [
+              "Kenley's",
+              "cooking",
+              "class",
+              "visited",
+              "a",
+              "busy",
+              "marketplace",
+              "full",
+              "of",
+              "colorful",
+              "spices."
+            ],
+            "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
+            "options": ["Common", "Proper", "Collective", "Compound"],
+            "targets": [
+              { "index": 0, "answer": "Proper" },
+              { "index": 2, "answer": "Common" },
+              { "index": 6, "answer": "Compound" },
+              { "index": 10, "answer": "Common" }
             ]
           },
           {
@@ -346,6 +424,32 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "adjective",
               "common noun"
             ]
+          },
+          {
+            "id": "ag1_4c",
+            "label": "Sentence 4 — Noun Check",
+            "type": "concept-check",
+            "sentence": [
+              "The",
+              "gymnastics",
+              "squad",
+              "and",
+              "the",
+              "yoga",
+              "group",
+              "shared",
+              "the",
+              "same",
+              "sunny",
+              "studio."
+            ],
+            "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
+            "options": ["Common", "Proper", "Collective", "Compound"],
+            "targets": [
+              { "index": 2, "answer": "Collective" },
+              { "index": 6, "answer": "Collective" },
+              { "index": 11, "answer": "Common" }
+            ]
           }
         ]
       }
@@ -362,7 +466,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl2",
             "label": "Week 2 Lesson: Pronouns Refresher — Plus Indefinite Pronouns",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 2: Pronouns Refresher — Plus Indefinite Pronouns</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1a (foundation)</p><p>Hi Adelyn! Quick refresher: pronouns replace nouns so we don't repeat names constantly. You already know subject pronouns (I, she, they), object pronouns (me, her, them), and possessive pronouns (my, her, their).NEW: INDEFINITE pronouns refer to people or things without naming exactly who or what — everyone, somebody, nothing, anything, few, several, all, both. They're 'indefinite' because they're intentionally vague!'EVERYONE clapped when Adelyn landed the trick.' Everyone doesn't name a specific person — it's indefinite, and it's still the subject of the sentence.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 2: Pronouns Refresher — Plus Indefinite Pronouns</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1a (foundation)</p><p>Hi Adelyn!</p><p>Quick refresher: pronouns replace nouns so we don't repeat names constantly.</p><p>You already know subject pronouns (I, she, they), object pronouns (me, her, them), and possessive pronouns (my, her, their).</p><p><b>NEW</b>: <b>INDEFINITE</b> pronouns refer to people or things without naming exactly who or what — everyone, somebody, nothing, anything, few, several, all, both.</p><p>They're 'indefinite' because they're intentionally vague!'<b>EVERYONE</b> clapped when Adelyn landed the trick.'</p><p>Everyone doesn't name a specific person — it's indefinite, and it's still the subject of the sentence.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
           },
           {
             "id": "ag2_1",
@@ -413,6 +517,30 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "article",
               "noun",
               "adverb"
+            ]
+          },
+          {
+            "id": "ag2_1c",
+            "label": "Sentence 1 — Pronoun Check",
+            "type": "concept-check",
+            "sentence": [
+              "Everyone",
+              "cheered",
+              "for",
+              "her",
+              "after",
+              "she",
+              "landed",
+              "the",
+              "cartwheel",
+              "perfectly."
+            ],
+            "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
+            "options": ["Subject", "Object", "Possessive", "Indefinite"],
+            "targets": [
+              { "index": 0, "answer": "Indefinite" },
+              { "index": 3, "answer": "Object" },
+              { "index": 5, "answer": "Subject" }
             ]
           },
           {
@@ -470,6 +598,34 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "possessive pronoun",
               "subject pronoun",
               "linking verb"
+            ]
+          },
+          {
+            "id": "ag2_2c",
+            "label": "Sentence 2 — Pronoun Check",
+            "type": "concept-check",
+            "sentence": [
+              "Somebody",
+              "left",
+              "their",
+              "yoga",
+              "mat",
+              "outside,",
+              "but",
+              "nobody",
+              "knew",
+              "whose",
+              "it",
+              "was."
+            ],
+            "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
+            "options": ["Subject", "Object", "Possessive", "Indefinite"],
+            "targets": [
+              { "index": 0, "answer": "Indefinite" },
+              { "index": 2, "answer": "Possessive" },
+              { "index": 7, "answer": "Indefinite" },
+              { "index": 9, "answer": "Possessive" },
+              { "index": 10, "answer": "Subject" }
             ]
           },
           {
@@ -545,6 +701,38 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             ]
           },
           {
+            "id": "ag2_3c",
+            "label": "Sentence 3 — Pronoun Check",
+            "type": "concept-check",
+            "sentence": [
+              "Everybody",
+              "wanted",
+              "to",
+              "try",
+              "her",
+              "new",
+              "yoga",
+              "pose,",
+              "but",
+              "nobody",
+              "could",
+              "balance",
+              "as",
+              "well",
+              "as",
+              "she",
+              "could."
+            ],
+            "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
+            "options": ["Subject", "Object", "Possessive", "Indefinite"],
+            "targets": [
+              { "index": 0, "answer": "Indefinite" },
+              { "index": 4, "answer": "Possessive" },
+              { "index": 9, "answer": "Indefinite" },
+              { "index": 15, "answer": "Subject" }
+            ]
+          },
+          {
             "id": "ag2_4",
             "label": "Sentence 4",
             "type": "pos-tagger",
@@ -600,6 +788,32 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "article",
               "noun"
             ]
+          },
+          {
+            "id": "ag2_4c",
+            "label": "Sentence 4 — Pronoun Check",
+            "type": "concept-check",
+            "sentence": [
+              "Someone",
+              "left",
+              "something",
+              "delicious",
+              "on",
+              "the",
+              "counter,",
+              "and",
+              "everyone",
+              "wanted",
+              "a",
+              "bite."
+            ],
+            "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
+            "options": ["Subject", "Object", "Possessive", "Indefinite"],
+            "targets": [
+              { "index": 0, "answer": "Indefinite" },
+              { "index": 2, "answer": "Indefinite" },
+              { "index": 8, "answer": "Indefinite" }
+            ]
           }
         ]
       }
@@ -616,7 +830,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl3",
             "label": "Week 3 Lesson: Verbs Refresher — Action, Linking & Helping, All at Once",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 3: Verbs Refresher — Action, Linking &amp; Helping, All at Once</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1 (foundation for L.4.1b)</p><p>Hi Adelyn! Fast refresher, three verb types in one week since you already met all three in Island: ACTION verbs show something happening (leaped, whisked). LINKING verbs connect the subject to a description, like an equals sign (is, seems, smelled). HELPING verbs team up with a main verb (was, has, will, can).Since you've got this, here's the test to nail it every time: try swapping the verb for an equals sign. If the sentence still makes sense, it's linking. If not, it's action (or working with a helper).This week's sentences mix all three types — see if you can sort them without hesitating.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 3: Verbs Refresher — Action, Linking &amp; Helping, All at Once</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1 (foundation for L.4.1b)</p><p>Hi Adelyn!</p><p>Fast refresher, three verb types in one week since you already met all three in Island: <b>ACTION</b> verbs show something happening (leaped, whisked).</p><p><b>LINKING</b> verbs connect the subject to a description, like an equals sign (is, seems, smelled).</p><p><b>HELPING</b> verbs team up with a main verb (was, has, will, can).</p><p>Since you've got this, here's the test to nail it every time: try swapping the verb for an equals sign.</p><p>If the sentence still makes sense, it's linking.</p><p>If not, it's action (or working with a helper).</p><p>This week's sentences mix all three types — see if you can sort them without hesitating.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
           },
           {
             "id": "ag3_1",
@@ -667,6 +881,30 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "action verb",
               "object pronoun",
               "adverb"
+            ]
+          },
+          {
+            "id": "ag3_1c",
+            "label": "Sentence 1 — Verb Check",
+            "type": "concept-check",
+            "sentence": [
+              "The",
+              "soup",
+              "smelled",
+              "delicious,",
+              "and",
+              "Kenley",
+              "was",
+              "stirring",
+              "it",
+              "carefully."
+            ],
+            "prompt": "Now look at the verbs you found in this sentence. Is each one action, linking, or helping?",
+            "options": ["Action", "Linking", "Helping"],
+            "targets": [
+              { "index": 2, "answer": "Linking" },
+              { "index": 6, "answer": "Helping" },
+              { "index": 7, "answer": "Action" }
             ]
           },
           {
@@ -724,6 +962,31 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             ]
           },
           {
+            "id": "ag3_2c",
+            "label": "Sentence 2 — Verb Check",
+            "type": "concept-check",
+            "sentence": [
+              "Adelyn",
+              "has",
+              "practiced",
+              "every",
+              "day,",
+              "and",
+              "she",
+              "seems",
+              "much",
+              "stronger",
+              "now."
+            ],
+            "prompt": "Now look at the verbs you found in this sentence. Is each one action, linking, or helping?",
+            "options": ["Action", "Linking", "Helping"],
+            "targets": [
+              { "index": 1, "answer": "Helping" },
+              { "index": 2, "answer": "Action" },
+              { "index": 7, "answer": "Linking" }
+            ]
+          },
+          {
             "id": "ag3_3",
             "label": "Sentence 3",
             "type": "pos-tagger",
@@ -769,6 +1032,30 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "helping verb",
               "action verb",
               "adverb"
+            ]
+          },
+          {
+            "id": "ag3_3c",
+            "label": "Sentence 3 — Verb Check",
+            "type": "concept-check",
+            "sentence": [
+              "Adelyn",
+              "is",
+              "stretching",
+              "now,",
+              "but",
+              "she",
+              "was",
+              "resting",
+              "earlier."
+            ],
+            "prompt": "Now look at the verbs you found in this sentence. Is each one action, linking, or helping?",
+            "options": ["Action", "Linking", "Helping"],
+            "targets": [
+              { "index": 1, "answer": "Helping" },
+              { "index": 2, "answer": "Action" },
+              { "index": 6, "answer": "Helping" },
+              { "index": 7, "answer": "Action" }
             ]
           },
           {
@@ -827,6 +1114,31 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "possessive pronoun",
               "gerund, acting as a noun (object of 'of')"
             ]
+          },
+          {
+            "id": "ag3_4c",
+            "label": "Sentence 4 — Verb Check",
+            "type": "concept-check",
+            "sentence": [
+              "The",
+              "bread",
+              "tasted",
+              "amazing,",
+              "and",
+              "Kenley",
+              "felt",
+              "very",
+              "proud",
+              "of",
+              "her",
+              "baking."
+            ],
+            "prompt": "Now look at the verbs you found in this sentence. Is each one action, linking, or helping?",
+            "options": ["Action", "Linking", "Helping"],
+            "targets": [
+              { "index": 2, "answer": "Linking" },
+              { "index": 6, "answer": "Linking" }
+            ]
           }
         ]
       }
@@ -843,7 +1155,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl4",
             "label": "Week 4 Lesson: NEW: Verbals — Gerunds (Verbs Acting as Nouns)",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 4: NEW: Verbals — Gerunds (Verbs Acting as Nouns)</b></p><p style=\"opacity:.7;font-size:0.78rem;\">NEW TOPIC — Standards: L.4.1 (Town-level enrichment beyond CCSS minimum; supports W.4.3 sentence variety)</p><p>Hi Adelyn! Here's something totally new, straight from Town-level grammar: a VERBAL is a verb form that stopped acting like a verb and started doing a different job. The first kind is the GERUND — a verb + -ing that acts as a NOUN.'CARTWHEELING is Adelyn's favorite activity.' Cartwheeling looks like a verb, but here it's the SUBJECT of the sentence — a noun job! Compare that to 'Adelyn is cartwheeling,' where cartwheeling is just part of the verb.The trick: ask what job the -ing word is doing. If it's acting as a person/place/thing (subject, object, etc.), it's a gerund. If it's paired with a helping verb showing action happening, it's just a regular verb.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 4: NEW: Verbals — Gerunds (Verbs Acting as Nouns)</b></p><p style=\"opacity:.7;font-size:0.78rem;\">NEW TOPIC — Standards: L.4.1 (Town-level enrichment beyond CCSS minimum; supports W.4.3 sentence variety)</p><p>Hi Adelyn!</p><p>Here's something totally new, straight from Town-level grammar: a <b>VERBAL</b> is a verb form that stopped acting like a verb and started doing a different job.</p><p>The first kind is the <b>GERUND</b> — a verb + -ing that acts as a <b>NOUN</b>.'<b>CARTWHEELING</b> is Adelyn's favorite activity.'</p><p>Cartwheeling looks like a verb, but here it's the <b>SUBJECT</b> of the sentence — a noun job!</p><p>Compare that to 'Adelyn is cartwheeling,' where cartwheeling is just part of the verb.</p><p>The trick: ask what job the -ing word is doing.</p><p>If it's acting as a person/place/thing (subject, object, etc.), it's a gerund.</p><p>If it's paired with a helping verb showing action happening, it's just a regular verb.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
           },
           {
             "id": "ag4_1",
@@ -1035,7 +1347,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl5",
             "label": "Week 5 Lesson: NEW: Verbals — Participles (Verbs Acting as Adjectives)",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 5: NEW: Verbals — Participles (Verbs Acting as Adjectives)</b></p><p style=\"opacity:.7;font-size:0.78rem;\">NEW TOPIC — Standards: L.4.1 (Town-level enrichment; supports W.4.3)</p><p>Hi Adelyn! Second verbal: the PARTICIPLE — a verb form (usually ending in -ing or -ed) that acts as an ADJECTIVE, describing a noun.'The GIGGLING gymnasts stretched.' Giggling looks like a verb, but here it describes gymnasts — an adjective job! Same word family as a gerund, totally different job depending on what it's doing in the sentence.Compare: 'Adelyn was LAUGHING' (verb, part of the action) vs. 'the LAUGHING chef' (participle, describing chef). Same word, different job — grammar is sneaky like that!</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 5: NEW: Verbals — Participles (Verbs Acting as Adjectives)</b></p><p style=\"opacity:.7;font-size:0.78rem;\">NEW TOPIC — Standards: L.4.1 (Town-level enrichment; supports W.4.3)</p><p>Hi Adelyn!</p><p>Second verbal: the <b>PARTICIPLE</b> — a verb form (usually ending in -ing or -ed) that acts as an <b>ADJECTIVE</b>, describing a noun.'The <b>GIGGLING</b> gymnasts stretched.'</p><p>Giggling looks like a verb, but here it describes gymnasts — an adjective job!</p><p>Same word family as a gerund, totally different job depending on what it's doing in the sentence.</p><p>Compare: 'Adelyn was <b>LAUGHING</b>' (verb, part of the action) vs.</p><p>'the <b>LAUGHING</b> chef' (participle, describing chef).</p><p>Same word, different job — grammar is sneaky like that!</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
           },
           {
             "id": "ag5_1",
@@ -1273,7 +1585,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl6",
             "label": "Week 6 Lesson: NEW: Verbals — Infinitives (To + Verb)",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 6: NEW: Verbals — Infinitives (To + Verb)</b></p><p style=\"opacity:.7;font-size:0.78rem;\">NEW TOPIC — Standards: L.4.1 (Town-level enrichment; supports W.4.3)</p><p>Hi Adelyn! Third and final verbal: the INFINITIVE — 'to' + a verb (to jump, to cook, to travel). Infinitives can act as a noun, an adjective, or an adverb, depending on the sentence.'Adelyn wants TO PRACTICE every morning.' To practice acts as a noun (wants WHAT? to practice). 'Kenley has a recipe TO TRY.' To try acts as an adjective (describes which recipe). 'They traveled TO EXPLORE new places.' To explore acts as an adverb (traveled WHY?).Don't worry about perfectly labeling noun/adjective/adverb infinitive jobs yet — for now, just get great at SPOTTING an infinitive: 'to' + a verb, working as a team.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 6: NEW: Verbals — Infinitives (To + Verb)</b></p><p style=\"opacity:.7;font-size:0.78rem;\">NEW TOPIC — Standards: L.4.1 (Town-level enrichment; supports W.4.3)</p><p>Hi Adelyn!</p><p>Third and final verbal: the <b>INFINITIVE</b> — 'to' + a verb (to jump, to cook, to travel).</p><p>Infinitives can act as a noun, an adjective, or an adverb, depending on the sentence.'Adelyn wants TO <b>PRACTICE</b> every morning.'</p><p>To practice acts as a noun (wants <b>WHAT</b>? to practice).</p><p>'Kenley has a recipe TO <b>TRY</b>.'</p><p>To try acts as an adjective (describes which recipe).</p><p>'They traveled TO <b>EXPLORE</b> new places.'</p><p>To explore acts as an adverb (traveled <b>WHY</b>?).</p><p>Don't worry about perfectly labeling noun/adjective/adverb infinitive jobs yet — for now, just get great at <b>SPOTTING</b> an infinitive: 'to' + a verb, working as a team.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
           },
           {
             "id": "ag6_1",
@@ -1509,7 +1821,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl7",
             "label": "Week 7 Lesson: Adjectives Refresher — Plus Demonstrative & Interrogative Pronouns",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 7: Adjectives Refresher — Plus Demonstrative &amp; Interrogative Pronouns</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1a, L.4.1d (foundation)</p><p>Hi Adelyn! Quick refresher: adjectives describe nouns (color, size, number, feeling), and a/an/the are special article-adjectives. You've had this since Island.NEW: DEMONSTRATIVE words (this, that, these, those) point to a specific noun. They're pronouns when they stand alone ('THAT is my mat') and adjectives when they describe a noun right next to them ('THAT mat is mine'). INTERROGATIVE pronouns (who, what, which, whose) ask a question — and you'll meet them again later this year in a much bigger role!This week, spot the regular adjectives AND these two new pronoun types.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 7: Adjectives Refresher — Plus Demonstrative &amp; Interrogative Pronouns</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1a, L.4.1d (foundation)</p><p>Hi Adelyn!</p><p>Quick refresher: adjectives describe nouns (color, size, number, feeling), and a/an/the are special article-adjectives.</p><p>You've had this since Island.</p><p><b>NEW</b>: <b>DEMONSTRATIVE</b> words (this, that, these, those) point to a specific noun.</p><p>They're pronouns when they stand alone ('<b>THAT</b> is my mat') and adjectives when they describe a noun right next to them ('<b>THAT</b> mat is mine').</p><p><b>INTERROGATIVE</b> pronouns (who, what, which, whose) ask a question — and you'll meet them again later this year in a much bigger role!</p><p>This week, spot the regular adjectives <b>AND</b> these two new pronoun types.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
           },
           {
             "id": "ag7_1",
@@ -1754,7 +2066,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl8",
             "label": "Week 8 Lesson: Adverbs & Prepositions Refresher",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 8: Adverbs &amp; Prepositions Refresher</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1, L.4.1e (foundation)</p><p>Hi Adelyn! Two quick refreshers in one week since you know both from Island. ADVERBS describe verbs (and sometimes adjectives or other adverbs), telling how, when, where, or how much — gracefully, yesterday, extremely.PREPOSITIONS show a relationship (location, direction, time) and always travel with a noun friend, forming a prepositional phrase — in the courtyard, during breakfast, beside the fountain.This week's sentences mix both, plus a verbal or two from the last few weeks — see if your eye catches everything.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 8: Adverbs &amp; Prepositions Refresher</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1, L.4.1e (foundation)</p><p>Hi Adelyn!</p><p>Two quick refreshers in one week since you know both from Island.</p><p><b>ADVERBS</b> describe verbs (and sometimes adjectives or other adverbs), telling how, when, where, or how much — gracefully, yesterday, extremely.</p><p><b>PREPOSITIONS</b> show a relationship (location, direction, time) and always travel with a noun friend, forming a prepositional phrase — in the courtyard, during breakfast, beside the fountain.</p><p>This week's sentences mix both, plus a verbal or two from the last few weeks — see if your eye catches everything.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
           },
           {
             "id": "ag8_1",
@@ -1996,7 +2308,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl9",
             "label": "Week 9 Lesson: Conjunctions & Interjections Refresher — Full Cumulative Review",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 9: Conjunctions &amp; Interjections Refresher — Full Cumulative Review</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1 (cumulative)</p><p>Hi Adelyn! Last quick refresher: CONJUNCTIONS join things together (FANBOYS: for, and, nor, but, or, yet, so). INTERJECTIONS burst out with sudden feeling (Wow! Yikes!). Both straight from Island — you've got these.Now for the big picture: you know all 8 original parts of speech, PLUS this unit's new depth — collective/compound nouns, indefinite pronouns, gerunds, participles, infinitives, and demonstrative/interrogative words. That's a serious upgrade from Island!This week, label everything you can in two sentences — old parts of speech AND new Town-level layers.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 9: Conjunctions &amp; Interjections Refresher — Full Cumulative Review</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1 (cumulative)</p><p>Hi Adelyn!</p><p>Last quick refresher: <b>CONJUNCTIONS</b> join things together (<b>FANBOYS</b>: for, and, nor, but, or, yet, so).</p><p><b>INTERJECTIONS</b> burst out with sudden feeling (Wow!</p><p>Yikes!).</p><p>Both straight from Island — you've got these.</p><p>Now for the big picture: you know all 8 original parts of speech, <b>PLUS</b> this unit's new depth — collective/compound nouns, indefinite pronouns, gerunds, participles, infinitives, and demonstrative/interrogative words.</p><p>That's a serious upgrade from Island!</p><p>This week, label everything you can in two sentences — old parts of speech <b>AND</b> new Town-level layers.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
           },
           {
             "id": "ag9_1",
@@ -2286,7 +2598,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl10",
             "label": "Week 10 Lesson: Unit 1 Assessment — Full Grammar Safari",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 10: Unit 1 Assessment — Full Grammar Safari</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1, L.4.6 (cumulative assessment)</p><p>Hi Adelyn! Time for a full Grammar Safari! Label every single word (or verbal) in two whole sentences, all by yourself, pulling together your Island knowledge plus everything new from this unit.Don't stress about perfection — even professional grammarians debate a few tricky words. The goal is showing me you understand the JOB each word is doing, at a real Town-level depth now.When you finish, do a victory cartwheel — you've officially leveled up past Grammar Island. Level 1 of the Four-Level Analysis, Town edition, is yours!</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 10: Unit 1 Assessment — Full Grammar Safari</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1, L.4.6 (cumulative assessment)</p><p>Hi Adelyn!</p><p>Time for a full Grammar Safari!</p><p>Label every single word (or verbal) in two whole sentences, all by yourself, pulling together your Island knowledge plus everything new from this unit.</p><p>Don't stress about perfection — even professional grammarians debate a few tricky words.</p><p>The goal is showing me you understand the <b>JOB</b> each word is doing, at a real Town-level depth now.</p><p>When you finish, do a victory cartwheel — you've officially leveled up past Grammar Island.</p><p>Level 1 of the Four-Level Analysis, Town edition, is yours!</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
           },
           {
             "id": "ag10_1",
