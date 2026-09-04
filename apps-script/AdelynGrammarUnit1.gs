@@ -69,7 +69,8 @@ function seedAdelynGrammarUnit1_() {
   var sh = getSheet_('Schedule');
   var existing = sheetToObjects_(sh);
   if (existing.some(function (r) { return r.task_id === 'agl1'; })) {
-    SpreadsheetApp.getUi().alert('Adelyn\'s Grammar Unit 1 content already appears to be seeded (found task agl1) — skipping to avoid duplicates.');
+    var alreadyMsg = 'Adelyn\'s Grammar Unit 1 content already appears to be seeded (found task agl1) — skipping to avoid duplicates.';
+    try { SpreadsheetApp.getUi().alert(alreadyMsg); } catch (e) { Logger.log(alreadyMsg); }
     return;
   }
 
@@ -104,7 +105,8 @@ function seedAdelynGrammarUnit1_() {
 
   var headers = SHEET_HEADERS.Schedule;
   sh.getRange(sh.getLastRow() + 1, 1, rows.length, headers.length).setValues(rows);
-  SpreadsheetApp.getUi().alert('Added ' + rows.length + ' new Schedule rows for Adelyn — Grammar, Unit 1 (Weeks 1-10).');
+  var doneMsg = 'Added ' + rows.length + ' new Schedule rows for Adelyn — Grammar, Unit 1 (Weeks 1-10).';
+  try { SpreadsheetApp.getUi().alert(doneMsg); } catch (e) { Logger.log(doneMsg); }
 }
 
 // ---------- Content ----------

@@ -59,7 +59,8 @@ function seedAdelynSpelling_() {
   var sh = getSheet_('Schedule');
   var existing = sheetToObjects_(sh);
   if (existing.some(function (r) { return r.task_id === 'asf1' && r.subject_key === 'spelling'; })) {
-    SpreadsheetApp.getUi().alert('Adelyn\'s Spelling content already appears to be seeded (found task asf1) — skipping to avoid duplicates.');
+    var alreadyMsg = 'Adelyn\'s Spelling content already appears to be seeded (found task asf1) — skipping to avoid duplicates.';
+    try { SpreadsheetApp.getUi().alert(alreadyMsg); } catch (e) { Logger.log(alreadyMsg); }
     return;
   }
 
@@ -94,7 +95,8 @@ function seedAdelynSpelling_() {
 
   var headers = SHEET_HEADERS.Schedule;
   sh.getRange(sh.getLastRow() + 1, 1, rows.length, headers.length).setValues(rows);
-  SpreadsheetApp.getUi().alert('Added ' + rows.length + ' new Schedule rows for Adelyn — Spelling, all 27 weeks (AAS Level 5, Steps 2-28).');
+  var doneMsg = 'Added ' + rows.length + ' new Schedule rows for Adelyn — Spelling, all 27 weeks (AAS Level 5, Steps 2-28).';
+  try { SpreadsheetApp.getUi().alert(doneMsg); } catch (e) { Logger.log(doneMsg); }
 }
 
 // ---------- Content ----------
