@@ -34,9 +34,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard1",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Short Vowels &amp; Closed Syllables</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Short Vowels &amp; Closed Syllables</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "cat",
@@ -121,9 +121,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard2",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Silent-E (Magic E)</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Silent-E (Magic E)</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "cake",
@@ -208,9 +208,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard3",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Vowel Teams (ai/ay, ee/ea, oa/ow, ie)</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Vowel Teams (ai/ay, ee/ea, oa/ow, ie)</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "rain",
@@ -735,9 +735,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard4",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>R-Controlled Vowels (ar, er, ir, or, ur)</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>R-Controlled Vowels (ar, er, ir, or, ur)</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "star",
@@ -822,9 +822,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard5",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Blends &amp; Digraphs in Multisyllable Words</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Blends &amp; Digraphs in Multisyllable Words</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "splash",
@@ -909,9 +909,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard6",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Common Prefixes (re-, un-, dis-, pre-, mis-, non-)</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Common Prefixes (re-, un-, dis-, pre-, mis-, non-)</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "redo",
@@ -996,9 +996,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard7",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Common Suffixes (-tion, -sion, -ing, -ed, -ly, -ful, -less)</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Common Suffixes (-tion, -sion, -ing, -ed, -ly, -ful, -less)</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "action",
@@ -1523,9 +1523,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard8",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Syllable Division Patterns</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Syllable Division Patterns</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "napkin",
@@ -1610,9 +1610,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard9",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Homophones &amp; Frequently Confused Words</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Homophones &amp; Frequently Confused Words</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "their",
@@ -1697,9 +1697,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard10",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Short Vowels &amp; Closed Syllables</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Short Vowels &amp; Closed Syllables</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "sand",
@@ -1784,9 +1784,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard11",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Silent-E (Magic E)</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Silent-E (Magic E)</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "brave",
@@ -2311,9 +2311,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard12",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Vowel Teams</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Vowel Teams</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "train",
@@ -2398,9 +2398,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard13",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>R-Controlled Vowels</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>R-Controlled Vowels</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "chart",
@@ -2485,9 +2485,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard14",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Blends &amp; Digraphs</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Blends &amp; Digraphs</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "shrink",
@@ -2572,9 +2572,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard15",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Common Prefixes</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Common Prefixes</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "replay",
@@ -3099,9 +3099,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard16",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Common Suffixes</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Common Suffixes</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "vacation",
@@ -3186,9 +3186,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard17",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Syllable Division Patterns</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Syllable Division Patterns</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "basket",
@@ -3273,9 +3273,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard18",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Homophones &amp; Confused Words</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Homophones &amp; Confused Words</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "to",
@@ -3356,9 +3356,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard19",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Short Vowels &amp; Closed Syllables</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Short Vowels &amp; Closed Syllables</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "crunch",
@@ -3883,9 +3883,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard20",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Silent-E (Magic E)</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Silent-E (Magic E)</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "grape",
@@ -3970,9 +3970,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard21",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Vowel Teams</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Vowel Teams</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "paint",
@@ -4057,9 +4057,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard22",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>R-Controlled Vowels</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>R-Controlled Vowels</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "park",
@@ -4144,9 +4144,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard23",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Blends &amp; Digraphs</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Blends &amp; Digraphs</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "strong",
@@ -4671,9 +4671,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard24",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Common Prefixes</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Common Prefixes</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "rebuild",
@@ -4758,9 +4758,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard25",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Common Suffixes</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Common Suffixes</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "attention",
@@ -4845,9 +4845,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard26",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Syllable Division Patterns</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Syllable Division Patterns</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "cactus",
@@ -4932,9 +4932,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard27",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Homophones &amp; Confused Words</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Homophones &amp; Confused Words</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "which",
@@ -5451,9 +5451,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard28",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Short Vowels &amp; Closed Syllables</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Short Vowels &amp; Closed Syllables</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "brand",
@@ -5538,9 +5538,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard29",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Silent-E (Magic E)</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Silent-E (Magic E)</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "flame",
@@ -5625,9 +5625,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard30",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Vowel Teams</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Vowel Teams</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "braid",
@@ -5712,9 +5712,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard31",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>R-Controlled Vowels</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>R-Controlled Vowels</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "yard",
@@ -6239,9 +6239,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard32",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Blends &amp; Digraphs</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Blends &amp; Digraphs</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "strap",
@@ -6326,9 +6326,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard33",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Common Prefixes</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Common Prefixes</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "recheck",
@@ -6413,9 +6413,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard34",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Common Suffixes</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Common Suffixes</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "motion",
@@ -6500,9 +6500,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard35",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Syllable Division Patterns</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Syllable Division Patterns</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "contest",
@@ -7635,9 +7635,9 @@ var ADELYN_VOCAB_READING_WEEKS = [
           },
           {
             "id": "ard36",
-            "label": "Phonics Fluency Warm-Up (Listen & Spell)",
-            "type": "graded-dictation",
-            "prompt": "This week's review category: <b>Homophones &amp; Confused Words</b>. Tap each 🔊 button to hear the word (or the practice sentence), then type what you hear. This is quick review of sounds she already knows — the goal is speed, not new learning.",
+            "label": "Phonics Fluency Warm-Up (Read Aloud)",
+            "type": "fluency-read",
+            "prompt": "This week's review category: <b>Homophones &amp; Confused Words</b>. Read each word out loud (a grown-up listens), then read the practice sentence too. This is quick review of sounds she already knows — the goal is fluent reading, not spelling.",
             "words": [
               {
                 "answer": "whole",

@@ -58,16 +58,13 @@
 function seedAdelynSpelling_() {
   var sh = getSheet_('Schedule');
   var existing = sheetToObjects_(sh);
-  if (existing.some(function (r) { return r.task_id === 'asf1' && r.subject_key === 'spelling'; })) {
-    var alreadyMsg = 'Adelyn\'s Spelling content already appears to be seeded (found task asf1) — skipping to avoid duplicates.';
-    try { SpreadsheetApp.getUi().alert(alreadyMsg); } catch (e) { Logger.log(alreadyMsg); }
-    return;
-  }
 
-  // Remove Adelyn's original single placeholder row for spelling
-  // ("as1" waiting-shell) so it doesn't sit alongside the real content.
+  // Delete EVERY existing Adelyn row for spelling — old placeholder, an
+  // older version of this same content, anything — and rebuild fresh from
+  // ADELYN_SPELLING_WEEKS below. Safe to re-run any time this content is
+  // updated; it always fully replaces rather than skipping.
   var toDelete = existing.filter(function (r) {
-    return r.student === 'adelyn' && r.subject_key === 'spelling' && r.task_id === 'as1' && r.label.indexOf('Waiting') !== -1;
+    return r.student === 'adelyn' && r.subject_key === 'spelling';
   });
   toDelete.sort(function (a, b) { return b._row - a._row; }).forEach(function (r) { sh.deleteRow(r._row); });
 
@@ -164,10 +161,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass1",
-            "label": "Dictated Sentences",
+            "id": "ass1a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "Sam and Amy collect yellow bugs every summer.",
@@ -192,7 +189,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "This stuffed bear is the object of my love!",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass1b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "I think the teams in our district are the best!",
                 "kind": "sentence"
@@ -292,10 +297,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass2",
-            "label": "Dictated Sentences",
+            "id": "ass2a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "I have no objection to painting the barn pink.",
@@ -320,7 +325,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "The construction of our tree house is nearing completion.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass2b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "Beth showed us her gold medal at the celebration.",
                 "kind": "sentence"
@@ -413,10 +426,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass3",
-            "label": "Dictated Sentences",
+            "id": "ass3a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "His tall tale about the talking bunny did not impress me.",
@@ -441,7 +454,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "I must confess that I don't like to eat sticky things.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass3b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "My sister enjoys photographing family events.",
                 "kind": "sentence"
@@ -535,10 +556,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass4",
-            "label": "Dictated Sentences",
+            "id": "ass4a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "We hoped to invent a robot that could fold shirts.",
@@ -563,7 +584,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "What is that furry thing under the front porch?",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass4b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "We giggled when the dogs got their tails stuck in the fence.",
                 "kind": "sentence"
@@ -661,10 +690,10 @@ var ADELYN_SPELLING_WEEKS = [
             "content": "<div class=\"lesson-text\"><p><b>Ways to Spell /shŭn/</b> — Step 6.</p><p style=\"opacity:.8;\">A review of the two most common ways to spell /shŭn/.</p><p>This week is a review, pulling together what you've learned about spelling /shŭn/. Two spellings cover the vast majority of words: tion and sion. Try sorting these words by ending: completion, protection, impression, recession, confession, connection, operation, election, infection, discussion, education, invention. Say each word aloud, listen for /shŭn/, and think about which of your three clues from the last two weeks applies.</p><p><b>REMEMBER</b></p><p>tion is used far more often than sion — when you're truly unsure and none of the clues apply, tion is the better guess.</p></div>"
           },
           {
-            "id": "ass5",
-            "label": "Dictated Sentences",
+            "id": "ass5a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "Ben munched on a plateful of fried clams.",
@@ -689,7 +718,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "This is the crunchiest apple pie I have ever had.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass5b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "The sly horse tugged on the rotting rope until he broke free.",
                 "kind": "sentence"
@@ -782,10 +819,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass6",
-            "label": "Dictated Sentences",
+            "id": "ass6a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "Ed had eighty extra electric ice makers.",
@@ -810,7 +847,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "A mother bear will do anything to protect her cubs.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass6b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "Did you pass your exam about the different types of worms?",
                 "kind": "sentence"
@@ -903,10 +948,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass7",
-            "label": "Dictated Sentences",
+            "id": "ass7a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "Our holiday events are mostly loud and joyful!",
@@ -931,7 +976,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "A hundred friendly ducks dashed out of the woods.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass7b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "Our Thanksgiving turkey was tough, but the plum pie was good.",
                 "kind": "sentence"
@@ -1025,10 +1078,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass8",
-            "label": "Dictated Sentences",
+            "id": "ass8a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "The odor of garlic in the kitchen just knocked me down!",
@@ -1053,7 +1106,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "The smallest crow crunched loudly on a crispy leaf.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass8b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "What flavor is the cake you're baking for us tonight?",
                 "kind": "sentence"
@@ -1151,10 +1212,10 @@ var ADELYN_SPELLING_WEEKS = [
             "content": "<div class=\"lesson-text\"><p><b>Ways to Spell /er/</b> — Step 10.</p><p style=\"opacity:.8;\">A review of five ways to spell the /er/ sound.</p><p>This week reviews everything you know so far about spelling the /er/ sound. There are five spellings to keep straight: er, ur, ir, or, and ear. Try sorting these words by spelling: flavor, letter, heard, curve, shirt, prefer, thirty, work, turn, serve, summer, early, skirt, world, mayor, church, learn, dirt, offer, inventor, hurt, worst, search, birthday, father. Say each word aloud, listen for /er/, and think about which spelling it uses.</p></div>"
           },
           {
-            "id": "ass9",
-            "label": "Dictated Sentences",
+            "id": "ass9a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "I wish the pretty princess would extend an invitation to us.",
@@ -1179,7 +1240,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "The puppy planted a big wet kiss on my cheek!",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass9b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "She passed the afternoon joyfully among good friends.",
                 "kind": "sentence"
@@ -1273,10 +1342,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass10",
-            "label": "Dictated Sentences",
+            "id": "ass10a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "We spent hours grinding grain in the field.",
@@ -1301,7 +1370,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "Use this sheet to shield yourself from the muddy ground.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass10b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "We felt such relief when we found our lost stork in the hedge!",
                 "kind": "sentence"
@@ -1394,10 +1471,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass11",
-            "label": "Dictated Sentences",
+            "id": "ass11a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "How did your footprints get on the ceiling?",
@@ -1422,7 +1499,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "We paid a large amount for that pony but didn't get a receipt.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass11b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "Is dear Mrs. Maple a relative of yours?",
                 "kind": "sentence"
@@ -1467,10 +1552,10 @@ var ADELYN_SPELLING_WEEKS = [
             "content": "<div class=\"lesson-text\"><p><b>Ways to Spell /ē/</b> — Step 13.</p><p style=\"opacity:.8;\">A review of nine ways to spell the /ē/ sound.</p><p>This week reviews the many ways to spell /ē/ — quite a few, since it's one of the most common vowel sounds in English! The nine spellings are: e, e-e, ee, ea, y, i, ey, ie, and ei. Try sorting these words by spelling: monkey, street, cheek, real, Steve, these, niece, money, seed, copier, receipt, lucky, east, field, beef, penny, speak, honey, here, valley, even, year, she, puppy, happier, because, shield. Say each word aloud, listen for /ē/, and think about which spelling it uses.</p></div>"
           },
           {
-            "id": "ass12",
-            "label": "Dictated Sentences",
+            "id": "ass12a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "I find it very funny that the ox is oinking.",
@@ -1495,7 +1580,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "My brother unlocked the barn and pushed the colt inside.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass12b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "April looked quite ill after spinning around like a top.",
                 "kind": "sentence"
@@ -1641,10 +1734,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass13",
-            "label": "Dictated Sentences",
+            "id": "ass13a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "The spoiled queen lined up her invitations and smiled happily.",
@@ -1669,7 +1762,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "The second sentence of the story stopped me in my tracks.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass13b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "The look in her eyes seems to change with every passing minute.",
                 "kind": "sentence"
@@ -1763,10 +1864,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass14",
-            "label": "Dictated Sentences",
+            "id": "ass14a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "Deb has no desire to dig for worms after dark.",
@@ -1791,7 +1892,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "The president decided to close the biggest prison in the state.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass14b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "Frank heard a noise in the closet and dove under the covers.",
                 "kind": "sentence"
@@ -1836,10 +1945,10 @@ var ADELYN_SPELLING_WEEKS = [
             "content": "<div class=\"lesson-text\"><p><b>Make It Plural Book</b> — Step 16.</p><p style=\"opacity:.8;\">Reviewing four patterns for making words plural.</p><p>This week reviews four patterns you already know for making a word plural: adding s (farmers, wings, mayors), adding es after certain endings (houses, faces, wires), changing y to i and adding es (armies, replies, cities), and a few other familiar patterns (candies, pennies, flies). There are no new spelling words this week — instead, it's a good chance to notice these patterns in words you already know how to spell.</p></div>"
           },
           {
-            "id": "ass15",
-            "label": "Dictated Sentences",
+            "id": "ass15a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "The children continued to imprison the bugs in glass jars.",
@@ -1864,7 +1973,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "Mrs. White photographed the mayor for the newspaper article.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass15b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "The inventor pulled on the brake to stop his flying bike.",
                 "kind": "sentence"
@@ -1957,10 +2074,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass16",
-            "label": "Dictated Sentences",
+            "id": "ass16a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "Her shelves are full of torn clothes and unmatched socks.",
@@ -1985,7 +2102,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "What lovely white wolves we saw on the snowy hills!",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass16b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "Their intention is to keep their inventions to themselves.",
                 "kind": "sentence"
@@ -2131,10 +2256,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass17",
-            "label": "Dictated Sentences",
+            "id": "ass17a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "Twenty-two tornadoes swept swiftly across the nation.",
@@ -2159,7 +2284,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "The president pinned badges on the shirts of the heroes.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass17b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "Tuning pianos and teaching music is our family business.",
                 "kind": "sentence"
@@ -2252,10 +2385,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass18",
-            "label": "Dictated Sentences",
+            "id": "ass18a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "Did he put enough postage on the package before he mailed it?",
@@ -2280,7 +2413,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "Do your trucks get better mileage in the city?",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass18b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "If you ask me, this kitchen has a real shortage of cupcakes!",
                 "kind": "sentence"
@@ -2375,10 +2516,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass19",
-            "label": "Dictated Sentences",
+            "id": "ass19a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "My uncle often wears his spacesuit to dinner.",
@@ -2403,7 +2544,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "How did you get that bruise on your knee?",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass19b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "Ted is trying to recruit someone to complete the hardest tasks.",
                 "kind": "sentence"
@@ -2496,10 +2645,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass20",
-            "label": "Dictated Sentences",
+            "id": "ass20a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "Would you design a fine sign that I could call mine?",
@@ -2524,7 +2673,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "I knew a gnu who grew too tall and died too soon.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass20b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "The articles said the mayor will resign at the end of the week.",
                 "kind": "sentence"
@@ -2670,10 +2827,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass21",
-            "label": "Dictated Sentences",
+            "id": "ass21a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "Are we disturbing you by playing our trumpets and pianos?",
@@ -2698,7 +2855,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "Ron selected thicker covers to keep the cows warm.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass21b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "Are you referring to those calves who like fruit juice and grapes?",
                 "kind": "sentence"
@@ -2792,10 +2957,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass22",
-            "label": "Dictated Sentences",
+            "id": "ass22a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "We earned one dollar for every pearl we pried from an oyster.",
@@ -2820,7 +2985,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "He grabbed my collar and demanded I hand him the mustard.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass22b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "The beginner made an effortless and graceful turn on her toes.",
                 "kind": "sentence"
@@ -2915,10 +3088,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass23",
-            "label": "Dictated Sentences",
+            "id": "ass23a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "I thought you might like this ham and pickle sandwich.",
@@ -2943,7 +3116,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "A bunch of bald babies blew bubbles on the bridge.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass23b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "That particular author also wrote a few works of fiction.",
                 "kind": "sentence"
@@ -3039,10 +3220,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass24",
-            "label": "Dictated Sentences",
+            "id": "ass24a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "The gnat fought the fly for that juicy piece of meat pie.",
@@ -3067,7 +3248,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "June spent nearly an hour selecting that pair of jeans.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass24b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "You need to increase the amount of salt in the rice.",
                 "kind": "sentence"
@@ -3215,10 +3404,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass25",
-            "label": "Dictated Sentences",
+            "id": "ass25a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "I was stung by a young bee while returning from the pond.",
@@ -3243,7 +3432,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "We took some photos of that row of neat country houses.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass25b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "My cousin made a double batch of sugary frosted cupcakes.",
                 "kind": "sentence"
@@ -3336,10 +3533,10 @@ var ADELYN_SPELLING_WEEKS = [
             ]
           },
           {
-            "id": "ass26",
-            "label": "Dictated Sentences",
+            "id": "ass26a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "Our journey led us over rocky hilltops and into green valleys.",
@@ -3364,7 +3561,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "We would never discourage you from starring in rodeos!",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass26b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "My dream is to design a door made of gnarled wood.",
                 "kind": "sentence"
@@ -3409,10 +3614,10 @@ var ADELYN_SPELLING_WEEKS = [
             "content": "<div class=\"lesson-text\"><p><b>Ways to Spell /er/ — Final Lesson of Level 5</b> — Step 28.</p><p style=\"opacity:.8;\">A full review of all six ways to spell the /er/ sound.</p><p>This final lesson pulls together everything you've learned about spelling /er/ across all of Level 5. There are six spellings in total: er, ur, ir, or, ear, and our. Try sorting these words by spelling: together, stir, prefer, turn, third, turkey, dirt, word, ruler, purple, power, inventor, labor, cover, direction, circle, worst, mayor, slower, firm, curve, brother, busier, thirteen, Thursday.</p><p><b>A SENTENCE TO REMEMBER THEM BY</b></p><p>Here's a sentence that uses all six common spellings of /er/: Her nurse first works early on the journey.</p></div>"
           },
           {
-            "id": "ass27",
-            "label": "Dictated Sentences",
+            "id": "ass27a",
+            "label": "Dictated Sentences — Set 1 (1–6)",
             "type": "graded-dictation",
-            "prompt": "All 12 sentences from this week's dictation set.",
+            "prompt": "The first 6 of this week's 12 dictation sentences.",
             "words": [
               {
                 "answer": "We closed the door to escape the odor of that smelly fish!",
@@ -3437,7 +3642,15 @@ var ADELYN_SPELLING_WEEKS = [
               {
                 "answer": "They are offering their visitors a beautiful room in a windmill.",
                 "kind": "sentence"
-              },
+              }
+            ]
+          },
+          {
+            "id": "ass27b",
+            "label": "Dictated Sentences — Set 2 (7–12)",
+            "type": "graded-dictation",
+            "prompt": "The second 6 of this week's 12 dictation sentences.",
+            "words": [
               {
                 "answer": "We thanked him for defending his friends from the wild wolves.",
                 "kind": "sentence"

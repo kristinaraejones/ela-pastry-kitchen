@@ -54,18 +54,13 @@
 function seedAdelynVocabReading_() {
   var sh = getSheet_('Schedule');
   var existing = sheetToObjects_(sh);
-  if (existing.some(function (r) { return r.task_id === 'av1' && r.label === "Study This Week's Words"; })) {
-    var alreadyMsg = 'Adelyn\'s Vocabulary/Reading content already appears to be seeded (found task av1) — skipping to avoid duplicates.';
-    try { SpreadsheetApp.getUi().alert(alreadyMsg); } catch (e) { Logger.log(alreadyMsg); }
-    return;
-  }
 
-  // Remove Adelyn's original single placeholder rows for vocab/reading
-  // ("av1"/"ar1" waiting-shells) so the new "ar1" (Week 1's real reading
-  // lesson) doesn't collide with the old placeholder id.
+  // Delete EVERY existing Adelyn row for vocab/reading — old placeholder,
+  // an older version of this same content, anything — and rebuild fresh
+  // from ADELYN_VOCAB_READING_WEEKS below. Safe to re-run any time this
+  // content is updated; it always fully replaces rather than skipping.
   var toDelete = existing.filter(function (r) {
-    return r.student === 'adelyn' && (r.subject_key === 'vocab' || r.subject_key === 'reading') &&
-      (r.task_id === 'av1' || r.task_id === 'ar1') && r.label.indexOf('Waiting') !== -1;
+    return r.student === 'adelyn' && (r.subject_key === 'vocab' || r.subject_key === 'reading');
   });
   toDelete.sort(function (a, b) { return b._row - a._row; }).forEach(function (r) { sh.deleteRow(r._row); });
 
