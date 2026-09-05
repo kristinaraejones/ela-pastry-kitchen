@@ -640,9 +640,37 @@ function getTaskQuestions(key, id) {
 
 // ---------- Speech synthesis (dictation) ----------
 
+// Prefers warmer-sounding built-in voices (Apple's Samantha on iPad/Mac,
+// Google's default on Android/Chrome) over flatter ones, and otherwise
+// falls back to any offline-capable (localService) English voice — never a
+// network-only voice, since that would silently fail to read anything with
+// no connection, defeating the point of the offline mode above.
+let cachedVoice = null;
+const PREFERRED_VOICE_NAMES = [
+  "Samantha", "Google US English", "Microsoft Zira - English (United States)",
+  "Karen", "Moira", "Tessa", "Google UK English Female"
+];
+function pickFriendlyVoice() {
+  if (cachedVoice) return cachedVoice;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  for (const name of PREFERRED_VOICE_NAMES) {
+    const v = voices.find(v => v.name === name);
+    if (v) { cachedVoice = v; return v; }
+  }
+  const localEn = voices.find(v => v.localService && v.lang.startsWith("en"));
+  if (localEn) { cachedVoice = localEn; return localEn; }
+  return voices[0] || null;
+}
+if ("speechSynthesis" in window) {
+  window.speechSynthesis.onvoiceschanged = () => { cachedVoice = null; };
+}
+
 function speakWord(word) {
   if (!("speechSynthesis" in window)) return;
   const u = new SpeechSynthesisUtterance(word);
+  u.voice = pickFriendlyVoice();
+  u.pitch = 1.05;
   u.rate = 0.85;
   window.speechSynthesis.cancel();
   window.speechSynthesis.speak(u);
@@ -652,6 +680,8 @@ function speakSequence(parts) {
   window.speechSynthesis.cancel();
   parts.forEach(text => {
     const u = new SpeechSynthesisUtterance(text);
+    u.voice = pickFriendlyVoice();
+    u.pitch = 1.05;
     u.rate = 0.85;
     window.speechSynthesis.speak(u);
   });
@@ -669,6 +699,8 @@ function speakElementText(elId) {
   const text = (el.innerText || el.textContent || "").trim();
   if (!text) return;
   const u = new SpeechSynthesisUtterance(text);
+  u.voice = pickFriendlyVoice();
+  u.pitch = 1.05;
   u.rate = 0.9;
   window.speechSynthesis.cancel();
   window.speechSynthesis.speak(u);
