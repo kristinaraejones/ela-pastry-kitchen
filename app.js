@@ -41,14 +41,117 @@ function resolveApiUrl() {
   return localStorage.getItem("elaApiUrl") || (typeof DEFAULT_API_URL !== "undefined" ? DEFAULT_API_URL : "") || "";
 }
 
+const BOOTSTRAP_CACHE_PREFIX = "elaBootstrapCache_";
+
 async function apiGetBootstrap(student) {
-  const res = await fetch(`${API_URL}?action=bootstrap&student=${encodeURIComponent(student)}`);
-  const json = await res.json();
-  if (!json.ok) throw new Error(json.error || "Bootstrap failed");
-  return json;
+  try {
+    const res = await fetch(`${API_URL}?action=bootstrap&student=${encodeURIComponent(student)}`);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || "Bootstrap failed");
+    try { localStorage.setItem(BOOTSTRAP_CACHE_PREFIX + student, JSON.stringify(json)); } catch (e) {}
+    return json;
+  } catch (err) {
+    const cached = localStorage.getItem(BOOTSTRAP_CACHE_PREFIX + student);
+    if (!cached) throw err;
+    const parsed = JSON.parse(cached);
+    parsed._offline = true;
+    applyQueuedWritesToBootstrap(parsed, student);
+    return parsed;
+  }
 }
 
+// Reconciles the last-known-good bootstrap snapshot with any writes still
+// sitting in the offline queue, so reopening the app offline (after already
+// having worked offline once) doesn't show stale/reverted task state.
+function applyQueuedWritesToBootstrap(resp, student) {
+  const queue = loadWriteQueue();
+  if (queue.length === 0) return;
+  const subByTaskId = {};
+  (resp.submissions || []).forEach(s => { subByTaskId[s.task_id] = s; });
+  resp.settings = resp.settings || {};
+  queue.forEach(item => {
+    if (item.action === "saveSubmission" && item.payload.student === student) {
+      subByTaskId[item.payload.task_id] = { ...subByTaskId[item.payload.task_id], ...item.payload };
+    } else if (item.action === "saveSetting") {
+      resp.settings[item.payload.key] = item.payload.value;
+    }
+  });
+  resp.submissions = Object.values(subByTaskId);
+}
+
+// ---------- Offline write queue ----------
+// apiPost's callers already update local `state`/`settings` synchronously
+// before calling it — every call site is fire-and-forget (`.catch(() => {})`).
+// That means the UI is already optimistic, so going offline just means
+// queuing the persistence call instead of losing it.
+
+const WRITE_QUEUE_KEY = "elaWriteQueue";
+let flushInFlight = false;
+
+function loadWriteQueue() {
+  try { return JSON.parse(localStorage.getItem(WRITE_QUEUE_KEY)) || []; }
+  catch (e) { return []; }
+}
+function saveWriteQueue(q) {
+  localStorage.setItem(WRITE_QUEUE_KEY, JSON.stringify(q));
+}
+function queueWrite(action, payload) {
+  const q = loadWriteQueue();
+  q.push({ action, payload, queuedAt: Date.now() });
+  saveWriteQueue(q);
+  updateOfflineBanner();
+}
+
+async function flushWriteQueue() {
+  if (flushInFlight || !navigator.onLine) { updateOfflineBanner(); return; }
+  flushInFlight = true;
+  try {
+    while (true) {
+      const q = loadWriteQueue();
+      if (q.length === 0) break;
+      const item = q[0];
+      try {
+        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: item.action, ...item.payload }) });
+        const json = await res.json();
+        if (!json.ok) console.error("Dropped queued write (server rejected):", item, json.error);
+      } catch (err) {
+        break; // still unreachable — stop draining, leave the rest queued
+      }
+      const remaining = loadWriteQueue();
+      remaining.shift();
+      saveWriteQueue(remaining);
+    }
+  } finally {
+    flushInFlight = false;
+    updateOfflineBanner();
+  }
+}
+
+function updateOfflineBanner() {
+  const el = document.getElementById("syncBanner");
+  if (!el) return;
+  const q = loadWriteQueue();
+  if (!navigator.onLine) {
+    el.textContent = q.length > 0
+      ? `📴 Offline — working from saved lesson data. ${q.length} change${q.length === 1 ? "" : "s"} will sync once you're back online.`
+      : "📴 Offline — working from saved lesson data.";
+    el.style.display = "block";
+  } else if (q.length > 0) {
+    el.textContent = `🔄 Syncing ${q.length} saved change${q.length === 1 ? "" : "s"}…`;
+    el.style.display = "block";
+  } else {
+    el.style.display = "none";
+  }
+}
+
+window.addEventListener("online", flushWriteQueue);
+window.addEventListener("offline", updateOfflineBanner);
+
 async function apiPost(action, payload) {
+  if (!navigator.onLine) {
+    queueWrite(action, payload);
+    return { ok: true, queued: true };
+  }
   try {
     const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action, ...payload }) });
     const json = await res.json();
@@ -56,6 +159,11 @@ async function apiPost(action, payload) {
     clearSyncError();
     return json;
   } catch (err) {
+    if (err instanceof TypeError) {
+      // fetch couldn't even complete (offline/unreachable) — queue instead of losing it
+      queueWrite(action, payload);
+      return { ok: true, queued: true };
+    }
     console.error("apiPost failed:", action, err);
     showSyncError("Couldn't save your last update — check the connection and try again.");
     throw err;
@@ -69,8 +177,13 @@ function showSyncError(msg) {
   el.style.display = "block";
 }
 function clearSyncError() {
-  const el = document.getElementById("syncBanner");
-  if (el) el.style.display = "none";
+  updateOfflineBanner();
+}
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(err => console.error("SW registration failed:", err));
+  });
 }
 
 // ---------- Setup / connect screen ----------
@@ -119,6 +232,8 @@ async function init() {
     document.getElementById("loadingNote").style.display = "none";
     document.getElementById("board").style.display = "block";
     render();
+    updateOfflineBanner();
+    flushWriteQueue();
   } catch (err) {
     console.error(err);
     showSetupOverlay("Couldn't reach that URL: " + err.message + ". Double-check it and try again.");
