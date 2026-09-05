@@ -38,7 +38,18 @@ const banksCache = {};      // { kenley: {vocab:[...], spelling:[...], ...} }
 // ---------- API layer ----------
 
 function resolveApiUrl() {
-  return localStorage.getItem("elaApiUrl") || (typeof DEFAULT_API_URL !== "undefined" ? DEFAULT_API_URL : "") || "";
+  const stored = localStorage.getItem("elaApiUrl");
+  if (stored) return stored;
+  if (typeof DEFAULT_API_URL !== "undefined" && DEFAULT_API_URL) {
+    // Persist it on first successful use so every load after this one is
+    // independent of config.js loading/executing correctly at all — a
+    // device that saw it once can never hit the "connect the kitchen"
+    // screen again, regardless of what caused config.js to come back
+    // empty that one time.
+    try { localStorage.setItem("elaApiUrl", DEFAULT_API_URL); } catch (e) {}
+    return DEFAULT_API_URL;
+  }
+  return "";
 }
 
 const BOOTSTRAP_CACHE_PREFIX = "elaBootstrapCache_";
