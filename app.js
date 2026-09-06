@@ -950,16 +950,24 @@ function taskHeadHTML(key, t) {
 function taskBodyHTML(key, t) {
   const s = state[key].tasks[t.id];
   let inner = "";
+  // Kenley doesn't want the whole session/instructions narrated to her (she
+  // just needs single-word audio, handled separately per task type) — but
+  // this function renders both kids' tasks, so every read-aloud button here
+  // must stay gated on currentChild, not removed outright, or it disappears
+  // for Adelyn too.
+  const trimReadAloud = currentChild === "kenley";
   if (t.type === "read") {
     const contentId = `read-content-${key}-${t.id}`;
     const parentNotesHtml = (t.parentNotes && currentView === "parent")
       ? `<div class="parent-notes"><b>👪 Notes for you</b>${t.parentNotes}</div>` : "";
-    inner = `<div id="${contentId}">${t.content}</div>
+    inner = `${trimReadAloud ? "" : readAloudButton(contentId, "Read this to me")}
+      <div id="${contentId}">${t.content}</div>
       ${parentNotesHtml}
       ${s.done ? `` : `<button class="btn primary" onclick="markRead('${key}','${t.id}')">Mark as read</button>`}`;
   } else if (t.type === "external") {
     const noteId = `ext-note-${key}-${t.id}`;
-    inner = `<a class="ext-link" href="${t.url || '#'}" target="_blank" rel="noopener">${t.linkText} ↗</a>
+    inner = `${trimReadAloud ? "" : readAloudButton(noteId)}
+      <a class="ext-link" href="${t.url || '#'}" target="_blank" rel="noopener">${t.linkText} ↗</a>
       <div class="lesson-text" id="${noteId}" style="opacity:.75;font-size:0.78rem;">${t.note}</div>
       <label style="font-size:0.82rem;display:flex;align-items:center;gap:8px;">
         <input type="checkbox" ${s.done ? "checked" : ""} onchange="markExternal('${key}','${t.id}',this.checked)"> Mark complete
@@ -967,7 +975,7 @@ function taskBodyHTML(key, t) {
   } else if (t.type === "reflection") {
     const promptId = `refl-prompt-${key}-${t.id}`;
     const feedbackNote = s.parentComment ? `<div class="parent-feedback">📝 ${s.reviewed ? "Feedback from parent:" : "Refired — please revise:"} ${s.parentComment}</div>` : "";
-    inner = `${readAloudButton(promptId, "Read the question to me")}
+    inner = `${trimReadAloud && key === "reading" ? "" : readAloudButton(promptId, "Read the question to me")}
       <div class="lesson-text" id="${promptId}"><p>${t.prompt}</p></div>
       ${feedbackNote}
       <textarea id="ta-${key}-${t.id}" placeholder="Type your answer here..." ${s.done ? "disabled" : ""}>${s.answers.text || ""}</textarea>
@@ -986,7 +994,7 @@ function taskBodyHTML(key, t) {
       else words = state[key].tasks[t.id]._reviewWords || [];
     }
     const dictPromptId = `dict-prompt-${key}-${t.id}`;
-    inner = `<div class="lesson-text" id="${dictPromptId}"><p>${t.prompt}</p></div>`;
+    inner = `${trimReadAloud ? "" : readAloudButton(dictPromptId, "Read the instructions to me")}<div class="lesson-text" id="${dictPromptId}"><p>${t.prompt}</p></div>`;
     if (s.done && s.results) {
       inner += s.results.map(r => {
         if (r.kind === "sentence") {
@@ -1031,7 +1039,7 @@ function taskBodyHTML(key, t) {
     }
   } else if (t.type === "fluency-read") {
     const fluencyPromptId = `fluency-prompt-${key}-${t.id}`;
-    inner = `<div class="lesson-text" id="${fluencyPromptId}"><p>${t.prompt}</p></div>`;
+    inner = `${trimReadAloud ? "" : readAloudButton(fluencyPromptId, "Read the instructions to me")}<div class="lesson-text" id="${fluencyPromptId}"><p>${t.prompt}</p></div>`;
     if (s.done) {
       inner += t.words.map((w, i) => {
         const mark = s.answers.fluency ? s.answers.fluency[i] : false;
@@ -1058,6 +1066,7 @@ function taskBodyHTML(key, t) {
   } else if (t.type === "pos-tagger") {
     const posSentenceId = `pos-sentence-${key}-${t.id}`;
     inner = `<div class="lesson-text"><p>Tap a word, then tap its part of speech.</p></div>
+      ${trimReadAloud ? "" : readAloudButton(posSentenceId, "Read the sentence to me")}
       <div id="${posSentenceId}" style="opacity:.75;font-size:0.82rem;">${t.sentence.join(" ")}</div>
       <div class="pos-row">`;
     t.sentence.forEach((word, i) => {
@@ -1088,6 +1097,7 @@ function taskBodyHTML(key, t) {
   } else if (t.type === "phrase-tagger") {
     const phraseSentenceId = `phrase-sentence-${key}-${t.id}`;
     inner = `<div class="lesson-text"><p>Tap the first word, then the last word of a chunk, then choose what it is. (Tap the same word twice for a single-word chunk.)</p></div>
+      ${trimReadAloud ? "" : readAloudButton(phraseSentenceId, "Read the sentence to me")}
       <div id="${phraseSentenceId}" style="opacity:.75;font-size:0.82rem;">${t.sentence.join(" ")}</div>
       <div class="pos-row">`;
     t.sentence.forEach((word, i) => {
@@ -1148,7 +1158,7 @@ function taskBodyHTML(key, t) {
     // actually teaching (t.targets) are tappable; everything else is plain
     // context so the sentence still reads naturally.
     const conceptPromptId = `concept-prompt-${key}-${t.id}`;
-    inner = `<div class="lesson-text" id="${conceptPromptId}"><p>${t.prompt}</p></div><div class="pos-row">`;
+    inner = `${trimReadAloud ? "" : readAloudButton(conceptPromptId)}<div class="lesson-text" id="${conceptPromptId}"><p>${t.prompt}</p></div><div class="pos-row">`;
     t.sentence.forEach((word, i) => {
       const target = t.targets.find(tg => tg.index === i);
       if (!target) {
@@ -1204,7 +1214,7 @@ function taskBodyHTML(key, t) {
         }
         inner += `<div class="mc-option ${cls}" onclick="selectMC('${key}','${t.id}',${qi},${oi})">${opt}</div>`;
       });
-      inner += `</div></div>`;
+      inner += `</div></div>${trimReadAloud ? "" : readAloudButton(qId, "Read this question and choices to me")}`;
       if (s.done && q.explanation) inner += `<div class="tag-review-item" style="margin-top:6px;">${q.explanation}</div>`;
     });
     if (s.done) {
