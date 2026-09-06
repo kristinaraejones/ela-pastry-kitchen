@@ -196,7 +196,7 @@ var DATA_BY_CHILD_SEED = {
       name: 'Vocabulary', tag: 'Case Files · Vocab Set A',
       tasks: [
         { id: 'v1', label: 'Study Set A Words', type: 'read', content: '<div class="lesson-text"><p>Four words for this week, each tied to a root family you\'ll keep seeing:</p></div><table class="vocab-table"><tr><td>incredulous</td><td>CRED- (believe) + IN-. Use it: describe a moment you were incredulous about something a sibling or friend told you.</td></tr><tr><td>deduction</td><td>DUCT- (lead) + -TION. Use it: make a small deduction about something in the room right now, using only what you can observe.</td></tr><tr><td>meticulous</td><td>From Latin <i>metus</i> (fear) — "fearful" became "extremely careful." Use it: describe a task that requires being meticulous.</td></tr><tr><td>resilient</td><td>Latin <i>resilire</i>, "to rebound." Use it: name someone or something resilient.</td></tr></table>' },
-        { id: 'v2', label: 'Play Mystery Round 3 — Case Files', type: 'external', linkText: 'Open Vocab Case Files', note: 'Score syncs back automatically once the game module is wired to the shared sheet.' },
+        { id: 'v2', label: 'Play Mystery Round 3 — Case Files', type: 'external', url: 'https://root-and-bloom-case-files.vercel.app', linkText: 'Open Vocab Case Files', note: 'Opens in a new tab. Works offline once you\'ve loaded it there at least once.' },
         { id: 'v3', label: 'Monthly Comprehension Test', type: 'graded-mc', dynamic: 'vocabMonthBank', monthlyTest: true, questions: [] },
         { id: 'v4', label: 'Term Final — Vocabulary', type: 'graded-mc', dynamic: 'examVocabBank', termFinal: true, questions: [] }
       ]

@@ -961,7 +961,7 @@ function taskBodyHTML(key, t) {
   } else if (t.type === "external") {
     const noteId = `ext-note-${key}-${t.id}`;
     inner = `${readAloudButton(noteId)}
-      <a class="ext-link" href="#" onclick="return false;">${t.linkText} ↗</a>
+      <a class="ext-link" href="${t.url || '#'}" target="_blank" rel="noopener">${t.linkText} ↗</a>
       <div class="lesson-text" id="${noteId}" style="opacity:.75;font-size:0.78rem;">${t.note}</div>
       <label style="font-size:0.82rem;display:flex;align-items:center;gap:8px;">
         <input type="checkbox" ${s.done ? "checked" : ""} onchange="markExternal('${key}','${t.id}',this.checked)"> Mark complete
