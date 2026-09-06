@@ -954,14 +954,12 @@ function taskBodyHTML(key, t) {
     const contentId = `read-content-${key}-${t.id}`;
     const parentNotesHtml = (t.parentNotes && currentView === "parent")
       ? `<div class="parent-notes"><b>👪 Notes for you</b>${t.parentNotes}</div>` : "";
-    inner = `${readAloudButton(contentId, "Read this to me")}
-      <div id="${contentId}">${t.content}</div>
+    inner = `<div id="${contentId}">${t.content}</div>
       ${parentNotesHtml}
       ${s.done ? `` : `<button class="btn primary" onclick="markRead('${key}','${t.id}')">Mark as read</button>`}`;
   } else if (t.type === "external") {
     const noteId = `ext-note-${key}-${t.id}`;
-    inner = `${readAloudButton(noteId)}
-      <a class="ext-link" href="${t.url || '#'}" target="_blank" rel="noopener">${t.linkText} ↗</a>
+    inner = `<a class="ext-link" href="${t.url || '#'}" target="_blank" rel="noopener">${t.linkText} ↗</a>
       <div class="lesson-text" id="${noteId}" style="opacity:.75;font-size:0.78rem;">${t.note}</div>
       <label style="font-size:0.82rem;display:flex;align-items:center;gap:8px;">
         <input type="checkbox" ${s.done ? "checked" : ""} onchange="markExternal('${key}','${t.id}',this.checked)"> Mark complete
@@ -988,7 +986,7 @@ function taskBodyHTML(key, t) {
       else words = state[key].tasks[t.id]._reviewWords || [];
     }
     const dictPromptId = `dict-prompt-${key}-${t.id}`;
-    inner = `${readAloudButton(dictPromptId, "Read the instructions to me")}<div class="lesson-text" id="${dictPromptId}"><p>${t.prompt}</p></div>`;
+    inner = `<div class="lesson-text" id="${dictPromptId}"><p>${t.prompt}</p></div>`;
     if (s.done && s.results) {
       inner += s.results.map(r => {
         if (r.kind === "sentence") {
@@ -1033,7 +1031,7 @@ function taskBodyHTML(key, t) {
     }
   } else if (t.type === "fluency-read") {
     const fluencyPromptId = `fluency-prompt-${key}-${t.id}`;
-    inner = `${readAloudButton(fluencyPromptId, "Read the instructions to me")}<div class="lesson-text" id="${fluencyPromptId}"><p>${t.prompt}</p></div>`;
+    inner = `<div class="lesson-text" id="${fluencyPromptId}"><p>${t.prompt}</p></div>`;
     if (s.done) {
       inner += t.words.map((w, i) => {
         const mark = s.answers.fluency ? s.answers.fluency[i] : false;
@@ -1060,7 +1058,6 @@ function taskBodyHTML(key, t) {
   } else if (t.type === "pos-tagger") {
     const posSentenceId = `pos-sentence-${key}-${t.id}`;
     inner = `<div class="lesson-text"><p>Tap a word, then tap its part of speech.</p></div>
-      ${readAloudButton(posSentenceId, "Read the sentence to me")}
       <div id="${posSentenceId}" style="opacity:.75;font-size:0.82rem;">${t.sentence.join(" ")}</div>
       <div class="pos-row">`;
     t.sentence.forEach((word, i) => {
@@ -1091,7 +1088,6 @@ function taskBodyHTML(key, t) {
   } else if (t.type === "phrase-tagger") {
     const phraseSentenceId = `phrase-sentence-${key}-${t.id}`;
     inner = `<div class="lesson-text"><p>Tap the first word, then the last word of a chunk, then choose what it is. (Tap the same word twice for a single-word chunk.)</p></div>
-      ${readAloudButton(phraseSentenceId, "Read the sentence to me")}
       <div id="${phraseSentenceId}" style="opacity:.75;font-size:0.82rem;">${t.sentence.join(" ")}</div>
       <div class="pos-row">`;
     t.sentence.forEach((word, i) => {
@@ -1152,7 +1148,7 @@ function taskBodyHTML(key, t) {
     // actually teaching (t.targets) are tappable; everything else is plain
     // context so the sentence still reads naturally.
     const conceptPromptId = `concept-prompt-${key}-${t.id}`;
-    inner = `${readAloudButton(conceptPromptId)}<div class="lesson-text" id="${conceptPromptId}"><p>${t.prompt}</p></div><div class="pos-row">`;
+    inner = `<div class="lesson-text" id="${conceptPromptId}"><p>${t.prompt}</p></div><div class="pos-row">`;
     t.sentence.forEach((word, i) => {
       const target = t.targets.find(tg => tg.index === i);
       if (!target) {
@@ -1208,7 +1204,7 @@ function taskBodyHTML(key, t) {
         }
         inner += `<div class="mc-option ${cls}" onclick="selectMC('${key}','${t.id}',${qi},${oi})">${opt}</div>`;
       });
-      inner += `</div></div>${readAloudButton(qId, "Read this question and choices to me")}`;
+      inner += `</div></div>`;
       if (s.done && q.explanation) inner += `<div class="tag-review-item" style="margin-top:6px;">${q.explanation}</div>`;
     });
     if (s.done) {

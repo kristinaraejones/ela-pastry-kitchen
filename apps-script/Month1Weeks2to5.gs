@@ -79,11 +79,11 @@ var MONTH1_WEEKS_2_TO_5 = [
           { id: 'v2a', label: "Study This Week's Words", type: 'read', content:
             '<div class="lesson-text"><p>Five words this week, each used in a sentence that gives you a clue to its meaning. Notice <i>which part</i> of the sentence tips you off — a comma followed by a definition, a phrase that restates the word, or a contrast that shows the opposite.</p></div>' +
             '<table class="vocab-table">' +
-            '<tr><td>rival</td><td>"Martina Crowe was Reynie\'s rival, the one classmate who always tried to outdo him." (clue: comma-definition)</td></tr>' +
-            '<tr><td>ominous</td><td>"The Waiting Room sounded ominous, threatening enough that even mentioning it made Sticky\'s hands shake." (clue: restating phrase)</td></tr>' +
-            '<tr><td>irrational</td><td>"The anger Reynie felt was irrational — it made no sense, since nothing around him had actually changed." (clue: contrast)</td></tr>' +
-            '<tr><td>perceptive</td><td>"Unlike the others, Constance seemed unusually perceptive, noticing things no one else in the room could sense." (clue: contrast)</td></tr>' +
-            '<tr><td>dismiss</td><td>"Reynie wanted to dismiss the strange feeling, to brush it off and pretend he hadn\'t noticed it at all." (clue: restating phrase)</td></tr>' +
+            '<tr><td>rival <button class="btn word-audio-btn" onclick="speakWord(\'rival\')">🔊</button></td><td>"Martina Crowe was Reynie\'s rival, the one classmate who always tried to outdo him." (clue: comma-definition)</td></tr>' +
+            '<tr><td>ominous <button class="btn word-audio-btn" onclick="speakWord(\'ominous\')">🔊</button></td><td>"The Waiting Room sounded ominous, threatening enough that even mentioning it made Sticky\'s hands shake." (clue: restating phrase)</td></tr>' +
+            '<tr><td>irrational <button class="btn word-audio-btn" onclick="speakWord(\'irrational\')">🔊</button></td><td>"The anger Reynie felt was irrational — it made no sense, since nothing around him had actually changed." (clue: contrast)</td></tr>' +
+            '<tr><td>perceptive <button class="btn word-audio-btn" onclick="speakWord(\'perceptive\')">🔊</button></td><td>"Unlike the others, Constance seemed unusually perceptive, noticing things no one else in the room could sense." (clue: contrast)</td></tr>' +
+            '<tr><td>dismiss <button class="btn word-audio-btn" onclick="speakWord(\'dismiss\')">🔊</button></td><td>"Reynie wanted to dismiss the strange feeling, to brush it off and pretend he hadn\'t noticed it at all." (clue: restating phrase)</td></tr>' +
             '</table>' },
           { id: 'v2b', label: 'Which Clue Told You the Meaning?', type: 'reflection',
             prompt: 'Pick at least two of this week\'s words (rival, ominous, irrational, perceptive, dismiss) and explain what specific part of the sentence gave away its meaning — was it a comma-definition, a contrast, or a restating phrase? Naming the word alone isn\'t enough; point to the actual words in the sentence that tipped you off.' }
@@ -212,11 +212,11 @@ var MONTH1_WEEKS_2_TO_5 = [
           { id: 'v3a', label: "Study This Week's Words", type: 'read', content:
             '<div class="lesson-text"><p>Five more words, each with a context clue built into the sentence. Watch for the same three clue types: comma-definition, contrast, or restating phrase.</p></div>' +
             '<table class="vocab-table">' +
-            '<tr><td>deception</td><td>"Lying to their teachers felt like deception, a kind of dishonesty that went against everything Reynie believed in." (clue: comma-definition)</td></tr>' +
-            '<tr><td>reluctant</td><td>"Sticky was reluctant to cheat, hesitating every time the plan required him to bend the rules." (clue: restating phrase)</td></tr>' +
-            '<tr><td>camouflage</td><td>"The trap blended into the forest like camouflage, disguised so well that only Kate\'s sharp eyes caught it." (clue: comma-definition)</td></tr>' +
-            '<tr><td>complicit</td><td>"By staying silent, Reynie felt complicit — as guilty as if he\'d caused the problem himself." (clue: restating phrase)</td></tr>' +
-            '<tr><td>injustice</td><td>"Watching an innocent student take the blame felt like an injustice, an unfairness none of them could fix." (clue: comma-definition)</td></tr>' +
+            '<tr><td>deception <button class="btn word-audio-btn" onclick="speakWord(\'deception\')">🔊</button></td><td>"Lying to their teachers felt like deception, a kind of dishonesty that went against everything Reynie believed in." (clue: comma-definition)</td></tr>' +
+            '<tr><td>reluctant <button class="btn word-audio-btn" onclick="speakWord(\'reluctant\')">🔊</button></td><td>"Sticky was reluctant to cheat, hesitating every time the plan required him to bend the rules." (clue: restating phrase)</td></tr>' +
+            '<tr><td>camouflage <button class="btn word-audio-btn" onclick="speakWord(\'camouflage\')">🔊</button></td><td>"The trap blended into the forest like camouflage, disguised so well that only Kate\'s sharp eyes caught it." (clue: comma-definition)</td></tr>' +
+            '<tr><td>complicit <button class="btn word-audio-btn" onclick="speakWord(\'complicit\')">🔊</button></td><td>"By staying silent, Reynie felt complicit — as guilty as if he\'d caused the problem himself." (clue: restating phrase)</td></tr>' +
+            '<tr><td>injustice <button class="btn word-audio-btn" onclick="speakWord(\'injustice\')">🔊</button></td><td>"Watching an innocent student take the blame felt like an injustice, an unfairness none of them could fix." (clue: comma-definition)</td></tr>' +
             '</table>' },
           { id: 'v3b', label: 'Which Clue Told You the Meaning?', type: 'reflection',
             prompt: 'Pick at least two of this week\'s words (deception, reluctant, camouflage, complicit, injustice) and explain what specific part of the sentence gave away its meaning. Point to the actual words that tipped you off, not just a definition.' }
@@ -338,11 +338,11 @@ var MONTH1_WEEKS_2_TO_5 = [
           { id: 'v4a', label: "Study This Week's Words", type: 'read', content:
             '<div class="lesson-text"><p>Five more words with context clues built in — this week’s theme is escalation and danger.</p></div>' +
             '<table class="vocab-table">' +
-            '<tr><td>escalate</td><td>"Mr. Curtain didn\'t stop there — he continued to escalate the signal, making it stronger and harder to ignore." (clue: contrast)</td></tr>' +
-            '<tr><td>vulnerable</td><td>"The stronger the messages became, the more vulnerable the children felt, as if anyone might crack under the pressure." (clue: restating phrase)</td></tr>' +
-            '<tr><td>discreet</td><td>"Passing the note required them to be discreet, careful not to draw a single eye in their direction." (clue: comma-definition)</td></tr>' +
-            '<tr><td>underestimate</td><td>"It would have been easy to underestimate Constance, to assume the youngest and smallest member had nothing to offer." (clue: restating phrase)</td></tr>' +
-            '<tr><td>resourceful</td><td>"Time and again, the team relied on being resourceful, finding clever solutions with whatever they had on hand." (clue: comma-definition)</td></tr>' +
+            '<tr><td>escalate <button class="btn word-audio-btn" onclick="speakWord(\'escalate\')">🔊</button></td><td>"Mr. Curtain didn\'t stop there — he continued to escalate the signal, making it stronger and harder to ignore." (clue: contrast)</td></tr>' +
+            '<tr><td>vulnerable <button class="btn word-audio-btn" onclick="speakWord(\'vulnerable\')">🔊</button></td><td>"The stronger the messages became, the more vulnerable the children felt, as if anyone might crack under the pressure." (clue: restating phrase)</td></tr>' +
+            '<tr><td>discreet <button class="btn word-audio-btn" onclick="speakWord(\'discreet\')">🔊</button></td><td>"Passing the note required them to be discreet, careful not to draw a single eye in their direction." (clue: comma-definition)</td></tr>' +
+            '<tr><td>underestimate <button class="btn word-audio-btn" onclick="speakWord(\'underestimate\')">🔊</button></td><td>"It would have been easy to underestimate Constance, to assume the youngest and smallest member had nothing to offer." (clue: restating phrase)</td></tr>' +
+            '<tr><td>resourceful <button class="btn word-audio-btn" onclick="speakWord(\'resourceful\')">🔊</button></td><td>"Time and again, the team relied on being resourceful, finding clever solutions with whatever they had on hand." (clue: comma-definition)</td></tr>' +
             '</table>' },
           { id: 'v4b', label: 'Which Clue Told You the Meaning?', type: 'reflection',
             prompt: 'Pick at least two of this week\'s words (escalate, vulnerable, discreet, underestimate, resourceful) and explain what specific part of the sentence gave away its meaning. Point to the actual words that tipped you off, not just a definition.' }
@@ -464,11 +464,11 @@ var MONTH1_WEEKS_2_TO_5 = [
           { id: 'v5a', label: "Study This Week's Words", type: 'read', content:
             '<div class="lesson-text"><p>The last five words of Month 1 — escape, deception, payoff, and resolution, as the book wraps up.</p></div>' +
             '<table class="vocab-table">' +
-            '<tr><td>resourcefulness</td><td>"Kate\'s resourcefulness saved them — her knack for finding a tool or a trick out of almost nothing, even just a rope and a ladder." (clue: comma-definition)</td></tr>' +
-            '<tr><td>futile</td><td>"Reynie\'s attempt to fool the Whisperer was futile, a hopeless effort the machine saw through instantly." (clue: restating phrase)</td></tr>' +
-            '<tr><td>vindicated</td><td>"When Constance\'s stubbornness turned out to be exactly what saved them, Kate finally felt vindicated in trusting her all along." (clue: contextual/restating)</td></tr>' +
-            '<tr><td>resolution</td><td>"The final chapter brought resolution to every storyline — each family reunited, each secret finally explained." (clue: comma-definition)</td></tr>' +
-            '<tr><td>credible</td><td>"Mr. Benedict\'s claims about Mr. Curtain finally became credible, believable enough that officials were willing to act." (clue: comma-definition/restating)</td></tr>' +
+            '<tr><td>resourcefulness <button class="btn word-audio-btn" onclick="speakWord(\'resourcefulness\')">🔊</button></td><td>"Kate\'s resourcefulness saved them — her knack for finding a tool or a trick out of almost nothing, even just a rope and a ladder." (clue: comma-definition)</td></tr>' +
+            '<tr><td>futile <button class="btn word-audio-btn" onclick="speakWord(\'futile\')">🔊</button></td><td>"Reynie\'s attempt to fool the Whisperer was futile, a hopeless effort the machine saw through instantly." (clue: restating phrase)</td></tr>' +
+            '<tr><td>vindicated <button class="btn word-audio-btn" onclick="speakWord(\'vindicated\')">🔊</button></td><td>"When Constance\'s stubbornness turned out to be exactly what saved them, Kate finally felt vindicated in trusting her all along." (clue: contextual/restating)</td></tr>' +
+            '<tr><td>resolution <button class="btn word-audio-btn" onclick="speakWord(\'resolution\')">🔊</button></td><td>"The final chapter brought resolution to every storyline — each family reunited, each secret finally explained." (clue: comma-definition)</td></tr>' +
+            '<tr><td>credible <button class="btn word-audio-btn" onclick="speakWord(\'credible\')">🔊</button></td><td>"Mr. Benedict\'s claims about Mr. Curtain finally became credible, believable enough that officials were willing to act." (clue: comma-definition/restating)</td></tr>' +
             '</table>' },
           { id: 'v5b', label: 'Which Clue Told You the Meaning?', type: 'reflection',
             prompt: 'Pick at least two of this week\'s words (resourcefulness, futile, vindicated, resolution, credible) and explain what specific part of the sentence gave away its meaning. Point to the actual words that tipped you off, not just a definition.' }

@@ -99,6 +99,8 @@ input[type=number]{background:#FFFFFF;border:1px solid var(--rail);border-radius
 .btn:disabled{opacity:0.5;cursor:default;}
 .btn.read-aloud-btn{display:inline-flex;align-items:center;gap:6px;background:#FFFBF3;border:1.5px solid var(--saffron);color:var(--saffron);font-weight:700;margin-bottom:12px;}
 .btn.read-aloud-btn:hover{background:var(--saffron);color:#fff;}
+.btn.word-audio-btn{margin-top:0;margin-left:6px;padding:2px 7px;font-size:0.75rem;background:#FFFBF3;border:1.5px solid var(--saffron);color:var(--saffron);}
+.btn.word-audio-btn:hover{background:var(--saffron);color:#fff;}
 .score-result{margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:0.8rem;padding:8px 10px;border-radius:6px;}
 .score-result.pass{background:#E7F3E3;color:var(--herb);}
 .score-result.retry{background:#FBE3E6;color:#C0526A;}
