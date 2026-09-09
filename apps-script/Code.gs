@@ -111,11 +111,22 @@ function readSubmissions_(student) {
         task_id: r.task_id,
         timestamp: r.timestamp,
         status: r.status,
-        score: r.score,
+        score: normalizeScore_(r.score),
         parent_comment: r.parent_comment,
         answers: safeParse_(r.answers_json, {})
       };
     });
+}
+
+// A score like "7/10" looks exactly like a date to Sheets' auto-detection
+// (July 10), so it silently gets stored as a real Date cell instead of the
+// text "7/10" — same class of bug as normalizeSettingValue_ below, just for
+// the Submissions sheet's score column. Reconstruct the fraction from the
+// date parts (month/day map back to correct/total) rather than showing a
+// raw timestamp.
+function normalizeScore_(v) {
+  if (v instanceof Date) return (v.getMonth() + 1) + '/' + v.getDate();
+  return (v === '' || v === undefined || v === null) ? '' : String(v);
 }
 
 function readReviewPool_(student) {
