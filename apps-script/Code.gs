@@ -13,6 +13,7 @@
  *   BurnLog           | student | station | tag | date | reason | items_json
  *   Banks             | student | subject_key | items_json
  *   Settings          | key | value
+ *   AnswerLog         | student | timestamp | game | subject | word | question | given_answer | correct_answer | correct
  *
  * Every read/write below is scoped by a `student` field. Nothing here queries
  * across students — that guarantee lives in every function that takes a
@@ -174,6 +175,27 @@ function normalizeSettingValue_(v) {
   return String(v);
 }
 
+// Most-recent-first, capped, so a growing log never balloons a bootstrap
+// response — the parent view only ever needs a recent window, not history.
+function readAnswerLog_(student) {
+  return sheetToObjects_(getSheet_('AnswerLog'))
+    .filter(function (r) { return r.student === student; })
+    .map(function (r) {
+      return {
+        timestamp: r.timestamp,
+        game: r.game,
+        subject: r.subject,
+        word: r.word,
+        question: r.question,
+        givenAnswer: r.given_answer,
+        correctAnswer: r.correct_answer,
+        correct: !!r.correct
+      };
+    })
+    .reverse()
+    .slice(0, 100);
+}
+
 function readSettings_() {
   var out = {};
   sheetToObjects_(getSheet_('Settings')).forEach(function (r) { out[r.key] = normalizeSettingValue_(r.value); });
@@ -196,7 +218,8 @@ function doGet(e) {
         markers: readMarkers_(student),
         burnLog: readBurnLog_(student),
         banks: readBanks_(student),
-        settings: readSettings_()
+        settings: readSettings_(),
+        answerLog: readAnswerLog_(student)
       });
     }
     throw new Error('Unknown action: ' + action);
@@ -250,6 +273,49 @@ function doPost(e) {
         subject_key: body.subject_key,
         bank_position: body.bank_position
       });
+      return jsonOut_({ ok: true });
+    }
+
+    // Logs one graded answer from an outside game (Root & Bloom: Case Files
+    // for Kenley, Word Bakery for Adelyn) so the parent view can show real
+    // answer-by-answer history, not just aggregate mastery. Also folds a
+    // miss/hit into ReviewPool so it shows up in the existing Review Bank
+    // alongside spelling's own missed words, without a second UI to check.
+    if (action === 'logAnswer') {
+      appendRowObject_(getSheet_('AnswerLog'), getHeaders_(getSheet_('AnswerLog')), {
+        student: student,
+        timestamp: new Date().toISOString(),
+        game: body.game || '',
+        subject: body.subject || '',
+        word: body.word || '',
+        question: body.question || '',
+        given_answer: body.given_answer || '',
+        correct_answer: body.correct_answer || '',
+        correct: !!body.correct
+      });
+
+      if (body.word) {
+        var reviewSheet = getSheet_('ReviewPool');
+        var existing = sheetToObjects_(reviewSheet).find(function (r) {
+          return r.student === student && String(r.word).toLowerCase() === String(body.word).toLowerCase();
+        });
+        var today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+        if (existing) {
+          var timesMissed = Number(existing.times_missed) || 0;
+          var timesCorrect = Number(existing.times_correct) || 0;
+          if (body.correct) { timesCorrect += 1; } else { timesMissed += 1; timesCorrect = 0; }
+          upsertRow_(reviewSheet, ['student', 'word'], {
+            student: student, word: existing.word, times_missed: timesMissed, times_correct: timesCorrect,
+            last_seen: today, status: timesCorrect >= 2 ? 'mastered' : 'active', context_sentence: existing.context_sentence || ''
+          });
+        } else if (!body.correct) {
+          upsertRow_(reviewSheet, ['student', 'word'], {
+            student: student, word: body.word, times_missed: 1, times_correct: 0,
+            last_seen: today, status: 'active', context_sentence: ''
+          });
+        }
+      }
+
       return jsonOut_({ ok: true });
     }
 

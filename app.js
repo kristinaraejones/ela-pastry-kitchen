@@ -31,6 +31,7 @@ let settings = { weeks: { kenley: 1, adelyn: 1 }, termFinalsUnlocked: false, mon
 
 const childrenCache = {};   // { kenley: {DATA, state} }
 const reviewPoolCache = {}; // { kenley: [ {word,timesMissed,...} ] }
+const answerLogCache = {}; // { kenley: [ {timestamp,game,subject,word,question,givenAnswer,correctAnswer,correct} ] }
 const markersCache = {};    // { kenley: {vocab: 3, ...} }
 const burnLogCache = {};    // { kenley: [ {...} ] }
 const banksCache = {};      // { kenley: {vocab:[...], spelling:[...], ...} }
@@ -257,6 +258,7 @@ async function loadChild(student) {
   const built = buildChildFromBootstrap(resp);
   childrenCache[student] = built;
   reviewPoolCache[student] = resp.reviewPool;
+  answerLogCache[student] = resp.answerLog || [];
   markersCache[student] = resp.markers;
   burnLogCache[student] = resp.burnLog;
   banksCache[student] = resp.banks;
@@ -584,6 +586,24 @@ function logReviewResult(word, correct) {
   persistReviewWord(existing);
 }
 
+// Logs one graded item from ANY subject/task type (MC, fill-in, pos-tagger,
+// phrase-tagger, concept-check, dictation) into the same AnswerLog sheet the
+// external vocab games (Case Files / Word Bakery) write to, so the parent
+// view's answer history covers the whole curriculum, not just those two
+// games. Best-effort — a failed/queued write never blocks grading.
+function logGradedAnswer(key, { word, question, given, correct, wasCorrect }) {
+  apiPost("logAnswer", {
+    student: currentChild,
+    game: "ELA Pastry Kitchen",
+    subject: (DATA[key] && DATA[key].name) || key,
+    word: word || "",
+    question: question || "",
+    given_answer: given == null ? "(no answer)" : given,
+    correct_answer: correct,
+    correct: wasCorrect
+  }).catch(() => {});
+}
+
 // ---------- Monthly/term banks ----------
 
 function getNewSinceLastTest(bank, subjectKey) {
@@ -759,6 +779,10 @@ function checkDictation(key, id) {
       const isRight = grade.allSpellingCorrect && grade.allGrammarPass;
       if (isRight) correctCount++;
       results.push({ kind: "sentence", typed, answer: w.answer, grade });
+      logGradedAnswer(key, {
+        word: w.answer, question: "Dictation sentence", given: typed, correct: w.answer,
+        wasCorrect: grade.allSpellingCorrect && grade.allGrammarPass
+      });
       grade.wordResults.forEach(wr => {
         if (!wr.spellingCorrect && wr.correctWord) logMiss(wr.correctWord, subjectTag(key) + " (in a sentence)", null);
       });
@@ -767,6 +791,7 @@ function checkDictation(key, id) {
       const isRight = typed.toLowerCase() === w.answer.toLowerCase();
       if (isRight) correctCount++;
       results.push({ kind: "word", typed, correct: isRight, answer: w.answer, context: w.context || null });
+      logGradedAnswer(key, { word: w.answer, question: "Dictation word", given: typed, correct: w.answer, wasCorrect: isRight });
       if (t.dynamic === "reviewPool") {
         logReviewResult(w.answer, isRight);
       } else if (!isRight) {
@@ -816,7 +841,11 @@ function checkPosTagging(key, id) {
   const t = DATA[key].tasks.find(x => x.id === id);
   const s = state[key].tasks[id];
   let correct = 0;
-  s.labels.forEach((l, i) => { if (l === t.answers[i]) correct++; });
+  s.labels.forEach((l, i) => {
+    const wasCorrect = l === t.answers[i];
+    if (wasCorrect) correct++;
+    logGradedAnswer(key, { word: t.sentence[i], question: "Part of speech", given: l, correct: t.answers[i], wasCorrect });
+  });
   s.score = `${correct}/${t.answers.length}`;
   s.done = true;
   persistTask(key, id);
@@ -835,7 +864,12 @@ function checkConceptCheck(key, id) {
   const t = DATA[key].tasks.find(x => x.id === id);
   const s = state[key].tasks[id];
   let correct = 0;
-  t.targets.forEach(tg => { if (s.labels[tg.index] === tg.answer) correct++; });
+  t.targets.forEach(tg => {
+    const given = s.labels[tg.index];
+    const wasCorrect = given === tg.answer;
+    if (wasCorrect) correct++;
+    logGradedAnswer(key, { word: t.sentence[tg.index], question: "Concept check", given, correct: tg.answer, wasCorrect });
+  });
   s.score = `${correct}/${t.targets.length}`;
   s.done = true;
   persistTask(key, id);
@@ -867,6 +901,12 @@ function checkPhraseTagging(key, id) {
   const s = state[key].tasks[id];
   let correct = 0;
   s.selections.forEach(sel => { if (t.phrases.some(p => p.start === sel.start && p.end === sel.end && p.type === sel.type)) correct++; });
+  t.phrases.forEach(p => {
+    const phraseText = t.sentence.slice(p.start, p.end + 1).join(" ");
+    const match = s.selections.find(sel => sel.start === p.start && sel.end === p.end);
+    const wasCorrect = !!match && match.type === p.type;
+    logGradedAnswer(key, { word: phraseText, question: "Phrase/clause tagging", given: match ? match.type : "(missed)", correct: p.type, wasCorrect });
+  });
   s.score = `${correct}/${t.phrases.length}`;
   s.done = true;
   persistTask(key, id);
@@ -876,8 +916,10 @@ function checkFill(key, id) {
   const t = DATA[key].tasks.find(x => x.id === id);
   let correct = 0;
   t.words.forEach((w, i) => {
-    const v = document.getElementById(`fill-${key}-${id}-${i}`).value.trim().toLowerCase();
-    if (v === w.answer.toLowerCase()) correct++;
+    const typed = document.getElementById(`fill-${key}-${id}-${i}`).value.trim();
+    const wasCorrect = typed.toLowerCase() === w.answer.toLowerCase();
+    if (wasCorrect) correct++;
+    logGradedAnswer(key, { word: w.answer, question: "Fill in the blank", given: typed, correct: w.answer, wasCorrect });
   });
   state[key].tasks[id].score = `${correct}/${t.words.length}`;
   state[key].tasks[id].done = true;
@@ -895,7 +937,15 @@ function submitMC(key, id) {
   const questions = getTaskQuestions(key, id);
   const answers = state[key].tasks[id].answers.mc || {};
   let correct = 0;
-  questions.forEach((q, i) => { if (answers[i] === q.correct) correct++; });
+  questions.forEach((q, i) => {
+    const wasCorrect = answers[i] === q.correct;
+    if (wasCorrect) correct++;
+    logGradedAnswer(key, {
+      word: q.q, question: q.q,
+      given: answers[i] != null ? q.options[answers[i]] : null,
+      correct: q.options[q.correct], wasCorrect
+    });
+  });
   state[key].tasks[id].score = `${correct}/${questions.length}`;
   state[key].tasks[id].done = true;
   if (t.dynamic) {
@@ -1531,6 +1581,18 @@ function render() {
         <b>Active (${active.length}):</b> ${active.map(p => `${p.word} (missed ${p.timesMissed}×, from ${p.lastSeen})`).join(", ") || "none"}<br>
         <b>Mastered (${mastered.length}):</b> ${mastered.map(p => p.word).join(", ") || "none"}
       </div>`;
+
+    const answerLog = (answerLogCache[currentChild] || []).slice(0, 40);
+    const answerLogList = document.getElementById("answerLogList");
+    answerLogList.innerHTML = answerLog.length === 0
+      ? `<div class="empty-note">No graded answers logged yet.</div>`
+      : answerLog.map(a => `
+        <div class="review-item">
+          <strong>${a.correct ? "✅" : "❌"} ${a.word}</strong>
+          <div class="meta">${a.game || ""}${a.subject ? " · " + a.subject : ""} · ${a.timestamp ? new Date(a.timestamp).toLocaleString() : ""}</div>
+          ${a.question ? `<div class="submitted-text">${a.question}</div>` : ""}
+          ${!a.correct ? `<div class="submitted-text">Answered: "${a.givenAnswer}" — Correct answer: "${a.correctAnswer}"</div>` : ""}
+        </div>`).join("");
 
     const burnLog = burnLogCache[currentChild] || [];
     const burnList = document.getElementById("burnLogList");

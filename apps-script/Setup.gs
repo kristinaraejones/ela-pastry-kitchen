@@ -17,7 +17,8 @@ var SHEET_HEADERS = {
   MonthTestMarkers: ['student', 'subject_key', 'bank_position'],
   BurnLog: ['student', 'station', 'tag', 'date', 'reason', 'items_json'],
   Banks: ['student', 'subject_key', 'items_json'],
-  Settings: ['key', 'value']
+  Settings: ['key', 'value'],
+  AnswerLog: ['student', 'timestamp', 'game', 'subject', 'word', 'question', 'given_answer', 'correct_answer', 'correct']
 };
 
 function setupSheets() {
