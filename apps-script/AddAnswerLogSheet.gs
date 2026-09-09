@@ -17,5 +17,12 @@ function addAnswerLogSheet() {
     sh.appendRow(headers);
     sh.setFrozenRows(1);
   }
-  SpreadsheetApp.getUi().alert('AnswerLog sheet ready. Re-deploy the Web App (Deploy > Manage deployments > edit > New version) so the new logAnswer action goes live.');
+  try {
+    SpreadsheetApp.getUi().alert('AnswerLog sheet ready. Re-deploy the Web App (Deploy > Manage deployments > edit > New version) so the new logAnswer action goes live.');
+  } catch (e) {
+    // getUi() only works when triggered from the Sheet's own UI, not when
+    // run from the Apps Script editor's Run button — the sheet is already
+    // created by this point regardless, so there's nothing to fix here.
+    Logger.log('AnswerLog sheet ready. Re-deploy the Web App (Deploy > Manage deployments > edit > New version) so the new logAnswer action goes live.');
+  }
 }
