@@ -1283,7 +1283,7 @@ function taskBodyHTML(key, t) {
 // reuses the same tile look as the live interactive pos-tagger, just non-clickable and pre-filled.
 function renderPosTaggerPreview(t) {
   const tiles = t.sentence.map((w, i) =>
-    `<div class="word-slot" style="cursor:default;"><span class="word-text">${w}</span><span class="word-label correct">${t.answers[i]}</span></div>`
+    `<div class="word-slot" style="cursor:default;"><span class="word-text">${w}</span><span class="word-label key">${t.answers[i]}</span></div>`
   ).join("");
   return `<div class="pos-row">${tiles}</div>`;
 }
@@ -1294,7 +1294,7 @@ function renderConceptCheckPreview(t) {
   const tiles = t.sentence.map((w, i) => {
     const target = t.targets.find(tg => tg.index === i);
     if (!target) return `<div class="word-slot plain-word"><span class="word-text">${w}</span></div>`;
-    return `<div class="word-slot" style="cursor:default;"><span class="word-text">${w}</span><span class="word-label correct">${target.answer}</span></div>`;
+    return `<div class="word-slot" style="cursor:default;"><span class="word-text">${w}</span><span class="word-label key">${target.answer}</span></div>`;
   }).join("");
   return `<div class="lesson-text"><p>${t.prompt}</p></div><div class="pos-row">${tiles}</div>`;
 }
@@ -1326,7 +1326,7 @@ function renderGradedMcPreview(t) {
   }
   return t.questions.map(q => {
     const opts = (q.options || []).map((o, i) =>
-      `<div class="preview-key-item"${i === q.correct ? "" : ` style="opacity:.6;border-left-color:var(--rail);"`}>${i === q.correct ? "✓ " : ""}${o}</div>`
+      `<div class="${i === q.correct ? "preview-key-item" : "preview-key-item-dim"}">${i === q.correct ? "✓ " : ""}${o}</div>`
     ).join("");
     const explanation = q.explanation ? `<div class="sample-answer"><b>Why:</b> ${q.explanation}</div>` : "";
     return `<div class="lesson-text"><p>${q.q}</p></div><div class="preview-key">${opts}</div>${explanation}`;
@@ -1350,8 +1350,20 @@ function renderTaskContent(t) {
   return `<div class="lesson-text">(interactive exercise — nothing to preview yet)</div>`;
 }
 
+// Task types with real per-item auto-grading, where taskBodyHTML's "done"
+// branch already colors each item green/pink by her actual answer — reuse
+// that directly instead of the generic blue reference-key preview once
+// she's actually completed the task. (selectMC/selectPos/etc. all no-op
+// once s.done is true, so the reused markup is effectively read-only.)
+const AUTO_GRADED_TYPES = ["graded-mc", "graded-dictation", "fluency-read", "pos-tagger", "phrase-tagger", "concept-check"];
+
 function renderPastTaskReport(key, t, s) {
-  let extra = renderTaskContent(t);
+  // taskBodyHTML's wrapper only shows its content when the task row has
+  // been toggled open (s.open) — force it open here without mutating the
+  // real state, since this read-only report always shows content expanded.
+  let extra = (s.done && AUTO_GRADED_TYPES.includes(t.type))
+    ? taskBodyHTML(key, t).replace('class="task-body ', 'class="task-body open ')
+    : renderTaskContent(t);
   if (t.type === "reflection" && s.answers && s.answers.text) {
     extra += `<div class="submitted-text">${s.answers.text}</div>`;
     if (s.parentComment) extra += `<div class="parent-feedback">📝 ${s.parentComment}</div>`;
@@ -1587,7 +1599,7 @@ function render() {
     answerLogList.innerHTML = answerLog.length === 0
       ? `<div class="empty-note">No graded answers logged yet.</div>`
       : answerLog.map(a => `
-        <div class="review-item">
+        <div class="review-item answer-log-item ${a.correct ? "answer-log-correct" : "answer-log-wrong"}">
           <strong>${a.correct ? "✅" : "❌"} ${a.word}</strong>
           <div class="meta">${a.game || ""}${a.subject ? " · " + a.subject : ""} · ${a.timestamp ? new Date(a.timestamp).toLocaleString() : ""}</div>
           ${a.question ? `<div class="submitted-text">${a.question}</div>` : ""}
@@ -1616,7 +1628,7 @@ function render() {
     list.innerHTML = items.length === 0
       ? `<div class="empty-note">Nothing waiting on you right now.</div>`
       : items.map(({ key, t, s }) => `
-        <div class="review-item">
+        <div class="review-item needs-attention">
           <strong>${DATA[key].name} — ${t.label}</strong>
           <div class="meta">Submitted by ${CHILD_META[currentChild].name}, awaiting review</div>
           <div class="submitted-text">${s.answers.text}</div>
