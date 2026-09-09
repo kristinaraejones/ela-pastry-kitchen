@@ -124,7 +124,7 @@ input[type=number]{background:#FFFFFF;border:1px solid var(--rail);border-radius
 .task-head.locked-task{opacity:0.55;cursor:default;}
 .task-head.locked-task .status-text{color:var(--chalk-dim);}
 .parent-feedback{background:#FCEFD9;border:1px solid var(--saffron);color:var(--saffron);font-size:0.82rem;border-radius:6px;padding:8px 10px;margin-bottom:8px;}
-.sample-answer{background:#EEF6ED;border:1px solid var(--herb);color:var(--chalk-text);font-size:0.82rem;line-height:1.45;border-radius:6px;padding:8px 10px;margin:6px 0;}
+.sample-answer{background:var(--sky-bg);border:1px solid var(--sky);color:var(--chalk-text);font-size:0.82rem;line-height:1.45;border-radius:6px;padding:8px 10px;margin:6px 0;}
 .sample-answer b{color:var(--herb);}
 .parent-notes{background:#FDF3E7;border:1px solid var(--saffron);color:var(--chalk-text);font-size:0.82rem;line-height:1.5;border-radius:6px;padding:10px 12px;margin:10px 0;}
 .parent-notes b{display:block;color:var(--saffron);margin-bottom:6px;}
