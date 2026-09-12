@@ -19,6 +19,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>TELE-</b> — far, far off (Greek prefix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>telephone</td><td><i>tele- (far) + phone (sound)</i> — a device used to talk to someone who is far away<br><span style=\"opacity:.75;\">\"Adelyn called her grandmother on the telephone to tell her about the trip.\"</span></td></tr><tr><td>television</td><td><i>tele- (far) + vision (to see)</i> — a device that shows moving pictures and sound sent from far away<br><span style=\"opacity:.75;\">\"The family watched a nature show on television after dinner.\"</span></td></tr><tr><td>telescope</td><td><i>tele- (far) + scope (to look at)</i> — a tool that makes faraway objects, like stars, look closer<br><span style=\"opacity:.75;\">\"Through the telescope, Adelyn could see the craters on the moon.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>however</td><td>used to introduce a statement that contrasts with something already said<br><span style=\"opacity:.75;\">\"Adelyn wanted to go to the beach; however, it started raining.\"</span></td></tr><tr><td>although</td><td>even though; despite the fact that<br><span style=\"opacity:.75;\">\"Although she was tired, Adelyn finished her stretching routine.\"</span></td></tr><tr><td>particular</td><td>specific; one certain thing and not others<br><span style=\"opacity:.75;\">\"Kenley had one particular market stall she visited every week.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -106,6 +114,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>GRAPH / GRAM</b> — write (Greek root). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>paragraph</td><td><i>para- (beside) + graph (write)</i> — a group of sentences about one main idea<br><span style=\"opacity:.75;\">\"Adelyn wrote a paragraph describing her favorite market in Lisbon.\"</span></td></tr><tr><td>biography</td><td><i>bio- (life) + graph (write)</i> — a true story of a person's life written by someone else<br><span style=\"opacity:.75;\">\"Kenley read a biography about a famous inventor.\"</span></td></tr><tr><td>photograph</td><td><i>photo- (light) + graph (write)</i> — a picture made using light, usually with a camera<br><span style=\"opacity:.75;\">\"Dad took a photograph of the sunset over the mountains.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>determine</td><td>to decide something after careful thought; to figure out<br><span style=\"opacity:.75;\">\"They used a map to determine the fastest route to the museum.\"</span></td></tr><tr><td>additional</td><td>extra; more than what is already there<br><span style=\"opacity:.75;\">\"The teacher gave Adelyn an additional worksheet for practice.\"</span></td></tr><tr><td>recognize</td><td>to know or identify someone or something from before<br><span style=\"opacity:.75;\">\"Adelyn didn't recognize the city at night with all the lights.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -193,6 +209,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>PORT</b> — carry (Latin root). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>transport</td><td><i>trans- (across) + port (carry)</i> — to carry people or things from one place to another<br><span style=\"opacity:.75;\">\"A big ship can transport hundreds of shipping containers across the ocean.\"</span></td></tr><tr><td>portable</td><td><i>port (carry) + -able (able to be)</i> — able to be carried or moved easily<br><span style=\"opacity:.75;\">\"Adelyn packed a portable speaker for the long train ride.\"</span></td></tr><tr><td>report</td><td><i>re- (back) + port (carry)</i> — to carry information back and share it with others<br><span style=\"opacity:.75;\">\"Adelyn will report on what she learned about Portuguese history.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>purpose</td><td>the reason something is done; a goal<br><span style=\"opacity:.75;\">\"The purpose of the trip was to visit Kenley's old friend.\"</span></td></tr><tr><td>environment</td><td>the surroundings or conditions in which someone lives<br><span style=\"opacity:.75;\">\"The rainforest environment was hot, humid, and full of sound.\"</span></td></tr><tr><td>achieve</td><td>to succeed in reaching a goal<br><span style=\"opacity:.75;\">\"Adelyn worked hard all year to achieve a perfect cartwheel.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -720,6 +744,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
                 "correct": 9
               }
             ]
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -807,6 +839,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>SPECT</b> — look, see (Latin root). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>inspect</td><td><i>in- (into) + spect (look)</i> — to look at something closely and carefully<br><span style=\"opacity:.75;\">\"The mechanic will inspect the van before our long road trip.\"</span></td></tr><tr><td>respect</td><td><i>re- (again) + spect (look)</i> — a feeling of admiration for someone; to treat someone with consideration<br><span style=\"opacity:.75;\">\"Adelyn showed respect for her coach by listening carefully.\"</span></td></tr><tr><td>spectator</td><td><i>spect (look) + -ator (one who)</i> — a person who watches an event without taking part<br><span style=\"opacity:.75;\">\"Hundreds of spectators cheered from the stands during the gymnastics meet.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>especially</td><td>more than usual; particularly<br><span style=\"opacity:.75;\">\"Adelyn loves fruit, especially mangoes.\"</span></td></tr><tr><td>considerable</td><td>fairly large in amount or size<br><span style=\"opacity:.75;\">\"It took a considerable amount of time to pack for the trip.\"</span></td></tr><tr><td>eventually</td><td>after some time; in the end<br><span style=\"opacity:.75;\">\"The rain stopped eventually, and they went outside to play.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -894,6 +934,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>STRUCT</b> — build (Latin root). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>construct</td><td><i>con- (together) + struct (build)</i> — to build or put something together<br><span style=\"opacity:.75;\">\"The workers used bamboo scaffolding to construct the new building.\"</span></td></tr><tr><td>instruct</td><td><i>in- (in) + struct (build)</i> — to teach or give directions<br><span style=\"opacity:.75;\">\"The coach will instruct the class on a new stretching routine.\"</span></td></tr><tr><td>structure</td><td><i>struct (build) + -ure (result of)</i> — something that has been built; the way parts are arranged<br><span style=\"opacity:.75;\">\"The old stone structure had stood in the village for centuries.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>appropriate</td><td>suitable or correct for the situation<br><span style=\"opacity:.75;\">\"Kenley picked an appropriate outfit for the fancy dinner.\"</span></td></tr><tr><td>obvious</td><td>easy to see or understand<br><span style=\"opacity:.75;\">\"It was obvious that Adelyn had practiced her routine every day.\"</span></td></tr><tr><td>generally</td><td>usually; in most cases<br><span style=\"opacity:.75;\">\"Adelyn generally wakes up early, even on travel days.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -981,6 +1029,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>RUPT</b> — break (Latin root). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>interrupt</td><td><i>inter- (between) + rupt (break)</i> — to break into a conversation or activity<br><span style=\"opacity:.75;\">\"It's polite to wait your turn instead of interrupting someone.\"</span></td></tr><tr><td>erupt</td><td><i>e- (out) + rupt (break)</i> — to burst out suddenly, like a volcano<br><span style=\"opacity:.75;\">\"The tour guide explained how the volcano could erupt without much warning.\"</span></td></tr><tr><td>disrupt</td><td><i>dis- (apart) + rupt (break)</i> — to break apart or interrupt the normal order of something<br><span style=\"opacity:.75;\">\"A power outage disrupted the cooking class for almost an hour.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>entire</td><td>whole; complete<br><span style=\"opacity:.75;\">\"They explored the entire old town in one afternoon.\"</span></td></tr><tr><td>immediately</td><td>right away; at once<br><span style=\"opacity:.75;\">\"Adelyn immediately recognized her cousin at the airport.\"</span></td></tr><tr><td>gradually</td><td>slowly, little by little<br><span style=\"opacity:.75;\">\"Her Spanish improved gradually over the year of travel.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -1508,6 +1564,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
                 "correct": 3
               }
             ]
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -1595,6 +1659,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>BIO</b> — life (Greek root). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>biology</td><td><i>bio- (life) + -logy (study of)</i> — the scientific study of living things<br><span style=\"opacity:.75;\">\"In biology, Adelyn learned how plants make their own food.\"</span></td></tr><tr><td>antibiotic</td><td><i>anti- (against) + bio (life)</i> — a medicine that fights harmful bacteria<br><span style=\"opacity:.75;\">\"The doctor gave Kenley an antibiotic to help fight the infection.\"</span></td></tr><tr><td>biodegradable</td><td><i>bio- (life) + degrade (break down) + -able (able to be)</i> — able to break down naturally over time<br><span style=\"opacity:.75;\">\"They packed biodegradable utensils for the picnic.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>rarely</td><td>not often<br><span style=\"opacity:.75;\">\"They rarely stayed in one city for more than a month.\"</span></td></tr><tr><td>frequently</td><td>often; many times<br><span style=\"opacity:.75;\">\"Adelyn frequently practiced her Spanish with the shopkeepers.\"</span></td></tr><tr><td>constantly</td><td>happening all the time, without stopping<br><span style=\"opacity:.75;\">\"The busy market was constantly full of noise and color.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -1682,6 +1754,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>PHOTO</b> — light (Greek root). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>photocopy</td><td><i>photo- (light) + copy</i> — a copy of a document made using a machine that uses light<br><span style=\"opacity:.75;\">\"The teacher made a photocopy of the map for every student.\"</span></td></tr><tr><td>photosynthesis</td><td><i>photo- (light) + synthesis (putting together)</i> — the process plants use to turn sunlight into food<br><span style=\"opacity:.75;\">\"During photosynthesis, a leaf uses sunlight, water, and air to make sugar.\"</span></td></tr><tr><td>photogenic</td><td><i>photo- (light) + gen (produce) + -ic (having qualities of)</i> — looking good in photographs<br><span style=\"opacity:.75;\">\"Adelyn's cartwheel photo turned out very photogenic.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>suddenly</td><td>happening quickly and unexpectedly<br><span style=\"opacity:.75;\">\"Suddenly, the sky turned dark and it began to pour.\"</span></td></tr><tr><td>previously</td><td>before now; earlier<br><span style=\"opacity:.75;\">\"They had previously visited that same city two years ago.\"</span></td></tr><tr><td>currently</td><td>happening right now<br><span style=\"opacity:.75;\">\"The family is currently living in a small apartment overseas.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -1769,6 +1849,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>MIT / MIS</b> — send (Latin root). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>permit</td><td><i>per- (through) + mit (send)</i> — to allow something; an official document that gives permission<br><span style=\"opacity:.75;\">\"You need a permit to camp in this national park.\"</span></td></tr><tr><td>submit</td><td><i>sub- (under) + mit (send)</i> — to hand in or turn something in<br><span style=\"opacity:.75;\">\"Adelyn had to submit her essay before Friday.\"</span></td></tr><tr><td>dismiss</td><td><i>dis- (away) + miss (send)</i> — to send away or allow to leave<br><span style=\"opacity:.75;\">\"The teacher will dismiss the class when the bell rings.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>approximately</td><td>close to an exact amount; about<br><span style=\"opacity:.75;\">\"The hike took approximately three hours to finish.\"</span></td></tr><tr><td>examine</td><td>to look at something closely and carefully<br><span style=\"opacity:.75;\">\"The doctor examined Adelyn's ankle after her fall.\"</span></td></tr><tr><td>observe</td><td>to watch something carefully<br><span style=\"opacity:.75;\">\"They stopped to observe the birds building a nest.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -2296,6 +2384,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
                 "correct": 0
               }
             ]
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -2383,6 +2479,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>AUD</b> — hear (Latin root). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>audience</td><td><i>aud (hear) + -ience (state of)</i> — a group of people watching or listening to a performance<br><span style=\"opacity:.75;\">\"The audience clapped loudly after the gymnastics routine.\"</span></td></tr><tr><td>audible</td><td><i>aud (hear) + -ible (able to be)</i> — loud enough to be heard<br><span style=\"opacity:.75;\">\"Her whisper was barely audible over the noisy market.\"</span></td></tr><tr><td>audio</td><td><i>aud (hear) + -io</i> — sound, especially recorded or broadcast sound<br><span style=\"opacity:.75;\">\"The museum offered an audio guide in five languages.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>summarize</td><td>to give the main points of something in a shorter form<br><span style=\"opacity:.75;\">\"Adelyn summarized the chapter in just three sentences.\"</span></td></tr><tr><td>conclude</td><td>to decide something after considering the facts; to end<br><span style=\"opacity:.75;\">\"After weighing both trails, they concluded the shorter one was better.\"</span></td></tr><tr><td>suggest</td><td>to offer an idea or plan for someone to consider<br><span style=\"opacity:.75;\">\"Kenley suggested they try the small bakery on the corner.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -2470,6 +2574,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>THERM</b> — heat (Greek root). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>thermometer</td><td><i>therm (heat) + meter (measure)</i> — a tool used to measure temperature<br><span style=\"opacity:.75;\">\"The thermometer showed it was over 90 degrees outside.\"</span></td></tr><tr><td>thermal</td><td><i>therm (heat) + -al (relating to)</i> — relating to heat<br><span style=\"opacity:.75;\">\"They wore thermal socks to stay warm on the mountain hike.\"</span></td></tr><tr><td>thermos</td><td><i>therm (heat)</i> — a container that keeps drinks hot or cold for a long time<br><span style=\"opacity:.75;\">\"Kenley packed hot soup in a thermos for the train ride.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>indicate</td><td>to show or point out<br><span style=\"opacity:.75;\">\"Dark clouds indicated that a storm was coming.\"</span></td></tr><tr><td>reveal</td><td>to make something known that was hidden<br><span style=\"opacity:.75;\">\"The old letter revealed a secret about the house's history.\"</span></td></tr><tr><td>demonstrate</td><td>to show clearly how something works or is done<br><span style=\"opacity:.75;\">\"The coach demonstrated the correct way to land a cartwheel.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -2557,6 +2669,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>AUTO</b> — self (Greek root). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>automatic</td><td><i>auto- (self) + -matic (acting)</i> — happening by itself, without a person controlling it<br><span style=\"opacity:.75;\">\"The automatic doors opened as soon as they walked close.\"</span></td></tr><tr><td>automobile</td><td><i>auto- (self) + mobile (moving)</i> — a car; a self-moving vehicle<br><span style=\"opacity:.75;\">\"The family rented an automobile to explore the countryside.\"</span></td></tr><tr><td>autopilot</td><td><i>auto- (self) + pilot</i> — a system that flies a plane or steers a ship without a person controlling it directly<br><span style=\"opacity:.75;\">\"The pilot switched to autopilot once the plane reached cruising height.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>establish</td><td>to set up or create something that will last<br><span style=\"opacity:.75;\">\"The family worked to establish a daily homeschool routine while traveling.\"</span></td></tr><tr><td>maintain</td><td>to keep something going or in good condition<br><span style=\"opacity:.75;\">\"It takes practice to maintain flexibility in gymnastics.\"</span></td></tr><tr><td>require</td><td>to need something<br><span style=\"opacity:.75;\">\"The recipe requires fresh basil and ripe tomatoes.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -3084,6 +3204,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
                 "correct": 4
               }
             ]
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -3171,6 +3299,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>TRI-</b> — three (Latin/Greek prefix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>triangle</td><td><i>tri- (three) + angle</i> — a shape with three sides and three angles<br><span style=\"opacity:.75;\">\"The roof of the little cabin was shaped like a triangle.\"</span></td></tr><tr><td>tricycle</td><td><i>tri- (three) + cycle (wheel)</i> — a vehicle with three wheels<br><span style=\"opacity:.75;\">\"Adelyn's little cousin loves riding his tricycle around the courtyard.\"</span></td></tr><tr><td>tripod</td><td><i>tri- (three) + pod (foot)</i> — a three-legged stand used to hold a camera steady<br><span style=\"opacity:.75;\">\"Dad set up the tripod to film Adelyn's cartwheel.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>struggle</td><td>to try hard to do something difficult<br><span style=\"opacity:.75;\">\"Kenley struggled at first to read the foreign menu.\"</span></td></tr><tr><td>hesitate</td><td>to pause because of uncertainty<br><span style=\"opacity:.75;\">\"Adelyn didn't hesitate before jumping into the pool.\"</span></td></tr><tr><td>wonder</td><td>to think about something with curiosity<br><span style=\"opacity:.75;\">\"Adelyn began to wonder how far away the stars really were.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -3258,6 +3394,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>UN-</b> — not (prefix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>unhappy</td><td><i>un- (not) + happy</i> — not happy; sad<br><span style=\"opacity:.75;\">\"Adelyn felt unhappy when the rain canceled the picnic.\"</span></td></tr><tr><td>unable</td><td><i>un- (not) + able</i> — not able to do something<br><span style=\"opacity:.75;\">\"The team was unable to finish the routine because of the storm.\"</span></td></tr><tr><td>unfair</td><td><i>un- (not) + fair</i> — not fair or just<br><span style=\"opacity:.75;\">\"It felt unfair that the match was postponed twice.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>imagine</td><td>to form a picture or idea in your mind<br><span style=\"opacity:.75;\">\"Try to imagine what life was like a hundred years ago.\"</span></td></tr><tr><td>realize</td><td>to become aware of something<br><span style=\"opacity:.75;\">\"Adelyn suddenly realized she had left her water bottle at the market.\"</span></td></tr><tr><td>recall</td><td>to remember something<br><span style=\"opacity:.75;\">\"Kenley could still recall the taste of her grandmother's soup.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -3341,6 +3485,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>RE-</b> — again, back (prefix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>rewrite</td><td><i>re- (again) + write</i> — to write something again, usually to improve it<br><span style=\"opacity:.75;\">\"Adelyn had to rewrite her paragraph to add more details.\"</span></td></tr><tr><td>replay</td><td><i>re- (again) + play</i> — to play something again, like a video<br><span style=\"opacity:.75;\">\"They watched a replay of the winning routine three times.\"</span></td></tr><tr><td>rebuild</td><td><i>re- (again) + build</i> — to build something again after it was broken or damaged<br><span style=\"opacity:.75;\">\"The village worked together to rebuild the bridge after the flood.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>remind</td><td>to help someone remember something<br><span style=\"opacity:.75;\">\"Mom set an alarm to remind them about the train.\"</span></td></tr><tr><td>remain</td><td>to stay in the same place or condition<br><span style=\"opacity:.75;\">\"Despite the chaos, Adelyn remained calm and focused.\"</span></td></tr><tr><td>continue</td><td>to keep doing something without stopping<br><span style=\"opacity:.75;\">\"They continued walking even after the sun went down.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -3868,6 +4020,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
                 "correct": 9
               }
             ]
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -3955,6 +4115,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>DIS-</b> — not, opposite of (prefix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>disagree</td><td><i>dis- (not) + agree</i> — to have a different opinion<br><span style=\"opacity:.75;\">\"Adelyn and Kenley disagreed about which movie to watch.\"</span></td></tr><tr><td>dislike</td><td><i>dis- (not) + like</i> — to not like something<br><span style=\"opacity:.75;\">\"Adelyn used to dislike spicy food, but now she loves it.\"</span></td></tr><tr><td>disappear</td><td><i>dis- (opposite) + appear</i> — to go out of sight<br><span style=\"opacity:.75;\">\"The cat seemed to disappear behind the market stalls.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>improve</td><td>to make or become better<br><span style=\"opacity:.75;\">\"Adelyn's cartwheels improved with every week of practice.\"</span></td></tr><tr><td>prevent</td><td>to stop something from happening<br><span style=\"opacity:.75;\">\"Wearing a helmet can prevent serious injuries.\"</span></td></tr><tr><td>protect</td><td>to keep someone or something safe from harm<br><span style=\"opacity:.75;\">\"Sunscreen helps protect skin from sunburn.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -4042,6 +4210,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>MIS-</b> — wrongly (prefix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>mistake</td><td><i>mis- (wrongly) + take</i> — an error; something done incorrectly<br><span style=\"opacity:.75;\">\"It was an honest mistake to add sugar instead of salt.\"</span></td></tr><tr><td>misspell</td><td><i>mis- (wrongly) + spell</i> — to spell a word incorrectly<br><span style=\"opacity:.75;\">\"Adelyn used to misspell the word 'because,' but not anymore.\"</span></td></tr><tr><td>mislead</td><td><i>mis- (wrongly) + lead</i> — to give someone a false idea; to lead in the wrong direction<br><span style=\"opacity:.75;\">\"The confusing sign nearly misled the hikers down the wrong path.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>provide</td><td>to give someone something they need<br><span style=\"opacity:.75;\">\"The host family provided fresh bread every morning.\"</span></td></tr><tr><td>produce</td><td>to make or create something<br><span style=\"opacity:.75;\">\"The small farm produces enough vegetables for the whole village.\"</span></td></tr><tr><td>create</td><td>to make something new<br><span style=\"opacity:.75;\">\"Adelyn used old fabric scraps to create a colorful bag.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -4129,6 +4305,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>SUB-</b> — under (prefix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>submarine</td><td><i>sub- (under) + marine (sea)</i> — a ship that can travel underwater<br><span style=\"opacity:.75;\">\"They watched a documentary about a submarine exploring the deep ocean.\"</span></td></tr><tr><td>subway</td><td><i>sub- (under) + way</i> — an underground train system<br><span style=\"opacity:.75;\">\"They took the subway to get across the busy city quickly.\"</span></td></tr><tr><td>substitute</td><td><i>sub- (in place of) + statute (set up)</i> — a person or thing that takes the place of another<br><span style=\"opacity:.75;\">\"They used honey as a substitute for sugar in the recipe.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>develop</td><td>to grow or become more advanced over time<br><span style=\"opacity:.75;\">\"Reading every night helped Adelyn develop a bigger vocabulary.\"</span></td></tr><tr><td>discover</td><td>to find something for the first time<br><span style=\"opacity:.75;\">\"They discovered a hidden waterfall behind the trees.\"</span></td></tr><tr><td>explore</td><td>to travel through a place to learn about it<br><span style=\"opacity:.75;\">\"The family loves to explore new cities on foot.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -4656,6 +4840,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
                 "correct": 2
               }
             ]
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -4743,6 +4935,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>-FUL</b> — full of (suffix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>joyful</td><td><i>joy + -ful (full of)</i> — full of joy or happiness<br><span style=\"opacity:.75;\">\"The whole family felt joyful after the reunion.\"</span></td></tr><tr><td>careful</td><td><i>care + -ful (full of)</i> — paying close attention; full of care<br><span style=\"opacity:.75;\">\"Be careful on the slippery cobblestone streets.\"</span></td></tr><tr><td>helpful</td><td><i>help + -ful (full of)</i> — giving help; useful<br><span style=\"opacity:.75;\">\"The friendly shopkeeper was very helpful with directions.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>calculate</td><td>to figure out an answer using math<br><span style=\"opacity:.75;\">\"Adelyn calculated how many days were left until their next flight.\"</span></td></tr><tr><td>estimate</td><td>to make a careful guess about an amount<br><span style=\"opacity:.75;\">\"Kenley estimated how much flour the recipe would need.\"</span></td></tr><tr><td>measure</td><td>to find the size, length, or amount of something<br><span style=\"opacity:.75;\">\"They used a tape measure to check the height of the doorway.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -4830,6 +5030,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>-LESS</b> — without (suffix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>careless</td><td><i>care + -less (without)</i> — not paying attention; done without care<br><span style=\"opacity:.75;\">\"A careless mistake caused the tower of blocks to fall.\"</span></td></tr><tr><td>fearless</td><td><i>fear + -less (without)</i> — without fear; very brave<br><span style=\"opacity:.75;\">\"The fearless gymnast attempted the trick without hesitation.\"</span></td></tr><tr><td>harmless</td><td><i>harm + -less (without)</i> — not able or likely to cause harm<br><span style=\"opacity:.75;\">\"The garden snake was harmless and quickly slithered away.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>include</td><td>to have something as part of a group<br><span style=\"opacity:.75;\">\"The tour price includes lunch and a boat ride.\"</span></td></tr><tr><td>exclude</td><td>to leave something out; to not include<br><span style=\"opacity:.75;\">\"The recipe excludes nuts because of Kenley's allergy.\"</span></td></tr><tr><td>combine</td><td>to join two or more things together<br><span style=\"opacity:.75;\">\"Combine the flour and water to make the dough.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -4917,6 +5125,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>-ABLE / -IBLE</b> — capable of (suffix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>comfortable</td><td><i>comfort + -able (capable of)</i> — providing comfort; at ease<br><span style=\"opacity:.75;\">\"The old hammock was surprisingly comfortable.\"</span></td></tr><tr><td>flexible</td><td><i>flex + -ible (capable of)</i> — able to bend or change easily<br><span style=\"opacity:.75;\">\"Years of gymnastics made Adelyn incredibly flexible.\"</span></td></tr><tr><td>reliable</td><td><i>rely + -able (capable of)</i> — able to be trusted or depended on<br><span style=\"opacity:.75;\">\"Their old van turned out to be a reliable way to travel.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>separate</td><td>to divide or keep apart<br><span style=\"opacity:.75;\">\"They separated the laundry into light and dark colors.\"</span></td></tr><tr><td>divide</td><td>to split something into parts<br><span style=\"opacity:.75;\">\"Adelyn divided the mangoes evenly between her and Kenley.\"</span></td></tr><tr><td>connect</td><td>to join or link together<br><span style=\"opacity:.75;\">\"A long bridge connects the two islands.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -5436,6 +5652,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
                 "correct": 11
               }
             ]
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -5523,6 +5747,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>-OLOGY</b> — study of (suffix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>zoology</td><td><i>zoo- (animal) + -logy (study of)</i> — the scientific study of animals<br><span style=\"opacity:.75;\">\"In zoology, Adelyn learned how octopuses change color to hide.\"</span></td></tr><tr><td>technology</td><td><i>techno- (skill/craft) + -logy (study of)</i> — the use of science to create tools and machines<br><span style=\"opacity:.75;\">\"New technology made it easier to video-call family back home.\"</span></td></tr><tr><td>mythology</td><td><i>myth + -logy (study of)</i> — the study of traditional stories, often about gods and heroes<br><span style=\"opacity:.75;\">\"Greek mythology is full of stories about brave heroes and powerful gods.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>trust</td><td>to believe that someone is honest or reliable<br><span style=\"opacity:.75;\">\"It's important to trust your gut when trying a new trick.\"</span></td></tr><tr><td>value</td><td>to think something is important or useful<br><span style=\"opacity:.75;\">\"The family values spending time together while traveling.\"</span></td></tr><tr><td>appreciate</td><td>to be thankful for something; to recognize its worth<br><span style=\"opacity:.75;\">\"Adelyn learned to appreciate the little things, like a warm meal.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -5610,6 +5842,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>HYDRO</b> — water (Greek root). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>dehydrate</td><td><i>de- (remove) + hydro (water) + -ate (to make)</i> — to remove water from something; to lose too much water<br><span style=\"opacity:.75;\">\"It's easy to dehydrate when hiking in hot weather, so drink plenty of water.\"</span></td></tr><tr><td>hydroelectric</td><td><i>hydro- (water) + electric</i> — producing electricity using the power of moving water<br><span style=\"opacity:.75;\">\"The dam produces hydroelectric power for the whole region.\"</span></td></tr><tr><td>hydrogen</td><td><i>hydro- (water) + -gen (produce)</i> — a gas that combines with oxygen to form water<br><span style=\"opacity:.75;\">\"Hydrogen is the lightest and most common element in the universe.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>admire</td><td>to respect or think highly of someone<br><span style=\"opacity:.75;\">\"Adelyn admired the gymnast's years of hard work.\"</span></td></tr><tr><td>encourage</td><td>to give someone support or confidence<br><span style=\"opacity:.75;\">\"Kenley encouraged her sister before the big competition.\"</span></td></tr><tr><td>inspire</td><td>to give someone the desire or idea to do something<br><span style=\"opacity:.75;\">\"The mountain view inspired Adelyn to try painting.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -5697,6 +5937,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>MAL-</b> — bad (prefix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>malfunction</td><td><i>mal- (bad) + function</i> — to fail to work correctly<br><span style=\"opacity:.75;\">\"The old camera began to malfunction halfway through the trip.\"</span></td></tr><tr><td>malnutrition</td><td><i>mal- (bad) + nutrition (nourishment)</i> — poor health caused by not getting enough of the right food<br><span style=\"opacity:.75;\">\"Doctors work to prevent malnutrition in communities with little access to fresh food.\"</span></td></tr><tr><td>malady</td><td><i>mal- (bad)</i> — an illness or unhealthy condition<br><span style=\"opacity:.75;\">\"A mild malady kept Kenley resting for a day before she felt better.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>motivate</td><td>to give someone a reason to do something<br><span style=\"opacity:.75;\">\"A gold star chart helped motivate Adelyn during spelling practice.\"</span></td></tr><tr><td>persuade</td><td>to convince someone to do or believe something<br><span style=\"opacity:.75;\">\"Adelyn tried to persuade her mom to let her stay up late.\"</span></td></tr><tr><td>convince</td><td>to make someone believe something is true<br><span style=\"opacity:.75;\">\"It took some convincing before Kenley agreed to try the spicy dish.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -6224,6 +6472,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
                 "correct": 8
               }
             ]
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -6311,6 +6567,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>-IST</b> — one who (suffix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>artist</td><td><i>art + -ist (one who)</i> — a person who creates art<br><span style=\"opacity:.75;\">\"The street artist painted a colorful mural on the old wall.\"</span></td></tr><tr><td>scientist</td><td><i>science + -ist (one who)</i> — a person who studies and researches science<br><span style=\"opacity:.75;\">\"A marine scientist explained how coral reefs grow.\"</span></td></tr><tr><td>tourist</td><td><i>tour + -ist (one who)</i> — a person traveling for pleasure<br><span style=\"opacity:.75;\">\"The small town welcomed tourists from all over the world.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>explain</td><td>to make something clear or easy to understand<br><span style=\"opacity:.75;\">\"Kenley explained the recipe step by step.\"</span></td></tr><tr><td>clarify</td><td>to make something clearer or easier to understand<br><span style=\"opacity:.75;\">\"The teacher clarified the instructions before the quiz began.\"</span></td></tr><tr><td>confuse</td><td>to make someone unsure or unable to understand<br><span style=\"opacity:.75;\">\"The maze of narrow streets began to confuse them.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -6398,6 +6662,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>-ER / -OR</b> — one who (suffix). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>inventor</td><td><i>invent + -or (one who)</i> — a person who creates something new<br><span style=\"opacity:.75;\">\"The young inventor built a machine that sorted seashells by size.\"</span></td></tr><tr><td>visitor</td><td><i>visit + -or (one who)</i> — a person who visits a place<br><span style=\"opacity:.75;\">\"The museum welcomed visitors from dozens of countries.\"</span></td></tr><tr><td>actor</td><td><i>act + -or (one who)</i> — a person who performs in plays or movies<br><span style=\"opacity:.75;\">\"The actor practiced her lines before the big performance.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>puzzle</td><td>to confuse someone; a problem that is hard to solve<br><span style=\"opacity:.75;\">\"The old riddle puzzled Adelyn for the whole afternoon.\"</span></td></tr><tr><td>curious</td><td>eager to learn or know something<br><span style=\"opacity:.75;\">\"Adelyn is curious about how other kids learn in different countries.\"</span></td></tr><tr><td>eager</td><td>very excited and ready to do something<br><span style=\"opacity:.75;\">\"She was eager to try the new gymnastics gym in town.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -6485,6 +6757,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
             "label": "Study This Week's Words",
             "type": "read",
             "content": "<div class=\"lesson-text\"><p>Root family this week: <b>CRED</b> — believe (Latin root). Three root words share this piece, plus three everyday \"frequency\" words that show up constantly in her reading.</p></div><table class=\"vocab-table\"><tr><td colspan=\"2\"><b>Strand 1: Root Words</b></td></tr><tr><td>credible</td><td><i>cred (believe) + -ible (capable of)</i> — believable; able to be trusted<br><span style=\"opacity:.75;\">\"The witness gave a credible account of what happened.\"</span></td></tr><tr><td>credit</td><td><i>cred (believe/trust)</i> — trust or belief in someone's honesty; recognition for an achievement<br><span style=\"opacity:.75;\">\"Adelyn deserves credit for practicing every single day.\"</span></td></tr><tr><td>incredible</td><td><i>in- (not) + cred (believe) + -ible (capable of)</i> — impossible or hard to believe; amazing<br><span style=\"opacity:.75;\">\"The view from the mountaintop was absolutely incredible.\"</span></td></tr><tr><td colspan=\"2\"><b>Strand 2: Frequency Words</b></td></tr><tr><td>anxious</td><td>worried or nervous about something<br><span style=\"opacity:.75;\">\"Adelyn felt a little anxious before her first competition abroad.\"</span></td></tr><tr><td>nervous</td><td>feeling worried or uneasy<br><span style=\"opacity:.75;\">\"Kenley was nervous before tasting the unusual fruit.\"</span></td></tr><tr><td>confident</td><td>feeling sure of yourself and your abilities<br><span style=\"opacity:.75;\">\"After months of practice, Adelyn felt confident about her routine.\"</span></td></tr></table>"
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },
@@ -7620,6 +7900,14 @@ var ADELYN_VOCAB_READING_WEEKS = [
                 "correct": 1
               }
             ]
+          },
+          {
+            "id": "avwb",
+            "label": "Play in the Word Bakery",
+            "type": "external",
+            "url": "https://kristinaraejones.github.io/ela-pastry-kitchen/word-bakery/",
+            "linkText": "Open Word Bakery",
+            "note": "Opens in a new tab. Works offline once you've loaded it there at least once. Covers all her vocab words so far, not just this week's — great for review any week."
           }
         ]
       },

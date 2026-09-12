@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adelyn's Word Bakery</title>
+<style>
+  :root {
+    --sky: #cdeaf7;
+    --sky-soft: #e8f6fd;
+    --cream: #fdf6ec;
+    --cream-dim: #f3e7d3;
+    --crust: #5a3825;
+    --crust-soft: #7a5238;
+    --icing-pink: #e8a0ad;
+    --icing-pink-deep: #d9788a;
+    --butter: #f0c14b;
+    --mint: #7fb88f;
+    --panel: #fffaf2;
+    --shelf: #c9905e;
+    --mono: "Courier New", Courier, monospace;
+    --serif: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(255,255,255,0.5), transparent 45%),
+      var(--cream);
+    color: var(--crust);
+    font-family: var(--serif);
+    padding: 20px 14px 60px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+
+  header {
+    border-bottom: 3px dashed var(--icing-pink-deep);
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+  }
+  .stamp {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--icing-pink-deep);
+    text-transform: uppercase;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(24px, 6vw, 34px);
+    margin: 6px 0 4px;
+    color: var(--crust);
+  }
+  .subtitle { color: var(--crust-soft); font-size: 14px; font-style: italic; }
+
+  .rank-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--panel);
+    border: 1px solid var(--cream-dim);
+    border-radius: 14px;
+    padding: 10px 16px;
+    margin-bottom: 18px;
+    font-family: var(--mono);
+    font-size: 13px;
+    box-shadow: 0 2px 6px rgba(90,56,37,0.08);
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .rank-bar .rank-name { color: var(--icing-pink-deep); font-weight: bold; }
+  .rank-bar .sprinkles { color: var(--butter); font-weight: bold; }
+  .rank-bar .day-streak { color: var(--mint); }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--crust-soft);
+    border: 1px solid var(--cream-dim);
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .tab:hover { border-color: var(--icing-pink-deep); color: var(--crust); }
+  .tab.active {
+    background: var(--icing-pink-deep);
+    color: #fff;
+    border-color: var(--icing-pink-deep);
+    font-weight: bold;
+  }
+
+  .card {
+    background: var(--panel);
+    color: var(--crust);
+    border-radius: 16px;
+    padding: 26px 22px;
+    box-shadow: 0 10px 28px rgba(90,56,37,0.16);
+    position: relative;
+    min-height: 280px;
+    border: 1px solid var(--cream-dim);
+  }
+
+  /* ---- Intro / welcome-back screen ---- */
+  .intro-emoji { font-size: 46px; margin-bottom: 6px; }
+  .intro-title {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 0 10px;
+  }
+  .intro-body { font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
+  .begin-btn {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--icing-pink-deep);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 12px 22px;
+    cursor: pointer;
+  }
+  .begin-btn:hover { background: #c2606f; }
+
+  /* ---- Customer / mascot ---- */
+  .customer-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .customer-avatar { font-size: 32px; line-height: 1; }
+  .speech-bubble {
+    position: relative;
+    background: var(--sky-soft);
+    border: 1.5px solid var(--sky);
+    border-radius: 14px;
+    padding: 10px 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    flex: 1;
+  }
+  .speech-bubble .customer-name { font-weight: bold; color: var(--crust-soft); }
+  .special-flag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--butter);
+    color: var(--crust);
+    border-radius: 10px;
+    padding: 3px 8px;
+    margin-bottom: 8px;
+  }
+  .rush-flag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--icing-pink-deep);
+    color: #fff;
+    border-radius: 10px;
+    padding: 3px 8px;
+    margin-bottom: 8px;
+    margin-left: 6px;
+    animation: rush-pulse 0.8s ease-in-out infinite;
+  }
+  .rush-flag.rush-closed { animation: none; background: var(--crust-soft); }
+  @keyframes rush-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.07); }
+  }
+  .rush-bar-track {
+    height: 6px;
+    background: var(--cream-dim);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 2px 0 14px;
+  }
+  .rush-bar-fill {
+    height: 100%;
+    background: var(--icing-pink-deep);
+    width: 100%;
+  }
+
+  .ticket-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--icing-pink-deep);
+    margin-bottom: 8px;
+  }
+  .ticket-label.review { color: var(--mint); }
+
+  .word-display {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: bold;
+    margin: 2px 0 4px;
+    color: var(--crust);
+  }
+  .root-note {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--crust-soft);
+    margin-bottom: 14px;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    text-align: left;
+    background: #fff;
+    border: 1.5px solid var(--cream-dim);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: var(--serif);
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    color: var(--crust);
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--icing-pink-deep); background: #fffdf9; transform: translateY(-1px); }
+  .option-btn.correct { background: #e2f1e6; border-color: var(--mint); animation: pop 0.35s ease; }
+  .option-btn.wrong { background: #f9e3e6; border-color: var(--icing-pink-deep); }
+  .option-btn:disabled { cursor: default; }
+
+  @keyframes pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+  .card.shake-it { animation: shake 0.3s ease; }
+
+  .feedback {
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 13px;
+    min-height: 20px;
+  }
+  .feedback.good { color: #3d6b47; }
+  .feedback.bad { color: var(--icing-pink-deep); }
+  .combo-tag {
+    color: var(--butter);
+    font-weight: bold;
+    margin-left: 8px;
+    display: inline-block;
+    animation: combo-pop 0.4s ease;
+  }
+  .combo-tag.tier2 { color: #e8862c; }
+  .combo-tag.tier3 { color: var(--icing-pink-deep); font-size: 1.12em; }
+  @keyframes combo-pop {
+    0% { transform: scale(0.5) rotate(-8deg); opacity: 0; }
+    60% { transform: scale(1.18) rotate(4deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  .fly-point {
+    position: fixed;
+    font-family: var(--mono);
+    font-weight: bold;
+    font-size: 15px;
+    color: var(--butter);
+    pointer-events: none;
+    z-index: 998;
+    white-space: nowrap;
+  }
+
+  .next-btn {
+    margin-top: 18px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--crust);
+    color: var(--butter);
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    display: none;
+  }
+  .next-btn.show { display: inline-block; }
+  .next-btn:hover { background: var(--crust-soft); }
+
+  /* ---- Match mode ---- */
+  .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+  .match-col-label {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--crust-soft); margin-bottom: 6px;
+  }
+  .match-item {
+    background: #fff;
+    border: 1.5px solid var(--cream-dim);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+  .match-item.selected { border-color: var(--butter); background: #fff8e2; }
+  .match-item.matched { background: #e2f1e6; border-color: var(--mint); opacity: 0.7; cursor: default; }
+  .match-item.wrong-flash { background: #f9e3e6; border-color: var(--icing-pink-deep); }
+
+  .empty-state {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--crust-soft);
+    text-align: center;
+    padding: 30px 10px;
+  }
+
+  /* ---- My Bakery tab: decorate-the-cake scene ---- */
+  .shop-scene {
+    background: var(--sky-soft);
+    border-radius: 14px;
+    padding: 0;
+    margin-bottom: 20px;
+    height: 270px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cake-stand-label {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: #fff;
+    border: 1.5px solid var(--icing-pink-deep);
+    border-radius: 20px;
+    padding: 4px 12px;
+    color: var(--icing-pink-deep);
+    white-space: nowrap;
+    z-index: 3;
+  }
+  .cake {
+    position: absolute;
+    bottom: 46px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 62%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+  }
+  .cake .tier-top {
+    width: 60%;
+    height: 46px;
+    background: linear-gradient(180deg, #fff9f0 0%, #ffeccb 100%);
+    border: 3px solid var(--crust-soft);
+    border-radius: 10px;
+    margin-bottom: -3px;
+  }
+  .cake .tier-bottom {
+    width: 100%;
+    height: 62px;
+    background: linear-gradient(180deg, #fbe3ea 0%, #f3bdcb 100%);
+    border: 3px solid var(--crust-soft);
+    border-radius: 10px;
+  }
+  .cake-plate {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 74%;
+    height: 16px;
+    background: var(--shelf);
+    border-radius: 50%;
+    box-shadow: 0 3px 0 var(--crust-soft);
+    z-index: 0;
+  }
+  .cake-table {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: var(--crust-soft);
+  }
+  .decor-slots {
+    position: absolute;
+    top: 15%;
+    left: 12%;
+    right: 12%;
+    bottom: 20%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    align-items: center;
+    justify-items: center;
+    z-index: 2;
+  }
+  .decor-slot {
+    font-size: 22px;
+    filter: grayscale(1) opacity(0.22);
+    transition: filter 0.3s ease;
+  }
+  .decor-slot.owned {
+    visibility: hidden;
+  }
+  .cake-topping {
+    position: absolute;
+    font-size: 26px;
+    cursor: grab;
+    z-index: 4;
+    touch-action: none;
+    user-select: none;
+    animation: bounce-in 0.35s ease;
+  }
+  .cake-topping.dragging {
+    cursor: grabbing;
+    transform: scale(1.18);
+    filter: drop-shadow(0 4px 6px rgba(90,56,37,0.35));
+    z-index: 5;
+  }
+  .cake-hint {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--crust-soft);
+    margin: -6px 0 14px;
+  }
+
+  .box-section-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--icing-pink-deep);
+    margin: 18px 0 10px;
+  }
+  .treat-shelf {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 30px;
+    background: #fff;
+    border: 1px dashed var(--cream-dim);
+    border-radius: 10px;
+    padding: 14px;
+    min-height: 50px;
+  }
+  .treat-shelf .treat { animation: bounce-in 0.3s ease; }
+  @keyframes bounce-in {
+    0% { transform: scale(0.4); opacity: 0; }
+    70% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+  .shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .shop-item {
+    background: #fff;
+    border: 1px solid var(--cream-dim);
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    font-size: 13px;
+  }
+  .shop-item .shop-emoji { font-size: 28px; display: block; margin-bottom: 4px; }
+  .shop-buy-btn {
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--icing-pink-deep);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 6px 10px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .shop-buy-btn:disabled { background: var(--cream-dim); color: var(--crust-soft); cursor: default; }
+  .shop-buy-btn.owned { background: var(--mint); }
+
+  .parent-settings {
+    margin-top: 22px;
+    border: 1px dashed var(--cream-dim);
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+  .parent-settings summary {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--crust-soft);
+    cursor: pointer;
+  }
+  .settings-body { margin-top: 10px; font-size: 13px; }
+  .settings-body input[type="number"] {
+    width: 60px;
+    padding: 4px 6px;
+    border: 1px solid var(--cream-dim);
+    border-radius: 6px;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  .settings-save-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--crust);
+    color: var(--butter);
+    border: none;
+    border-radius: 14px;
+    padding: 6px 12px;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+  .settings-note {
+    display: block;
+    color: var(--crust-soft);
+    font-size: 11px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .parent-report {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 6px;
+  }
+  .report-list { display: flex; flex-direction: column; gap: 6px; }
+  .report-row {
+    font-size: 12px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--cream-dim);
+  }
+  .report-row.report-correct { border-color: #b9dcae; background: #f2f9ee; }
+  .report-row.report-wrong { border-color: #f0b8b8; background: #fdf0f0; }
+  .report-row .settings-note { margin-top: 2px; }
+
+  footer {
+    text-align: center;
+    margin-top: 22px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--crust-soft);
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 480px) {
+    .match-grid { grid-template-columns: 1fr; }
+  }
+
+  .confetti-piece {
+    position: fixed;
+    top: -10px;
+    width: 8px;
+    height: 14px;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 999;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="stamp">The Vocabulary Bakeshop</div>
+    <h1>ADELYN'S WORD BAKERY</h1>
+    <div class="subtitle">Run the counter, serve every customer, and grow your very own bakery.</div>
+  </header>
+
+  <div class="rank-bar">
+    <div><span class="rank-name" id="rankName">Kitchen Helper</span></div>
+    <div class="sprinkles" id="sprinklesDisplay">✨ 0</div>
+    <div class="day-streak" id="dayStreakDisplay">🔥 0 day streak</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-mode="quiz">Bake!</button>
+    <button class="tab" data-mode="match">Match Orders</button>
+    <button class="tab" data-mode="shop">My Bakery</button>
+  </div>
+
+  <div class="card" id="gameCard">
+    <!-- populated by JS -->
+  </div>
+
+  <footer>ADELYN'S WORD BAKERY &middot; Vocabulary, Grade 4 &middot; works fully offline, saved right here on this device</footer>
+</div>
+
+<script>
+// ---------- Word bank ----------
+// Pulled straight from Adelyn's real Vocabulary & Reading curriculum
+// (root words + frequency words, all 36 weeks).
+//
+// HOW TO ADVANCE HER PACING:
+// state.currentWeek (default 1) is the highest week she's been taught —
+// it should always match her current_week pointer in the ELA Pastry
+// Kitchen app. It's editable right in the game: My Bakery tab -> Parent
+// Settings. Words from any week ABOVE currentWeek are never shown, in
+// quiz, match, or the treat shelf — she can't stumble onto vocab she
+// hasn't been taught yet. The current week and the one before it count
+// as "active" (shown most often); everything taught before that becomes
+// review material, cycled back in less often, with anything she's missed
+// prioritized until she gets it right twice in a row.
+const ACTIVE_WINDOW = 2;
+
+const WORDS = [{"id":"w1_telephone","week":1,"word":"telephone","type":"root","rootFamily":"TELE- — far, far off (Greek prefix)","rootNote":"tele- (far) + phone (sound)","definition":"a device used to talk to someone who is far away","example":"Adelyn called her grandmother on the telephone to tell her about the trip."},{"id":"w1_television","week":1,"word":"television","type":"root","rootFamily":"TELE- — far, far off (Greek prefix)","rootNote":"tele- (far) + vision (to see)","definition":"a device that shows moving pictures and sound sent from far away","example":"The family watched a nature show on television after dinner."},{"id":"w1_telescope","week":1,"word":"telescope","type":"root","rootFamily":"TELE- — far, far off (Greek prefix)","rootNote":"tele- (far) + scope (to look at)","definition":"a tool that makes faraway objects, like stars, look closer","example":"Through the telescope, Adelyn could see the craters on the moon."},{"id":"w1_however","week":1,"word":"however","type":"frequency","rootFamily":null,"rootNote":null,"definition":"used to introduce a statement that contrasts with something already said","example":"Adelyn wanted to go to the beach; however, it started raining."},{"id":"w1_although","week":1,"word":"although","type":"frequency","rootFamily":null,"rootNote":null,"definition":"even though; despite the fact that","example":"Although she was tired, Adelyn finished her stretching routine."},{"id":"w1_particular","week":1,"word":"particular","type":"frequency","rootFamily":null,"rootNote":null,"definition":"specific; one certain thing and not others","example":"Kenley had one particular market stall she visited every week."},{"id":"w2_paragraph","week":2,"word":"paragraph","type":"root","rootFamily":"GRAPH / GRAM — write (Greek root)","rootNote":"para- (beside) + graph (write)","definition":"a group of sentences about one main idea","example":"Adelyn wrote a paragraph describing her favorite market in Lisbon."},{"id":"w2_biography","week":2,"word":"biography","type":"root","rootFamily":"GRAPH / GRAM — write (Greek root)","rootNote":"bio- (life) + graph (write)","definition":"a true story of a person's life written by someone else","example":"Kenley read a biography about a famous inventor."},{"id":"w2_photograph","week":2,"word":"photograph","type":"root","rootFamily":"GRAPH / GRAM — write (Greek root)","rootNote":"photo- (light) + graph (write)","definition":"a picture made using light, usually with a camera","example":"Dad took a photograph of the sunset over the mountains."},{"id":"w2_determine","week":2,"word":"determine","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to decide something after careful thought; to figure out","example":"They used a map to determine the fastest route to the museum."},{"id":"w2_additional","week":2,"word":"additional","type":"frequency","rootFamily":null,"rootNote":null,"definition":"extra; more than what is already there","example":"The teacher gave Adelyn an additional worksheet for practice."},{"id":"w2_recognize","week":2,"word":"recognize","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to know or identify someone or something from before","example":"Adelyn didn't recognize the city at night with all the lights."},{"id":"w3_transport","week":3,"word":"transport","type":"root","rootFamily":"PORT — carry (Latin root)","rootNote":"trans- (across) + port (carry)","definition":"to carry people or things from one place to another","example":"A big ship can transport hundreds of shipping containers across the ocean."},{"id":"w3_portable","week":3,"word":"portable","type":"root","rootFamily":"PORT — carry (Latin root)","rootNote":"port (carry) + -able (able to be)","definition":"able to be carried or moved easily","example":"Adelyn packed a portable speaker for the long train ride."},{"id":"w3_report","week":3,"word":"report","type":"root","rootFamily":"PORT — carry (Latin root)","rootNote":"re- (back) + port (carry)","definition":"to carry information back and share it with others","example":"Adelyn will report on what she learned about Portuguese history."},{"id":"w3_purpose","week":3,"word":"purpose","type":"frequency","rootFamily":null,"rootNote":null,"definition":"the reason something is done; a goal","example":"The purpose of the trip was to visit Kenley's old friend."},{"id":"w3_environment","week":3,"word":"environment","type":"frequency","rootFamily":null,"rootNote":null,"definition":"the surroundings or conditions in which someone lives","example":"The rainforest environment was hot, humid, and full of sound."},{"id":"w3_achieve","week":3,"word":"achieve","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to succeed in reaching a goal","example":"Adelyn worked hard all year to achieve a perfect cartwheel."},{"id":"w4_predict","week":4,"word":"predict","type":"root","rootFamily":"DICT — say, speak (Latin root)","rootNote":"pre- (before) + dict (say)","definition":"to say what will happen before it happens","example":"Kenley tried to predict how the soup would taste before adding the spices."},{"id":"w4_dictionary","week":4,"word":"dictionary","type":"root","rootFamily":"DICT — say, speak (Latin root)","rootNote":"dict (say/word) + -ary (place/collection)","definition":"a book that lists words and their meanings","example":"When Adelyn didn't know a word, she looked it up in the dictionary."},{"id":"w4_dictate","week":4,"word":"dictate","type":"root","rootFamily":"DICT — say, speak (Latin root)","rootNote":"dict (say) + -ate (to do)","definition":"to say words aloud for someone else to write down","example":"Mom dictated the grocery list while Adelyn wrote it down."},{"id":"w4_ordinary","week":4,"word":"ordinary","type":"frequency","rootFamily":null,"rootNote":null,"definition":"normal; not special or unusual","example":"It was just an ordinary Tuesday until the surprise phone call."},{"id":"w4_opportunity","week":4,"word":"opportunity","type":"frequency","rootFamily":null,"rootNote":null,"definition":"a chance to do something","example":"Living abroad gave Adelyn the opportunity to learn Spanish."},{"id":"w4_various","week":4,"word":"various","type":"frequency","rootFamily":null,"rootNote":null,"definition":"several different","example":"The market sold various spices from all over the region."},{"id":"w5_inspect","week":5,"word":"inspect","type":"root","rootFamily":"SPECT — look, see (Latin root)","rootNote":"in- (into) + spect (look)","definition":"to look at something closely and carefully","example":"The mechanic will inspect the van before our long road trip."},{"id":"w5_respect","week":5,"word":"respect","type":"root","rootFamily":"SPECT — look, see (Latin root)","rootNote":"re- (again) + spect (look)","definition":"a feeling of admiration for someone; to treat someone with consideration","example":"Adelyn showed respect for her coach by listening carefully."},{"id":"w5_spectator","week":5,"word":"spectator","type":"root","rootFamily":"SPECT — look, see (Latin root)","rootNote":"spect (look) + -ator (one who)","definition":"a person who watches an event without taking part","example":"Hundreds of spectators cheered from the stands during the gymnastics meet."},{"id":"w5_especially","week":5,"word":"especially","type":"frequency","rootFamily":null,"rootNote":null,"definition":"more than usual; particularly","example":"Adelyn loves fruit, especially mangoes."},{"id":"w5_considerable","week":5,"word":"considerable","type":"frequency","rootFamily":null,"rootNote":null,"definition":"fairly large in amount or size","example":"It took a considerable amount of time to pack for the trip."},{"id":"w5_eventually","week":5,"word":"eventually","type":"frequency","rootFamily":null,"rootNote":null,"definition":"after some time; in the end","example":"The rain stopped eventually, and they went outside to play."},{"id":"w6_construct","week":6,"word":"construct","type":"root","rootFamily":"STRUCT — build (Latin root)","rootNote":"con- (together) + struct (build)","definition":"to build or put something together","example":"The workers used bamboo scaffolding to construct the new building."},{"id":"w6_instruct","week":6,"word":"instruct","type":"root","rootFamily":"STRUCT — build (Latin root)","rootNote":"in- (in) + struct (build)","definition":"to teach or give directions","example":"The coach will instruct the class on a new stretching routine."},{"id":"w6_structure","week":6,"word":"structure","type":"root","rootFamily":"STRUCT — build (Latin root)","rootNote":"struct (build) + -ure (result of)","definition":"something that has been built; the way parts are arranged","example":"The old stone structure had stood in the village for centuries."},{"id":"w6_appropriate","week":6,"word":"appropriate","type":"frequency","rootFamily":null,"rootNote":null,"definition":"suitable or correct for the situation","example":"Kenley picked an appropriate outfit for the fancy dinner."},{"id":"w6_obvious","week":6,"word":"obvious","type":"frequency","rootFamily":null,"rootNote":null,"definition":"easy to see or understand","example":"It was obvious that Adelyn had practiced her routine every day."},{"id":"w6_generally","week":6,"word":"generally","type":"frequency","rootFamily":null,"rootNote":null,"definition":"usually; in most cases","example":"Adelyn generally wakes up early, even on travel days."},{"id":"w7_interrupt","week":7,"word":"interrupt","type":"root","rootFamily":"RUPT — break (Latin root)","rootNote":"inter- (between) + rupt (break)","definition":"to break into a conversation or activity","example":"It's polite to wait your turn instead of interrupting someone."},{"id":"w7_erupt","week":7,"word":"erupt","type":"root","rootFamily":"RUPT — break (Latin root)","rootNote":"e- (out) + rupt (break)","definition":"to burst out suddenly, like a volcano","example":"The tour guide explained how the volcano could erupt without much warning."},{"id":"w7_disrupt","week":7,"word":"disrupt","type":"root","rootFamily":"RUPT — break (Latin root)","rootNote":"dis- (apart) + rupt (break)","definition":"to break apart or interrupt the normal order of something","example":"A power outage disrupted the cooking class for almost an hour."},{"id":"w7_entire","week":7,"word":"entire","type":"frequency","rootFamily":null,"rootNote":null,"definition":"whole; complete","example":"They explored the entire old town in one afternoon."},{"id":"w7_immediately","week":7,"word":"immediately","type":"frequency","rootFamily":null,"rootNote":null,"definition":"right away; at once","example":"Adelyn immediately recognized her cousin at the airport."},{"id":"w7_gradually","week":7,"word":"gradually","type":"frequency","rootFamily":null,"rootNote":null,"definition":"slowly, little by little","example":"Her Spanish improved gradually over the year of travel."},{"id":"w8_describe","week":8,"word":"describe","type":"root","rootFamily":"SCRIB / SCRIPT — write (Latin root)","rootNote":"de- (down) + scrib (write)","definition":"to tell or write details about something","example":"Adelyn tried to describe the taste of the strange new fruit."},{"id":"w8_subscribe","week":8,"word":"subscribe","type":"root","rootFamily":"SCRIB / SCRIPT — write (Latin root)","rootNote":"sub- (under) + scrib (write)","definition":"to sign up to regularly receive something","example":"Kenley asked to subscribe to a cooking magazine."},{"id":"w8_script","week":8,"word":"script","type":"root","rootFamily":"SCRIB / SCRIPT — write (Latin root)","rootNote":"script (write)","definition":"the written words of a play, movie, or speech","example":"The actors memorized their script before the show."},{"id":"w8_numerous","week":8,"word":"numerous","type":"frequency","rootFamily":null,"rootNote":null,"definition":"many","example":"There were numerous stalls selling handmade jewelry."},{"id":"w8_tremendous","week":8,"word":"tremendous","type":"frequency","rootFamily":null,"rootNote":null,"definition":"very great in size or amount","example":"The gymnast made a tremendous effort during her final routine."},{"id":"w8_enormous","week":8,"word":"enormous","type":"frequency","rootFamily":null,"rootNote":null,"definition":"extremely large","example":"The old castle had an enormous courtyard."},{"id":"w9_biology","week":9,"word":"biology","type":"root","rootFamily":"BIO — life (Greek root)","rootNote":"bio- (life) + -logy (study of)","definition":"the scientific study of living things","example":"In biology, Adelyn learned how plants make their own food."},{"id":"w9_antibiotic","week":9,"word":"antibiotic","type":"root","rootFamily":"BIO — life (Greek root)","rootNote":"anti- (against) + bio (life)","definition":"a medicine that fights harmful bacteria","example":"The doctor gave Kenley an antibiotic to help fight the infection."},{"id":"w9_biodegradable","week":9,"word":"biodegradable","type":"root","rootFamily":"BIO — life (Greek root)","rootNote":"bio- (life) + degrade (break down) + -able (able to be)","definition":"able to break down naturally over time","example":"They packed biodegradable utensils for the picnic."},{"id":"w9_rarely","week":9,"word":"rarely","type":"frequency","rootFamily":null,"rootNote":null,"definition":"not often","example":"They rarely stayed in one city for more than a month."},{"id":"w9_frequently","week":9,"word":"frequently","type":"frequency","rootFamily":null,"rootNote":null,"definition":"often; many times","example":"Adelyn frequently practiced her Spanish with the shopkeepers."},{"id":"w9_constantly","week":9,"word":"constantly","type":"frequency","rootFamily":null,"rootNote":null,"definition":"happening all the time, without stopping","example":"The busy market was constantly full of noise and color."},{"id":"w10_photocopy","week":10,"word":"photocopy","type":"root","rootFamily":"PHOTO — light (Greek root)","rootNote":"photo- (light) + copy","definition":"a copy of a document made using a machine that uses light","example":"The teacher made a photocopy of the map for every student."},{"id":"w10_photosynthesis","week":10,"word":"photosynthesis","type":"root","rootFamily":"PHOTO — light (Greek root)","rootNote":"photo- (light) + synthesis (putting together)","definition":"the process plants use to turn sunlight into food","example":"During photosynthesis, a leaf uses sunlight, water, and air to make sugar."},{"id":"w10_photogenic","week":10,"word":"photogenic","type":"root","rootFamily":"PHOTO — light (Greek root)","rootNote":"photo- (light) + gen (produce) + -ic (having qualities of)","definition":"looking good in photographs","example":"Adelyn's cartwheel photo turned out very photogenic."},{"id":"w10_suddenly","week":10,"word":"suddenly","type":"frequency","rootFamily":null,"rootNote":null,"definition":"happening quickly and unexpectedly","example":"Suddenly, the sky turned dark and it began to pour."},{"id":"w10_previously","week":10,"word":"previously","type":"frequency","rootFamily":null,"rootNote":null,"definition":"before now; earlier","example":"They had previously visited that same city two years ago."},{"id":"w10_currently","week":10,"word":"currently","type":"frequency","rootFamily":null,"rootNote":null,"definition":"happening right now","example":"The family is currently living in a small apartment overseas."},{"id":"w11_permit","week":11,"word":"permit","type":"root","rootFamily":"MIT / MIS — send (Latin root)","rootNote":"per- (through) + mit (send)","definition":"to allow something; an official document that gives permission","example":"You need a permit to camp in this national park."},{"id":"w11_submit","week":11,"word":"submit","type":"root","rootFamily":"MIT / MIS — send (Latin root)","rootNote":"sub- (under) + mit (send)","definition":"to hand in or turn something in","example":"Adelyn had to submit her essay before Friday."},{"id":"w11_dismiss","week":11,"word":"dismiss","type":"root","rootFamily":"MIT / MIS — send (Latin root)","rootNote":"dis- (away) + miss (send)","definition":"to send away or allow to leave","example":"The teacher will dismiss the class when the bell rings."},{"id":"w11_approximately","week":11,"word":"approximately","type":"frequency","rootFamily":null,"rootNote":null,"definition":"close to an exact amount; about","example":"The hike took approximately three hours to finish."},{"id":"w11_examine","week":11,"word":"examine","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to look at something closely and carefully","example":"The doctor examined Adelyn's ankle after her fall."},{"id":"w11_observe","week":11,"word":"observe","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to watch something carefully","example":"They stopped to observe the birds building a nest."},{"id":"w12_visible","week":12,"word":"visible","type":"root","rootFamily":"VIS / VID — see (Latin root)","rootNote":"vis (see) + -ible (able to be)","definition":"able to be seen","example":"From the rooftop, the entire old city was visible."},{"id":"w12_invisible","week":12,"word":"invisible","type":"root","rootFamily":"VIS / VID — see (Latin root)","rootNote":"in- (not) + vis (see) + -ible (able to be)","definition":"not able to be seen","example":"The tiny insect was almost invisible against the green leaf."},{"id":"w12_vision","week":12,"word":"vision","type":"root","rootFamily":"VIS / VID — see (Latin root)","rootNote":"vis (see) + -ion (act of)","definition":"the ability to see; a picture in the mind of a future goal","example":"Adelyn's eye doctor checked her vision before the trip."},{"id":"w12_compare","week":12,"word":"compare","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to look at two or more things to see how they are alike or different","example":"Adelyn compared the price of mangoes at two different stalls."},{"id":"w12_contrast","week":12,"word":"contrast","type":"frequency","rootFamily":null,"rootNote":null,"definition":"a difference between two things","example":"There was a clear contrast between the busy city and the quiet countryside."},{"id":"w12_illustrate","week":12,"word":"illustrate","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to explain or show something clearly, often with pictures or examples","example":"The teacher used a diagram to illustrate how volcanoes erupt."},{"id":"w13_audience","week":13,"word":"audience","type":"root","rootFamily":"AUD — hear (Latin root)","rootNote":"aud (hear) + -ience (state of)","definition":"a group of people watching or listening to a performance","example":"The audience clapped loudly after the gymnastics routine."},{"id":"w13_audible","week":13,"word":"audible","type":"root","rootFamily":"AUD — hear (Latin root)","rootNote":"aud (hear) + -ible (able to be)","definition":"loud enough to be heard","example":"Her whisper was barely audible over the noisy market."},{"id":"w13_audio","week":13,"word":"audio","type":"root","rootFamily":"AUD — hear (Latin root)","rootNote":"aud (hear) + -io","definition":"sound, especially recorded or broadcast sound","example":"The museum offered an audio guide in five languages."},{"id":"w13_summarize","week":13,"word":"summarize","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to give the main points of something in a shorter form","example":"Adelyn summarized the chapter in just three sentences."},{"id":"w13_conclude","week":13,"word":"conclude","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to decide something after considering the facts; to end","example":"After weighing both trails, they concluded the shorter one was better."},{"id":"w13_suggest","week":13,"word":"suggest","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to offer an idea or plan for someone to consider","example":"Kenley suggested they try the small bakery on the corner."},{"id":"w14_thermometer","week":14,"word":"thermometer","type":"root","rootFamily":"THERM — heat (Greek root)","rootNote":"therm (heat) + meter (measure)","definition":"a tool used to measure temperature","example":"The thermometer showed it was over 90 degrees outside."},{"id":"w14_thermal","week":14,"word":"thermal","type":"root","rootFamily":"THERM — heat (Greek root)","rootNote":"therm (heat) + -al (relating to)","definition":"relating to heat","example":"They wore thermal socks to stay warm on the mountain hike."},{"id":"w14_thermos","week":14,"word":"thermos","type":"root","rootFamily":"THERM — heat (Greek root)","rootNote":"therm (heat)","definition":"a container that keeps drinks hot or cold for a long time","example":"Kenley packed hot soup in a thermos for the train ride."},{"id":"w14_indicate","week":14,"word":"indicate","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to show or point out","example":"Dark clouds indicated that a storm was coming."},{"id":"w14_reveal","week":14,"word":"reveal","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to make something known that was hidden","example":"The old letter revealed a secret about the house's history."},{"id":"w14_demonstrate","week":14,"word":"demonstrate","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to show clearly how something works or is done","example":"The coach demonstrated the correct way to land a cartwheel."},{"id":"w15_automatic","week":15,"word":"automatic","type":"root","rootFamily":"AUTO — self (Greek root)","rootNote":"auto- (self) + -matic (acting)","definition":"happening by itself, without a person controlling it","example":"The automatic doors opened as soon as they walked close."},{"id":"w15_automobile","week":15,"word":"automobile","type":"root","rootFamily":"AUTO — self (Greek root)","rootNote":"auto- (self) + mobile (moving)","definition":"a car; a self-moving vehicle","example":"The family rented an automobile to explore the countryside."},{"id":"w15_autopilot","week":15,"word":"autopilot","type":"root","rootFamily":"AUTO — self (Greek root)","rootNote":"auto- (self) + pilot","definition":"a system that flies a plane or steers a ship without a person controlling it directly","example":"The pilot switched to autopilot once the plane reached cruising height."},{"id":"w15_establish","week":15,"word":"establish","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to set up or create something that will last","example":"The family worked to establish a daily homeschool routine while traveling."},{"id":"w15_maintain","week":15,"word":"maintain","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to keep something going or in good condition","example":"It takes practice to maintain flexibility in gymnastics."},{"id":"w15_require","week":15,"word":"require","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to need something","example":"The recipe requires fresh basil and ripe tomatoes."},{"id":"w16_geography","week":16,"word":"geography","type":"root","rootFamily":"GEO — earth (Greek root)","rootNote":"geo- (earth) + graph (write)","definition":"the study of Earth's land, features, and people","example":"In geography class, Adelyn learned about the mountains of South America."},{"id":"w16_geology","week":16,"word":"geology","type":"root","rootFamily":"GEO — earth (Greek root)","rootNote":"geo- (earth) + -logy (study of)","definition":"the study of rocks, minerals, and the structure of the Earth","example":"The geology teacher brought in samples of volcanic rock."},{"id":"w16_geometry","week":16,"word":"geometry","type":"root","rootFamily":"GEO — earth (Greek root)","rootNote":"geo- (earth) + -metry (measurement)","definition":"the branch of math that studies shapes, sizes, and space","example":"Adelyn used geometry to figure out the angles of the kite she built."},{"id":"w16_accomplish","week":16,"word":"accomplish","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to successfully complete something","example":"Adelyn accomplished her goal of learning ten new words a week."},{"id":"w16_attempt","week":16,"word":"attempt","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to try to do something","example":"She made a brave attempt at the new gymnastics trick."},{"id":"w16_succeed","week":16,"word":"succeed","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to achieve a desired result","example":"After many tries, Adelyn finally succeeded at the backflip."},{"id":"w17_triangle","week":17,"word":"triangle","type":"root","rootFamily":"TRI- — three (Latin/Greek prefix)","rootNote":"tri- (three) + angle","definition":"a shape with three sides and three angles","example":"The roof of the little cabin was shaped like a triangle."},{"id":"w17_tricycle","week":17,"word":"tricycle","type":"root","rootFamily":"TRI- — three (Latin/Greek prefix)","rootNote":"tri- (three) + cycle (wheel)","definition":"a vehicle with three wheels","example":"Adelyn's little cousin loves riding his tricycle around the courtyard."},{"id":"w17_tripod","week":17,"word":"tripod","type":"root","rootFamily":"TRI- — three (Latin/Greek prefix)","rootNote":"tri- (three) + pod (foot)","definition":"a three-legged stand used to hold a camera steady","example":"Dad set up the tripod to film Adelyn's cartwheel."},{"id":"w17_struggle","week":17,"word":"struggle","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to try hard to do something difficult","example":"Kenley struggled at first to read the foreign menu."},{"id":"w17_hesitate","week":17,"word":"hesitate","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to pause because of uncertainty","example":"Adelyn didn't hesitate before jumping into the pool."},{"id":"w17_wonder","week":17,"word":"wonder","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to think about something with curiosity","example":"Adelyn began to wonder how far away the stars really were."},{"id":"w18_unhappy","week":18,"word":"unhappy","type":"root","rootFamily":"UN- — not (prefix)","rootNote":"un- (not) + happy","definition":"not happy; sad","example":"Adelyn felt unhappy when the rain canceled the picnic."},{"id":"w18_unable","week":18,"word":"unable","type":"root","rootFamily":"UN- — not (prefix)","rootNote":"un- (not) + able","definition":"not able to do something","example":"The team was unable to finish the routine because of the storm."},{"id":"w18_unfair","week":18,"word":"unfair","type":"root","rootFamily":"UN- — not (prefix)","rootNote":"un- (not) + fair","definition":"not fair or just","example":"It felt unfair that the match was postponed twice."},{"id":"w18_imagine","week":18,"word":"imagine","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to form a picture or idea in your mind","example":"Try to imagine what life was like a hundred years ago."},{"id":"w18_realize","week":18,"word":"realize","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to become aware of something","example":"Adelyn suddenly realized she had left her water bottle at the market."},{"id":"w18_recall","week":18,"word":"recall","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to remember something","example":"Kenley could still recall the taste of her grandmother's soup."},{"id":"w19_rewrite","week":19,"word":"rewrite","type":"root","rootFamily":"RE- — again, back (prefix)","rootNote":"re- (again) + write","definition":"to write something again, usually to improve it","example":"Adelyn had to rewrite her paragraph to add more details."},{"id":"w19_replay","week":19,"word":"replay","type":"root","rootFamily":"RE- — again, back (prefix)","rootNote":"re- (again) + play","definition":"to play something again, like a video","example":"They watched a replay of the winning routine three times."},{"id":"w19_rebuild","week":19,"word":"rebuild","type":"root","rootFamily":"RE- — again, back (prefix)","rootNote":"re- (again) + build","definition":"to build something again after it was broken or damaged","example":"The village worked together to rebuild the bridge after the flood."},{"id":"w19_remind","week":19,"word":"remind","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to help someone remember something","example":"Mom set an alarm to remind them about the train."},{"id":"w19_remain","week":19,"word":"remain","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to stay in the same place or condition","example":"Despite the chaos, Adelyn remained calm and focused."},{"id":"w19_continue","week":19,"word":"continue","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to keep doing something without stopping","example":"They continued walking even after the sun went down."},{"id":"w20_preview","week":20,"word":"preview","type":"root","rootFamily":"PRE- — before (prefix)","rootNote":"pre- (before) + view","definition":"a look at something before it fully happens","example":"The class got a preview of next week's spelling words."},{"id":"w20_prepare","week":20,"word":"prepare","type":"root","rootFamily":"PRE- — before (prefix)","rootNote":"pre- (before) + pare (make ready)","definition":"to get ready for something ahead of time","example":"Kenley began to prepare dinner while Adelyn set the table."},{"id":"w20_preheat","week":20,"word":"preheat","type":"root","rootFamily":"PRE- — before (prefix)","rootNote":"pre- (before) + heat","definition":"to heat something, like an oven, before using it","example":"Remember to preheat the oven before baking the bread."},{"id":"w20_reduce","week":20,"word":"reduce","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to make something smaller or less","example":"Packing light helped reduce the weight of their suitcases."},{"id":"w20_increase","week":20,"word":"increase","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to make or become greater","example":"Daily stretching helped increase Adelyn's flexibility."},{"id":"w20_decrease","week":20,"word":"decrease","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to make or become smaller","example":"The noise began to decrease as the market closed for the night."},{"id":"w21_disagree","week":21,"word":"disagree","type":"root","rootFamily":"DIS- — not, opposite of (prefix)","rootNote":"dis- (not) + agree","definition":"to have a different opinion","example":"Adelyn and Kenley disagreed about which movie to watch."},{"id":"w21_dislike","week":21,"word":"dislike","type":"root","rootFamily":"DIS- — not, opposite of (prefix)","rootNote":"dis- (not) + like","definition":"to not like something","example":"Adelyn used to dislike spicy food, but now she loves it."},{"id":"w21_disappear","week":21,"word":"disappear","type":"root","rootFamily":"DIS- — not, opposite of (prefix)","rootNote":"dis- (opposite) + appear","definition":"to go out of sight","example":"The cat seemed to disappear behind the market stalls."},{"id":"w21_improve","week":21,"word":"improve","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to make or become better","example":"Adelyn's cartwheels improved with every week of practice."},{"id":"w21_prevent","week":21,"word":"prevent","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to stop something from happening","example":"Wearing a helmet can prevent serious injuries."},{"id":"w21_protect","week":21,"word":"protect","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to keep someone or something safe from harm","example":"Sunscreen helps protect skin from sunburn."},{"id":"w22_mistake","week":22,"word":"mistake","type":"root","rootFamily":"MIS- — wrongly (prefix)","rootNote":"mis- (wrongly) + take","definition":"an error; something done incorrectly","example":"It was an honest mistake to add sugar instead of salt."},{"id":"w22_misspell","week":22,"word":"misspell","type":"root","rootFamily":"MIS- — wrongly (prefix)","rootNote":"mis- (wrongly) + spell","definition":"to spell a word incorrectly","example":"Adelyn used to misspell the word 'because,' but not anymore."},{"id":"w22_mislead","week":22,"word":"mislead","type":"root","rootFamily":"MIS- — wrongly (prefix)","rootNote":"mis- (wrongly) + lead","definition":"to give someone a false idea; to lead in the wrong direction","example":"The confusing sign nearly misled the hikers down the wrong path."},{"id":"w22_provide","week":22,"word":"provide","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to give someone something they need","example":"The host family provided fresh bread every morning."},{"id":"w22_produce","week":22,"word":"produce","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to make or create something","example":"The small farm produces enough vegetables for the whole village."},{"id":"w22_create","week":22,"word":"create","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to make something new","example":"Adelyn used old fabric scraps to create a colorful bag."},{"id":"w23_submarine","week":23,"word":"submarine","type":"root","rootFamily":"SUB- — under (prefix)","rootNote":"sub- (under) + marine (sea)","definition":"a ship that can travel underwater","example":"They watched a documentary about a submarine exploring the deep ocean."},{"id":"w23_subway","week":23,"word":"subway","type":"root","rootFamily":"SUB- — under (prefix)","rootNote":"sub- (under) + way","definition":"an underground train system","example":"They took the subway to get across the busy city quickly."},{"id":"w23_substitute","week":23,"word":"substitute","type":"root","rootFamily":"SUB- — under (prefix)","rootNote":"sub- (in place of) + statute (set up)","definition":"a person or thing that takes the place of another","example":"They used honey as a substitute for sugar in the recipe."},{"id":"w23_develop","week":23,"word":"develop","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to grow or become more advanced over time","example":"Reading every night helped Adelyn develop a bigger vocabulary."},{"id":"w23_discover","week":23,"word":"discover","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to find something for the first time","example":"They discovered a hidden waterfall behind the trees."},{"id":"w23_explore","week":23,"word":"explore","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to travel through a place to learn about it","example":"The family loves to explore new cities on foot."},{"id":"w24_international","week":24,"word":"international","type":"root","rootFamily":"INTER- — between (prefix)","rootNote":"inter- (between) + national (nation)","definition":"involving two or more countries","example":"Adelyn attends an international school with kids from many countries."},{"id":"w24_interact","week":24,"word":"interact","type":"root","rootFamily":"INTER- — between (prefix)","rootNote":"inter- (between) + act","definition":"to communicate or do things together with others","example":"Adelyn loves to interact with kids from different countries while traveling."},{"id":"w24_interview","week":24,"word":"interview","type":"root","rootFamily":"INTER- — between (prefix)","rootNote":"inter- (between) + view","definition":"a meeting where one person asks another questions","example":"A local reporter asked to interview the young gymnastics champion."},{"id":"w24_investigate","week":24,"word":"investigate","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to carefully look into something to learn the facts","example":"The kids investigated the strange noise coming from the attic."},{"id":"w24_research","week":24,"word":"research","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to study a subject carefully to learn new facts","example":"Adelyn did research on the country before they visited."},{"id":"w24_analyze","week":24,"word":"analyze","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to study something carefully in order to understand it","example":"Scientists analyze rock samples to learn about the Earth's history."},{"id":"w25_joyful","week":25,"word":"joyful","type":"root","rootFamily":"-FUL — full of (suffix)","rootNote":"joy + -ful (full of)","definition":"full of joy or happiness","example":"The whole family felt joyful after the reunion."},{"id":"w25_careful","week":25,"word":"careful","type":"root","rootFamily":"-FUL — full of (suffix)","rootNote":"care + -ful (full of)","definition":"paying close attention; full of care","example":"Be careful on the slippery cobblestone streets."},{"id":"w25_helpful","week":25,"word":"helpful","type":"root","rootFamily":"-FUL — full of (suffix)","rootNote":"help + -ful (full of)","definition":"giving help; useful","example":"The friendly shopkeeper was very helpful with directions."},{"id":"w25_calculate","week":25,"word":"calculate","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to figure out an answer using math","example":"Adelyn calculated how many days were left until their next flight."},{"id":"w25_estimate","week":25,"word":"estimate","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to make a careful guess about an amount","example":"Kenley estimated how much flour the recipe would need."},{"id":"w25_measure","week":25,"word":"measure","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to find the size, length, or amount of something","example":"They used a tape measure to check the height of the doorway."},{"id":"w26_careless","week":26,"word":"careless","type":"root","rootFamily":"-LESS — without (suffix)","rootNote":"care + -less (without)","definition":"not paying attention; done without care","example":"A careless mistake caused the tower of blocks to fall."},{"id":"w26_fearless","week":26,"word":"fearless","type":"root","rootFamily":"-LESS — without (suffix)","rootNote":"fear + -less (without)","definition":"without fear; very brave","example":"The fearless gymnast attempted the trick without hesitation."},{"id":"w26_harmless","week":26,"word":"harmless","type":"root","rootFamily":"-LESS — without (suffix)","rootNote":"harm + -less (without)","definition":"not able or likely to cause harm","example":"The garden snake was harmless and quickly slithered away."},{"id":"w26_include","week":26,"word":"include","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to have something as part of a group","example":"The tour price includes lunch and a boat ride."},{"id":"w26_exclude","week":26,"word":"exclude","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to leave something out; to not include","example":"The recipe excludes nuts because of Kenley's allergy."},{"id":"w26_combine","week":26,"word":"combine","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to join two or more things together","example":"Combine the flour and water to make the dough."},{"id":"w27_comfortable","week":27,"word":"comfortable","type":"root","rootFamily":"-ABLE / -IBLE — capable of (suffix)","rootNote":"comfort + -able (capable of)","definition":"providing comfort; at ease","example":"The old hammock was surprisingly comfortable."},{"id":"w27_flexible","week":27,"word":"flexible","type":"root","rootFamily":"-ABLE / -IBLE — capable of (suffix)","rootNote":"flex + -ible (capable of)","definition":"able to bend or change easily","example":"Years of gymnastics made Adelyn incredibly flexible."},{"id":"w27_reliable","week":27,"word":"reliable","type":"root","rootFamily":"-ABLE / -IBLE — capable of (suffix)","rootNote":"rely + -able (capable of)","definition":"able to be trusted or depended on","example":"Their old van turned out to be a reliable way to travel."},{"id":"w27_separate","week":27,"word":"separate","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to divide or keep apart","example":"They separated the laundry into light and dark colors."},{"id":"w27_divide","week":27,"word":"divide","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to split something into parts","example":"Adelyn divided the mangoes evenly between her and Kenley."},{"id":"w27_connect","week":27,"word":"connect","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to join or link together","example":"A long bridge connects the two islands."},{"id":"w28_celebration","week":28,"word":"celebration","type":"root","rootFamily":"-TION / -SION — act or state of (suffix)","rootNote":"celebrate + -tion (act of)","definition":"an event or activity to honor a special occasion","example":"The whole village joined the celebration for the harvest festival."},{"id":"w28_decision","week":28,"word":"decision","type":"root","rootFamily":"-TION / -SION — act or state of (suffix)","rootNote":"decide + -sion (act of)","definition":"a choice made after thinking it over","example":"Choosing which country to visit next was a tough decision."},{"id":"w28_invention","week":28,"word":"invention","type":"root","rootFamily":"-TION / -SION — act or state of (suffix)","rootNote":"invent + -ion (act of)","definition":"something newly created or designed","example":"The lightbulb was one of the most useful inventions in history."},{"id":"w28_relate","week":28,"word":"relate","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to show a connection between two things","example":"The story relates closely to something that happened to Adelyn."},{"id":"w28_depend","week":28,"word":"depend","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to rely on someone or something","example":"The whole trip depended on good weather."},{"id":"w28_rely","week":28,"word":"rely","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to trust and depend on someone or something","example":"Adelyn learned to rely on herself when trying something new."},{"id":"w29_zoology","week":29,"word":"zoology","type":"root","rootFamily":"-OLOGY — study of (suffix)","rootNote":"zoo- (animal) + -logy (study of)","definition":"the scientific study of animals","example":"In zoology, Adelyn learned how octopuses change color to hide."},{"id":"w29_technology","week":29,"word":"technology","type":"root","rootFamily":"-OLOGY — study of (suffix)","rootNote":"techno- (skill/craft) + -logy (study of)","definition":"the use of science to create tools and machines","example":"New technology made it easier to video-call family back home."},{"id":"w29_mythology","week":29,"word":"mythology","type":"root","rootFamily":"-OLOGY — study of (suffix)","rootNote":"myth + -logy (study of)","definition":"the study of traditional stories, often about gods and heroes","example":"Greek mythology is full of stories about brave heroes and powerful gods."},{"id":"w29_trust","week":29,"word":"trust","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to believe that someone is honest or reliable","example":"It's important to trust your gut when trying a new trick."},{"id":"w29_value","week":29,"word":"value","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to think something is important or useful","example":"The family values spending time together while traveling."},{"id":"w29_appreciate","week":29,"word":"appreciate","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to be thankful for something; to recognize its worth","example":"Adelyn learned to appreciate the little things, like a warm meal."},{"id":"w30_dehydrate","week":30,"word":"dehydrate","type":"root","rootFamily":"HYDRO — water (Greek root)","rootNote":"de- (remove) + hydro (water) + -ate (to make)","definition":"to remove water from something; to lose too much water","example":"It's easy to dehydrate when hiking in hot weather, so drink plenty of water."},{"id":"w30_hydroelectric","week":30,"word":"hydroelectric","type":"root","rootFamily":"HYDRO — water (Greek root)","rootNote":"hydro- (water) + electric","definition":"producing electricity using the power of moving water","example":"The dam produces hydroelectric power for the whole region."},{"id":"w30_hydrogen","week":30,"word":"hydrogen","type":"root","rootFamily":"HYDRO — water (Greek root)","rootNote":"hydro- (water) + -gen (produce)","definition":"a gas that combines with oxygen to form water","example":"Hydrogen is the lightest and most common element in the universe."},{"id":"w30_admire","week":30,"word":"admire","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to respect or think highly of someone","example":"Adelyn admired the gymnast's years of hard work."},{"id":"w30_encourage","week":30,"word":"encourage","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to give someone support or confidence","example":"Kenley encouraged her sister before the big competition."},{"id":"w30_inspire","week":30,"word":"inspire","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to give someone the desire or idea to do something","example":"The mountain view inspired Adelyn to try painting."},{"id":"w31_malfunction","week":31,"word":"malfunction","type":"root","rootFamily":"MAL- — bad (prefix)","rootNote":"mal- (bad) + function","definition":"to fail to work correctly","example":"The old camera began to malfunction halfway through the trip."},{"id":"w31_malnutrition","week":31,"word":"malnutrition","type":"root","rootFamily":"MAL- — bad (prefix)","rootNote":"mal- (bad) + nutrition (nourishment)","definition":"poor health caused by not getting enough of the right food","example":"Doctors work to prevent malnutrition in communities with little access to fresh food."},{"id":"w31_malady","week":31,"word":"malady","type":"root","rootFamily":"MAL- — bad (prefix)","rootNote":"mal- (bad)","definition":"an illness or unhealthy condition","example":"A mild malady kept Kenley resting for a day before she felt better."},{"id":"w31_motivate","week":31,"word":"motivate","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to give someone a reason to do something","example":"A gold star chart helped motivate Adelyn during spelling practice."},{"id":"w31_persuade","week":31,"word":"persuade","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to convince someone to do or believe something","example":"Adelyn tried to persuade her mom to let her stay up late."},{"id":"w31_convince","week":31,"word":"convince","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to make someone believe something is true","example":"It took some convincing before Kenley agreed to try the spicy dish."},{"id":"w32_nonfiction","week":32,"word":"nonfiction","type":"root","rootFamily":"NON- — not (prefix)","rootNote":"non- (not) + fiction","definition":"writing based on real facts and events","example":"Adelyn prefers nonfiction books about animals and geography."},{"id":"w32_nonstop","week":32,"word":"nonstop","type":"root","rootFamily":"NON- — not (prefix)","rootNote":"non- (not) + stop","definition":"without stopping","example":"They took a nonstop flight straight to their next destination."},{"id":"w32_nonsense","week":32,"word":"nonsense","type":"root","rootFamily":"NON- — not (prefix)","rootNote":"non- (not) + sense","definition":"words or ideas that have no meaning or logic","example":"The made-up song was silly nonsense, and everyone laughed."},{"id":"w32_argue","week":32,"word":"argue","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to give reasons for or against something, sometimes with disagreement","example":"The sisters argued about whose turn it was to choose the movie."},{"id":"w32_debate","week":32,"word":"debate","type":"frequency","rootFamily":null,"rootNote":null,"definition":"a discussion between people with different opinions","example":"The class held a debate about the best way to protect the ocean."},{"id":"w32_discuss","week":32,"word":"discuss","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to talk about something with someone","example":"They discussed their plans for the weekend over breakfast."},{"id":"w33_artist","week":33,"word":"artist","type":"root","rootFamily":"-IST — one who (suffix)","rootNote":"art + -ist (one who)","definition":"a person who creates art","example":"The street artist painted a colorful mural on the old wall."},{"id":"w33_scientist","week":33,"word":"scientist","type":"root","rootFamily":"-IST — one who (suffix)","rootNote":"science + -ist (one who)","definition":"a person who studies and researches science","example":"A marine scientist explained how coral reefs grow."},{"id":"w33_tourist","week":33,"word":"tourist","type":"root","rootFamily":"-IST — one who (suffix)","rootNote":"tour + -ist (one who)","definition":"a person traveling for pleasure","example":"The small town welcomed tourists from all over the world."},{"id":"w33_explain","week":33,"word":"explain","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to make something clear or easy to understand","example":"Kenley explained the recipe step by step."},{"id":"w33_clarify","week":33,"word":"clarify","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to make something clearer or easier to understand","example":"The teacher clarified the instructions before the quiz began."},{"id":"w33_confuse","week":33,"word":"confuse","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to make someone unsure or unable to understand","example":"The maze of narrow streets began to confuse them."},{"id":"w34_inventor","week":34,"word":"inventor","type":"root","rootFamily":"-ER / -OR — one who (suffix)","rootNote":"invent + -or (one who)","definition":"a person who creates something new","example":"The young inventor built a machine that sorted seashells by size."},{"id":"w34_visitor","week":34,"word":"visitor","type":"root","rootFamily":"-ER / -OR — one who (suffix)","rootNote":"visit + -or (one who)","definition":"a person who visits a place","example":"The museum welcomed visitors from dozens of countries."},{"id":"w34_actor","week":34,"word":"actor","type":"root","rootFamily":"-ER / -OR — one who (suffix)","rootNote":"act + -or (one who)","definition":"a person who performs in plays or movies","example":"The actor practiced her lines before the big performance."},{"id":"w34_puzzle","week":34,"word":"puzzle","type":"frequency","rootFamily":null,"rootNote":null,"definition":"to confuse someone; a problem that is hard to solve","example":"The old riddle puzzled Adelyn for the whole afternoon."},{"id":"w34_curious","week":34,"word":"curious","type":"frequency","rootFamily":null,"rootNote":null,"definition":"eager to learn or know something","example":"Adelyn is curious about how other kids learn in different countries."},{"id":"w34_eager","week":34,"word":"eager","type":"frequency","rootFamily":null,"rootNote":null,"definition":"very excited and ready to do something","example":"She was eager to try the new gymnastics gym in town."},{"id":"w35_credible","week":35,"word":"credible","type":"root","rootFamily":"CRED — believe (Latin root)","rootNote":"cred (believe) + -ible (capable of)","definition":"believable; able to be trusted","example":"The witness gave a credible account of what happened."},{"id":"w35_credit","week":35,"word":"credit","type":"root","rootFamily":"CRED — believe (Latin root)","rootNote":"cred (believe/trust)","definition":"trust or belief in someone's honesty; recognition for an achievement","example":"Adelyn deserves credit for practicing every single day."},{"id":"w35_incredible","week":35,"word":"incredible","type":"root","rootFamily":"CRED — believe (Latin root)","rootNote":"in- (not) + cred (believe) + -ible (capable of)","definition":"impossible or hard to believe; amazing","example":"The view from the mountaintop was absolutely incredible."},{"id":"w35_anxious","week":35,"word":"anxious","type":"frequency","rootFamily":null,"rootNote":null,"definition":"worried or nervous about something","example":"Adelyn felt a little anxious before her first competition abroad."},{"id":"w35_nervous","week":35,"word":"nervous","type":"frequency","rootFamily":null,"rootNote":null,"definition":"feeling worried or uneasy","example":"Kenley was nervous before tasting the unusual fruit."},{"id":"w35_confident","week":35,"word":"confident","type":"frequency","rootFamily":null,"rootNote":null,"definition":"feeling sure of yourself and your abilities","example":"After months of practice, Adelyn felt confident about her routine."},{"id":"w36_microphone","week":36,"word":"microphone","type":"root","rootFamily":"PHON — sound (Greek root)","rootNote":"micro- (small) + phon (sound)","definition":"a device that picks up and makes sound louder","example":"Adelyn spoke into the microphone before her speech."},{"id":"w36_symphony","week":36,"word":"symphony","type":"root","rootFamily":"PHON — sound (Greek root)","rootNote":"sym- (together) + phon (sound)","definition":"a long piece of music played by a full orchestra","example":"The orchestra performed a beautiful symphony in the old concert hall."},{"id":"w36_phonics","week":36,"word":"phonics","type":"root","rootFamily":"PHON — sound (Greek root)","rootNote":"phon (sound) + -ics (study/system)","definition":"a method of learning to read by connecting sounds to letters","example":"Phonics helps young readers sound out new words."},{"id":"w36_cautious","week":36,"word":"cautious","type":"frequency","rootFamily":null,"rootNote":null,"definition":"being careful to avoid danger or mistakes","example":"They were cautious while hiking along the rocky cliff."},{"id":"w36_courageous","week":36,"word":"courageous","type":"frequency","rootFamily":null,"rootNote":null,"definition":"brave; willing to face fear or difficulty","example":"It was courageous of Adelyn to try the trick in front of a crowd."},{"id":"w36_grateful","week":36,"word":"grateful","type":"frequency","rootFamily":null,"rootNote":null,"definition":"feeling or showing thanks","example":"They felt grateful for the kind family who hosted them."}];
+
+// ---------- Ranks (lifetime mastery — never goes down) ----------
+const RANKS = [
+  { min: 0, name: "Kitchen Helper" },
+  { min: 50, name: "Prep Cook" },
+  { min: 120, name: "Line Baker" },
+  { min: 220, name: "Pastry Apprentice" },
+  { min: 350, name: "Head Baker" },
+  { min: 500, name: "Master Pastry Chef" }
+];
+
+// ---------- Shop (spend sprinkles to decorate your cake) ----------
+const SHOP_ITEMS = [
+  { id: "sprinkles1", emoji: "🌈", name: "Rainbow Sprinkles", cost: 20 },
+  { id: "bow", emoji: "🎀", name: "Ribbon Bow", cost: 25 },
+  { id: "candle", emoji: "🕯️", name: "Birthday Candle", cost: 25 },
+  { id: "flowers", emoji: "🌸", name: "Sugar Flowers", cost: 30 },
+  { id: "cherry", emoji: "🍒", name: "Cherry on Top", cost: 30 },
+  { id: "sparkle", emoji: "✨", name: "Sparkle Stars", cost: 35 },
+  { id: "heart", emoji: "💕", name: "Heart Sprinkles", cost: 35 },
+  { id: "goldstar", emoji: "🌟", name: "Gold Star Topper", cost: 40 },
+  { id: "bunny", emoji: "🐰", name: "Bunny Topper", cost: 45 },
+  { id: "butterfly", emoji: "🦋", name: "Butterfly Topper", cost: 50 },
+  { id: "unicorn", emoji: "🦄", name: "Unicorn Topper", cost: 55 },
+  { id: "crown", emoji: "👑", name: "Crown Topper", cost: 60 }
+];
+
+const TREAT_EMOJI = ["🧁","🍰","🍪","🍩","🥐","🎂","🍫","🥧","🍮","🍬","🍭","🥯","🍨","🥮","🍡"];
+
+const CUSTOMERS = [
+  { name: "Mia", emoji: "🐰" },
+  { name: "Sam", emoji: "🐻" },
+  { name: "Theo", emoji: "🦊" },
+  { name: "Nora", emoji: "🐱" },
+  { name: "Leo", emoji: "🐼" },
+  { name: "Zoe", emoji: "🐨" },
+  { name: "Max", emoji: "🐶" },
+  { name: "Ivy", emoji: "🦁" }
+];
+
+const CORRECT_LINES = ["Yes, chef! 🎉", "Perfect batch!", "Order up — nailed it!", "Fresh out of the oven!", "That's the one!"];
+const WRONG_LINES = ["Oops, back in the oven.", "Not quite — let's try the next one.", "So close! Correct one's highlighted.", "Mixed up the recipe — no worries!"];
+
+// Default landing spot for each SHOP_ITEMS[i] the first time it's bought
+// (same 4x3 layout the faded "ghost" grid uses) — expressed as % of the
+// cake scene box, since toppings are dragged/stored in that unit.
+const DEFAULT_DECOR_POS = SHOP_ITEMS.map((_, i) => {
+  const col = i % 4;
+  const row = Math.floor(i / 4);
+  return { x: 12 + 19 * (col + 0.5), y: 15 + 21.67 * (row + 0.5) };
+});
+
+const STORAGE_KEY = "adelyn-word-bakery-progress";
+
+// Same Apps Script Web App the ELA Pastry Kitchen app itself uses (see its
+// config.js) — baked in as the default so every device Adelyn plays on
+// syncs (week pacing + missed-answer log) automatically, no setup needed.
+// Still overridable via Parent Settings.
+const DEFAULT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzV1ftuxqDxkBbRelL0OoYRPGXTDSGwqN8-q290MF2kWHh5_X83RYWkkKZu_2fGqffH9g/exec";
+
+// state.mastery[wordId] = { correct, wrong, needsReview, reviewRemaining, lastSeen }
+let state = {
+  lifetimePoints: 0,
+  sprinkles: 0,
+  streak: 0,
+  mastery: {},
+  attemptLog: [],
+  roundCounter: 0,
+  dayStreak: 0,
+  lastVisitDate: null,
+  specialDateUsed: null,
+  shopOwned: {},
+  decorPositions: {},
+  currentWeek: 1,
+  webAppUrl: "",
+  lastSyncAt: null,
+  lastSyncOk: null
+};
+let currentMode = "quiz";
+let quizPool = [];
+let quizIndex = 0;
+let pendingSpecial = false;
+const RUSH_CHANCE = 0.25;
+const RUSH_WINDOW_MS = 8000;
+let currentRush = null; // { deadline } while a rush order's timer is running
+let rushIntervalId = null;
+let matchPool = [];
+let matchSelectedWord = null;
+let matchSelectedDef = null;
+let matchedCount = 0;
+let parentSettingsOpen = false;
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+}
+
+// ---------- Storage (real localStorage — works fully offline, per device) ----------
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) state = Object.assign(state, JSON.parse(raw));
+  } catch (e) {
+    // no saved progress yet, or storage unavailable — use defaults
+  }
+  if (!state.mastery) state.mastery = {};
+  if (!Array.isArray(state.attemptLog)) state.attemptLog = [];
+  if (!state.shopOwned) state.shopOwned = {};
+  if (!state.decorPositions) state.decorPositions = {};
+  if (typeof state.currentWeek !== "number" || state.currentWeek < 1) state.currentWeek = 1;
+  if (typeof state.webAppUrl !== "string" || !state.webAppUrl) state.webAppUrl = DEFAULT_WEB_APP_URL;
+  if (typeof state.roundCounter !== "number") state.roundCounter = 0;
+  if (typeof state.lifetimePoints !== "number") state.lifetimePoints = 0;
+  if (typeof state.sprinkles !== "number") state.sprinkles = 0;
+  if (typeof state.streak !== "number") state.streak = 0;
+  if (typeof state.dayStreak !== "number") state.dayStreak = 0;
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.error("Could not save progress", e);
+  }
+}
+
+// ---------- Live sync with her ELA Pastry Kitchen Sheet (optional) ----------
+// If a Web App URL is set (Parent Settings), pull her real current_week
+// straight from the same Google Sheet/Apps Script backend that app uses,
+// so this game never needs a manual update again. This is the ONLY network
+// call this game ever makes — everything else stays fully offline, and if
+// this fails (no internet, bad URL, etc.) it just keeps using whatever
+// week was last known, silently. Never blocks or delays gameplay: it runs
+// in the background and only takes effect on the next round/tab render.
+async function syncCurrentWeek() {
+  if (!state.webAppUrl) return;
+  try {
+    const sep = state.webAppUrl.includes("?") ? "&" : "?";
+    const res = await fetch(state.webAppUrl + sep + "action=bootstrap&student=adelyn");
+    const data = await res.json();
+    const raw = data && data.ok && data.settings ? data.settings.adelyn_current_week : null;
+    const week = parseInt(raw, 10);
+    if (week >= 1 && week <= 36) state.currentWeek = week;
+    state.lastSyncOk = true;
+  } catch (e) {
+    state.lastSyncOk = false;
+  }
+  state.lastSyncAt = new Date().toISOString();
+  saveState();
+  if (currentMode === "shop") renderShop();
+}
+
+function getMastery(id) {
+  if (!state.mastery[id]) {
+    state.mastery[id] = { correct: 0, wrong: 0, needsReview: false, reviewRemaining: 0, lastSeen: 0 };
+  }
+  return state.mastery[id];
+}
+
+// Parent visibility: keep a capped local log of actual answers (works
+// offline, same device) and push each one to the same Google
+// Sheet/Apps Script backend syncCurrentWeek() already talks to, if a Web
+// App URL is set — so Kristina can also check from her own phone/computer.
+// Best-effort only: never blocks gameplay if it fails or isn't configured.
+const MAX_ATTEMPT_LOG = 50;
+
+function logAttempt(detail) {
+  const entry = {
+    timestamp: new Date().toISOString(),
+    subject: detail.subject || "vocabulary",
+    word: detail.word,
+    question: detail.question || "",
+    givenAnswer: detail.givenAnswer,
+    correctAnswer: detail.correctAnswer,
+    correct: detail.wasCorrect,
+  };
+  if (!Array.isArray(state.attemptLog)) state.attemptLog = [];
+  state.attemptLog.push(entry);
+  while (state.attemptLog.length > MAX_ATTEMPT_LOG) state.attemptLog.shift();
+
+  if (!state.webAppUrl) return;
+  fetch(state.webAppUrl, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "logAnswer",
+      student: "adelyn",
+      game: "Word Bakery",
+      subject: entry.subject,
+      word: entry.word,
+      question: entry.question,
+      given_answer: entry.givenAnswer,
+      correct_answer: entry.correctAnswer,
+      correct: entry.correct,
+    }),
+  }).catch(() => {});
+}
+
+function recordAnswer(id, isCorrect, detail) {
+  const m = getMastery(id);
+  m.lastSeen = state.roundCounter;
+  if (detail) logAttempt(detail);
+  if (isCorrect) {
+    m.correct += 1;
+    if (m.needsReview) {
+      m.reviewRemaining -= 1;
+      if (m.reviewRemaining <= 0) m.needsReview = false;
+    }
+  } else {
+    m.wrong += 1;
+    m.needsReview = true;
+    m.reviewRemaining = 2;
+  }
+}
+
+function treatFor(wordId) {
+  let sum = 0;
+  for (let i = 0; i < wordId.length; i++) sum += wordId.charCodeAt(i);
+  return TREAT_EMOJI[sum % TREAT_EMOJI.length];
+}
+
+function randomCustomer() { return CUSTOMERS[Math.floor(Math.random() * CUSTOMERS.length)]; }
+function randomLine(list) { return list[Math.floor(Math.random() * list.length)]; }
+
+// Combo tag shown after a correct answer — grows louder as the streak climbs.
+function comboTagHtml(streak) {
+  if (streak <= 1) return "";
+  const tier = streak >= 8 ? 3 : streak >= 4 ? 2 : 1;
+  const icon = tier === 3 ? "🔥🔥" : tier === 2 ? "🔥" : "⚡";
+  return '<span class="combo-tag tier' + tier + '">' + icon + ' Combo x' + streak + '</span>';
+}
+
+// Flies a "+N ✨" label from wherever she just answered to the sprinkles
+// counter in the rank bar — purely visual, the real count already updated.
+function flyPoints(originEl, amount) {
+  const target = document.getElementById("sprinklesDisplay");
+  if (!originEl || !target) return;
+  const startRect = originEl.getBoundingClientRect();
+  const endRect = target.getBoundingClientRect();
+  const el = document.createElement("div");
+  el.className = "fly-point";
+  el.textContent = "+" + amount + " ✨";
+  el.style.left = (startRect.left + startRect.width / 2) + "px";
+  el.style.top = startRect.top + "px";
+  document.body.appendChild(el);
+  const dx = (endRect.left + endRect.width / 2) - (startRect.left + startRect.width / 2);
+  const dy = endRect.top - startRect.top;
+  const anim = el.animate(
+    [
+      { transform: "translate(0,0) scale(1)", opacity: 1 },
+      { transform: "translate(" + dx + "px," + dy + "px) scale(0.55)", opacity: 0.15 }
+    ],
+    { duration: 650, easing: "cubic-bezier(.3,.6,.4,1)" }
+  );
+  anim.onfinish = () => el.remove();
+}
+
+function renderRankBar() {
+  let rank = RANKS[0].name;
+  for (const r of RANKS) { if (state.lifetimePoints >= r.min) rank = r.name; }
+  document.getElementById("rankName").textContent = rank;
+  document.getElementById("sprinklesDisplay").textContent = "\u2728 " + state.sprinkles;
+  document.getElementById("dayStreakDisplay").textContent = "\uD83D\uDD25 " + state.dayStreak + " day streak";
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// "Taught" = week <= her current pointer — a hard cutoff. Words above it
+// never enter any pool, so she can never see vocab she hasn't reached yet.
+function isTaught(item) { return item.week <= state.currentWeek; }
+function isActive(item) { return item.week <= state.currentWeek && item.week > state.currentWeek - ACTIVE_WINDOW; }
+
+// ---------- Round pool builder ----------
+function buildRoundPool(missedSlots, generalSlots) {
+  state.roundCounter++;
+  const active = shuffle(WORDS.filter(isActive));
+  const older = WORDS.filter(w => isTaught(w) && !isActive(w));
+
+  const missed = older.filter(w => getMastery(w.id).needsReview)
+    .sort((a, b) => getMastery(a.id).lastSeen - getMastery(b.id).lastSeen)
+    .slice(0, missedSlots);
+
+  const missedIds = new Set(missed.map(w => w.id));
+  const general = older.filter(w => !missedIds.has(w.id))
+    .sort((a, b) => getMastery(a.id).lastSeen - getMastery(b.id).lastSeen)
+    .slice(0, generalSlots);
+
+  const pool = shuffle(active.concat(missed, general));
+  pool.forEach(w => { getMastery(w.id).lastSeen = state.roundCounter; });
+  return pool;
+}
+
+// ---------- Distractor helpers ----------
+function pickDistractorDefinitions(item, count) {
+  const others = WORDS.filter(w => w.id !== item.id && w.definition !== item.definition);
+  return shuffle(others).slice(0, count).map(w => w.definition);
+}
+
+function pickDistractorWords(item, count) {
+  const others = WORDS.filter(w => w.id !== item.id && w.word.toLowerCase() !== item.word.toLowerCase());
+  return shuffle(others).slice(0, count).map(w => w.word);
+}
+
+function blankOutWord(example, word) {
+  const tokens = example.match(/[A-Za-z']+/g) || [];
+  const wLower = word.toLowerCase();
+  let best = null;
+  let bestScore = 0;
+  for (const t of tokens) {
+    const tLower = t.toLowerCase();
+    let score = 0;
+    const max = Math.min(tLower.length, wLower.length);
+    while (score < max && tLower[score] === wLower[score]) score++;
+    if (tLower === wLower) score += 100;
+    if (score > bestScore && score >= Math.min(4, wLower.length)) {
+      bestScore = score;
+      best = t;
+    }
+  }
+  const target = best || word;
+  const re = new RegExp("\\b" + target.replace(/[.*+?^${}()|[\]\\\\]/g, "\\$&") + "\\b");
+  return example.replace(re, "_____");
+}
+
+function rootNoteLine(item) {
+  if (item.type === "root") return "Root family: " + item.rootFamily;
+  return "Frequency word — shows up all over her reading";
+}
+
+// ---------- Daily visit / streak / welcome banner ----------
+function checkDailyVisit() {
+  const today = todayStr();
+  if (state.lastVisitDate === today) return false;
+
+  const y = new Date();
+  y.setDate(y.getDate() - 1);
+  const yesterday = y.getFullYear() + "-" + (y.getMonth() + 1) + "-" + y.getDate();
+
+  state.dayStreak = state.lastVisitDate === yesterday ? state.dayStreak + 1 : 1;
+  state.lastVisitDate = today;
+  state.sprinkles += 15;
+  saveState();
+  return true;
+}
+
+function renderWelcomeBanner() {
+  const card = document.getElementById("gameCard");
+  card.innerHTML = `
+    <div class="intro-emoji">\uD83E\uDDC1</div>
+    <div class="intro-title">Welcome back to the bakery!</div>
+    <div class="intro-body">Day streak: <b>${state.dayStreak} \uD83D\uDD25</b> \u2014 here's <b>+15 \u2728</b> for showing up today.
+    The counter's getting busy \u2014 ready to take some orders?</div>
+    <button class="begin-btn" id="beginDayBtn">Open the bakery \u2192</button>
+  `;
+  document.getElementById("beginDayBtn").onclick = () => {
+    renderRankBar();
+    startQuiz();
+  };
+}
+
+// ---------- Quiz mode (Bake!) ----------
+function startQuiz() {
+  quizPool = buildRoundPool(3, 2);
+  quizIndex = 0;
+  pendingSpecial = state.specialDateUsed !== todayStr();
+  saveState();
+  renderQuizQuestion();
+}
+
+// Stops the rush-order countdown (leaving the question, answering, or
+// bailing out of quiz mode entirely) so it never keeps ticking in the
+// background or leaks a stale interval onto the next question.
+function clearRushTimer() {
+  if (rushIntervalId !== null) { clearInterval(rushIntervalId); rushIntervalId = null; }
+  currentRush = null;
+}
+
+function renderQuizQuestion() {
+  clearRushTimer();
+  const card = document.getElementById("gameCard");
+  card.classList.remove("shake-it");
+  if (quizIndex >= quizPool.length) {
+    card.innerHTML = '<div class="empty-state">\uD83C\uDF89 The line has cleared \u2014 great shift! Come back for another batch of orders whenever you like.<br><br>' +
+      '<button class="next-btn show" id="restartQuiz">Start a new batch</button></div>';
+    document.getElementById("restartQuiz").onclick = startQuiz;
+    return;
+  }
+  const item = quizPool[quizIndex];
+  const useDefinitionQuestion = Math.random() < 0.55;
+  const isReview = !isActive(item);
+  const isSpecial = quizIndex === 0 && pendingSpecial;
+  const isRush = Math.random() < RUSH_CHANCE;
+  const customer = randomCustomer();
+  const ticketLabel = isReview
+    ? "Order #" + (quizIndex + 1) + " of " + quizPool.length + " \u2014 \u21BB RE-BAKE"
+    : "Order #" + (quizIndex + 1) + " of " + quizPool.length;
+
+  let optionsHtml = "";
+  let askLine = "";
+
+  if (useDefinitionQuestion) {
+    const opts = shuffle([item.definition, ...pickDistractorDefinitions(item, 3)]);
+    optionsHtml = opts.map(o =>
+      `<button class="option-btn" data-correct="${o === item.definition}">${o}</button>`
+    ).join("");
+    askLine = "\u201cI keep hearing the word \u2018" + item.word + "\u2019 \u2014 what does that even mean?\u201d";
+  } else {
+    const blanked = blankOutWord(item.example, item.word);
+    const opts = shuffle([item.word, ...pickDistractorWords(item, 3)]);
+    optionsHtml = opts.map(o =>
+      `<button class="option-btn" data-correct="${o.toLowerCase() === item.word.toLowerCase()}">${o}</button>`
+    ).join("");
+    askLine = "\u201cCan you fill in my order note? \u2018" + blanked + "\u2019\u201d";
+  }
+
+  // For a fill-in-the-blank order, the word itself is the answer — showing
+  // it above the sentence would give it away for free. Only the
+  // definition-question shows the word up front; the fill-in-blank reveals
+  // word + root note as part of the feedback, after she's answered.
+  const wordBlockHtml = useDefinitionQuestion
+    ? `<div class="word-display">${item.word}</div><div class="root-note">${rootNoteLine(item)}</div>`
+    : "";
+
+  card.innerHTML = `
+    <div class="ticket-label ${isReview ? 'review' : ''}">${ticketLabel}</div>
+    ${isSpecial ? '<div class="special-flag">\u2B50 Today\'s Special \u2014 Double Sprinkles</div>' : ''}
+    ${isRush ? '<div class="rush-flag" id="rushFlag">\uD83C\uDFC3 Rush order \u2014 answer fast for 2x!</div>' : ''}
+    <div class="customer-row">
+      <div class="customer-avatar">${customer.emoji}</div>
+      <div class="speech-bubble"><span class="customer-name">${customer.name}:</span> ${askLine}</div>
+    </div>
+    ${isRush ? '<div class="rush-bar-track"><div class="rush-bar-fill" id="rushBarFill"></div></div>' : ''}
+    <div id="wordBlock">${wordBlockHtml}</div>
+    <div class="options">${optionsHtml}</div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn">Next order \u2192</button>
+  `;
+
+  card.querySelectorAll(".option-btn").forEach(btn => {
+    btn.addEventListener("click", () => handleQuizAnswer(btn, item, isSpecial, useDefinitionQuestion));
+  });
+
+  if (isRush) {
+    currentRush = { deadline: Date.now() + RUSH_WINDOW_MS };
+    const fill = document.getElementById("rushBarFill");
+    rushIntervalId = setInterval(() => {
+      const remaining = currentRush.deadline - Date.now();
+      if (remaining <= 0) {
+        fill.style.width = "0%";
+        document.getElementById("rushFlag").textContent = "Rush window closed \u2014 still worth normal sprinkles.";
+        document.getElementById("rushFlag").classList.add("rush-closed");
+        clearInterval(rushIntervalId);
+        rushIntervalId = null;
+        return;
+      }
+      fill.style.width = (remaining / RUSH_WINDOW_MS * 100) + "%";
+    }, 100);
+  }
+}
+
+function handleQuizAnswer(btn, item, isSpecial, useDefinitionQuestion) {
+  const allBtns = document.querySelectorAll(".option-btn");
+  allBtns.forEach(b => b.disabled = true);
+  const isCorrect = btn.dataset.correct === "true";
+  const rushBonus = !!currentRush && Date.now() <= currentRush.deadline;
+  clearRushTimer();
+  const fb = document.getElementById("feedback");
+
+  recordAnswer(item.id, isCorrect, {
+    subject: "vocabulary",
+    word: item.word,
+    question: useDefinitionQuestion ? "What does this word mean?" : "Fill in the blank",
+    givenAnswer: btn.textContent,
+    correctAnswer: useDefinitionQuestion ? item.definition : item.word,
+    wasCorrect: isCorrect,
+  });
+  if (isSpecial) { state.specialDateUsed = todayStr(); pendingSpecial = false; }
+
+  if (!useDefinitionQuestion) {
+    document.getElementById("wordBlock").innerHTML =
+      `<div class="word-display">${item.word}</div><div class="root-note">${rootNoteLine(item)} \u2014 ${item.definition}</div>`;
+  }
+
+  if (isCorrect) {
+    btn.classList.add("correct");
+    let gain = 10 + Math.min(state.streak, 10);
+    if (isSpecial) gain *= 2;
+    if (rushBonus) gain *= 2;
+    state.lifetimePoints += gain;
+    state.sprinkles += gain;
+    state.streak += 1;
+    fb.className = "feedback good";
+    fb.innerHTML = "\u2713 " + randomLine(CORRECT_LINES) + " +" + gain + " \u2728" +
+      (rushBonus ? '<span class="combo-tag tier2">\ud83c\udfc3 Rush bonus!</span>' : "") +
+      comboTagHtml(state.streak);
+    flyPoints(btn, gain);
+    if (state.streak > 0 && state.streak % 4 === 0) celebrate(state.streak % 8 !== 0);
+  } else {
+    btn.classList.add("wrong");
+    allBtns.forEach(b => { if (b.dataset.correct === "true") b.classList.add("correct"); });
+    state.streak = 0;
+    fb.className = "feedback bad";
+    fb.textContent = "\u2717 " + randomLine(WRONG_LINES);
+    document.getElementById("gameCard").classList.add("shake-it");
+  }
+
+  renderRankBar();
+  saveState();
+  document.getElementById("nextBtn").classList.add("show");
+  document.getElementById("nextBtn").onclick = () => {
+    quizIndex++;
+    renderQuizQuestion();
+  };
+}
+
+// ---------- Match mode (Match Orders) ----------
+function startMatch() {
+  matchPool = buildRoundPool(2, 1).slice(0, 6);
+  matchSelectedWord = null;
+  matchSelectedDef = null;
+  matchedCount = 0;
+  saveState();
+  renderMatch();
+}
+
+function renderMatch() {
+  const card = document.getElementById("gameCard");
+  const wordsCol = shuffle(matchPool);
+  const defsCol = shuffle(matchPool);
+
+  card.innerHTML = `
+    <div class="ticket-label">Match Orders</div>
+    <div class="customer-row">
+      <div class="customer-avatar">\uD83E\uDDD1\u200D\uD83C\uDF73</div>
+      <div class="speech-bubble">The counter's stacked with mixed-up order tickets \u2014 match each word to its definition before they pile up!</div>
+    </div>
+    <div class="match-grid">
+      <div>
+        <div class="match-col-label">Words</div>
+        <div id="wordsCol"></div>
+      </div>
+      <div>
+        <div class="match-col-label">Definitions</div>
+        <div id="defsCol"></div>
+      </div>
+    </div>
+    <div class="feedback" id="matchFeedback"></div>
+    <button class="next-btn" id="newMatchBtn">New batch of tickets</button>
+  `;
+
+  const wordsColEl = document.getElementById("wordsCol");
+  const defsColEl = document.getElementById("defsCol");
+
+  wordsCol.forEach(item => {
+    const div = document.createElement("div");
+    const isReview = !isActive(item);
+    div.className = "match-item";
+    div.textContent = (isReview ? "\u21BB " : "") + item.word;
+    div.title = isReview ? "Re-bake \u2014 practice word" : "";
+    div.dataset.word = item.word;
+    div.addEventListener("click", () => selectMatchWord(div, item));
+    wordsColEl.appendChild(div);
+  });
+
+  defsCol.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "match-item";
+    div.textContent = item.definition;
+    div.dataset.word = item.word;
+    div.addEventListener("click", () => selectMatchDef(div, item));
+    defsColEl.appendChild(div);
+  });
+
+  document.getElementById("newMatchBtn").classList.add("show");
+  document.getElementById("newMatchBtn").onclick = startMatch;
+}
+
+function selectMatchWord(el, item) {
+  if (el.classList.contains("matched")) return;
+  document.querySelectorAll("#wordsCol .match-item").forEach(e => e.classList.remove("selected"));
+  el.classList.add("selected");
+  matchSelectedWord = { el, item };
+  tryMatch();
+}
+
+function selectMatchDef(el, item) {
+  if (el.classList.contains("matched")) return;
+  document.querySelectorAll("#defsCol .match-item").forEach(e => e.classList.remove("selected"));
+  el.classList.add("selected");
+  matchSelectedDef = { el, item };
+  tryMatch();
+}
+
+function tryMatch() {
+  if (!matchSelectedWord || !matchSelectedDef) return;
+  const fb = document.getElementById("matchFeedback");
+  const wordItem = matchSelectedWord.item;
+  const defItem = matchSelectedDef.item;
+  const isMatch = wordItem.word === defItem.word;
+  recordAnswer(wordItem.id, isMatch, {
+    subject: "vocabulary",
+    word: wordItem.word,
+    question: "Match the word to its definition",
+    givenAnswer: defItem.definition,
+    correctAnswer: wordItem.definition,
+    wasCorrect: isMatch,
+  });
+
+  if (isMatch) {
+    matchSelectedWord.el.classList.remove("selected");
+    matchSelectedDef.el.classList.remove("selected");
+    matchSelectedWord.el.classList.add("matched");
+    matchSelectedDef.el.classList.add("matched");
+    const gain = 8 + Math.min(state.streak, 10);
+    state.lifetimePoints += gain;
+    state.sprinkles += gain;
+    state.streak += 1;
+    matchedCount++;
+    fb.className = "feedback good";
+    fb.innerHTML = "\u2713 Match! +" + gain + " \u2728 (" + matchedCount + " of " + matchPool.length + " orders filled)" + comboTagHtml(state.streak);
+    flyPoints(matchSelectedDef.el, gain);
+    if (matchedCount === matchPool.length) {
+      fb.innerHTML += " \u2014 Whole board cleared!";
+      celebrate();
+    } else if (state.streak > 0 && state.streak % 4 === 0) {
+      celebrate(state.streak % 8 !== 0);
+    }
+  } else {
+    matchSelectedWord.el.classList.add("wrong-flash");
+    matchSelectedDef.el.classList.add("wrong-flash");
+    state.streak = 0;
+    fb.className = "feedback bad";
+    fb.textContent = "\u2717 Not a match. Try again.";
+    const w = matchSelectedWord, d = matchSelectedDef;
+    setTimeout(() => {
+      w.el.classList.remove("selected", "wrong-flash");
+      d.el.classList.remove("selected", "wrong-flash");
+    }, 500);
+  }
+  matchSelectedWord = null;
+  matchSelectedDef = null;
+  renderRankBar();
+  saveState();
+}
+
+// ---------- My Bakery (shop + treat collection) ----------
+function renderShop() {
+  const card = document.getElementById("gameCard");
+  const ownedCount = SHOP_ITEMS.filter(it => state.shopOwned[it.id]).length;
+  const masteredWords = WORDS.filter(w => {
+    const m = state.mastery[w.id];
+    return m && m.correct > 0 && !m.needsReview;
+  });
+
+  const decorSlotsHtml = SHOP_ITEMS.map(it => {
+    const owned = !!state.shopOwned[it.id];
+    return `<span class="decor-slot ${owned ? 'owned' : ''}" title="${owned ? it.name : it.name + ' (not bought yet)'}">${it.emoji}</span>`;
+  }).join("");
+
+  const toppingsHtml = SHOP_ITEMS.map((it, i) => {
+    if (!state.shopOwned[it.id]) return "";
+    const pos = state.decorPositions[it.id] || DEFAULT_DECOR_POS[i];
+    return `<span class="cake-topping" data-id="${it.id}" title="${it.name} \u2014 drag me!" style="left:${pos.x}%; top:${pos.y}%;">${it.emoji}</span>`;
+  }).join("");
+
+  const shelfTreats = masteredWords.length
+    ? masteredWords.map(w => `<span class="treat" title="${w.word}">${treatFor(w.id)}</span>`).join("")
+    : '<span style="font-size:13px; font-family: var(--mono); color: var(--crust-soft);">No treats baked yet \u2014 master a word in Bake! to add one to the shelf.</span>';
+
+  const shopHtml = SHOP_ITEMS.map(it => {
+    const owned = !!state.shopOwned[it.id];
+    const canAfford = state.sprinkles >= it.cost;
+    return `<div class="shop-item">
+      <span class="shop-emoji">${it.emoji}</span>
+      ${it.name}<br><span style="color: var(--crust-soft); font-size:11px;">\u2728 ${it.cost}</span>
+      <button class="shop-buy-btn ${owned ? 'owned' : ''}" data-id="${it.id}" ${owned || !canAfford ? 'disabled' : ''}>
+        ${owned ? '\u2713 Placed' : canAfford ? 'Buy' : 'Need more \u2728'}
+      </button>
+    </div>`;
+  }).join("");
+
+  card.innerHTML = `
+    <div class="ticket-label">Decorate Your Cake (${ownedCount} of ${SHOP_ITEMS.length})</div>
+    <div class="cake-hint">\uD83D\uDC46 Drag any topping to move it around the cake.</div>
+    <div class="shop-scene" id="cakeScene">
+      <div class="cake-stand-label">Adelyn's Cake</div>
+      <div class="cake">
+        <div class="tier-top"></div>
+        <div class="tier-bottom"></div>
+      </div>
+      <div class="cake-plate"></div>
+      <div class="cake-table"></div>
+      <div class="decor-slots">${decorSlotsHtml}</div>
+      ${toppingsHtml}
+    </div>
+    <div class="box-section-title">Treat Shelf (${masteredWords.length} mastered)</div>
+    <div class="treat-shelf">${shelfTreats}</div>
+    <div class="box-section-title">Decoration Box \u2014 tap a faded item above to spot what it is, then buy it here</div>
+    <div class="shop-grid">${shopHtml}</div>
+
+    <details class="parent-settings" id="parentSettingsDetails" ${parentSettingsOpen ? "open" : ""}>
+      <summary>Parent Settings</summary>
+      <div class="settings-body">
+        <label for="webAppUrlInput">ELA Pastry Kitchen Web App URL (auto-sync her current week):</label><br>
+        <input type="text" id="webAppUrlInput" placeholder="https://script.google.com/macros/s/.../exec"
+          value="${state.webAppUrl}" style="width:100%; max-width:340px;">
+        <button class="settings-save-btn" id="saveUrlBtn">Save &amp; Sync Now</button>
+        <p class="settings-note" id="syncStatusNote">${syncStatusLine()}</p>
+
+        <div class="box-section-title">Words to work on</div>
+        <div class="parent-report">${missedWordsReportHtml()}</div>
+
+        <div class="box-section-title">Recent answers</div>
+        <div class="parent-report">${recentAnswersHtml()}</div>
+
+        <label for="currentWeekInput">Or set her current week by hand:</label><br>
+        <input type="number" id="currentWeekInput" min="1" max="36" value="${state.currentWeek}">
+        <button class="settings-save-btn" id="saveWeekBtn">Save</button>
+        <span id="weekSavedNote" class="settings-note"></span>
+        <p class="settings-note">Words from any week after this number stay hidden either way. With a Web
+        App URL saved above, this number updates itself every time the game opens \u2014 set it by hand only
+        if you're not using auto-sync, or want to override it for now.</p>
+      </div>
+    </details>
+  `;
+
+  card.querySelectorAll(".shop-buy-btn").forEach(btn => {
+    btn.addEventListener("click", () => buyItem(btn.dataset.id));
+  });
+
+  attachDragHandlers(document.getElementById("cakeScene"));
+
+  const detailsEl = document.getElementById("parentSettingsDetails");
+  detailsEl.addEventListener("toggle", () => { parentSettingsOpen = detailsEl.open; });
+
+  document.getElementById("saveWeekBtn").addEventListener("click", () => {
+    const input = document.getElementById("currentWeekInput");
+    const week = Math.max(1, Math.min(36, parseInt(input.value, 10) || 1));
+    input.value = week;
+    state.currentWeek = week;
+    saveState();
+    document.getElementById("weekSavedNote").textContent = "\u2713 Saved \u2014 now on week " + week + ".";
+  });
+
+  document.getElementById("saveUrlBtn").addEventListener("click", async () => {
+    state.webAppUrl = document.getElementById("webAppUrlInput").value.trim();
+    saveState();
+    document.getElementById("syncStatusNote").textContent = "Syncing\u2026";
+    await syncCurrentWeek();
+    renderShop();
+  });
+}
+
+function missedWordsReportHtml() {
+  const needsReview = WORDS.filter(w => {
+    const m = state.mastery[w.id];
+    return m && m.needsReview;
+  }).sort((a, b) => (state.mastery[b.id].wrong || 0) - (state.mastery[a.id].wrong || 0));
+  if (needsReview.length === 0) {
+    return '<p class="settings-note">Nothing flagged for review right now.</p>';
+  }
+  const rows = needsReview.map(w => {
+    const m = state.mastery[w.id];
+    return `<div class="report-row"><strong>${w.word}</strong> — missed ${m.wrong}× — <em>${w.definition}</em></div>`;
+  }).join("");
+  return `<div class="report-list">${rows}</div>`;
+}
+
+function recentAnswersHtml() {
+  const log = (state.attemptLog || []).slice(-15).reverse();
+  if (log.length === 0) {
+    return '<p class="settings-note">No answers logged yet this session.</p>';
+  }
+  const rows = log.map(a => {
+    const when = new Date(a.timestamp).toLocaleString();
+    const detail = a.correct
+      ? ""
+      : ` — answered "${a.givenAnswer}", correct answer "${a.correctAnswer}"`;
+    return `<div class="report-row ${a.correct ? "report-correct" : "report-wrong"}">
+      ${a.correct ? "✅" : "❌"} <strong>${a.word}</strong>${detail}
+      <div class="settings-note">${when}</div>
+    </div>`;
+  }).join("");
+  return `<div class="report-list">${rows}</div>`;
+}
+
+function syncStatusLine() {
+  if (!state.webAppUrl) return "No Web App URL set yet \u2014 using the week number below.";
+  if (!state.lastSyncAt) return "Not synced yet \u2014 tap \u201cSave & Sync Now\u201d.";
+  const when = new Date(state.lastSyncAt).toLocaleString();
+  return state.lastSyncOk
+    ? "\u2713 Last synced " + when + " \u2014 week " + state.currentWeek + "."
+    : "\u26A0 Couldn't reach the Sheet at last try (" + when + ") \u2014 using last known week " + state.currentWeek + ".";
+}
+
+function attachDragHandlers(sceneEl) {
+  sceneEl.querySelectorAll(".cake-topping").forEach(el => {
+    el.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      const sceneRect = sceneEl.getBoundingClientRect();
+      const startLeftPx = el.offsetLeft;
+      const startTopPx = el.offsetTop;
+      const startX = e.clientX;
+      const startY = e.clientY;
+      el.setPointerCapture(e.pointerId);
+      el.classList.add("dragging");
+
+      function onMove(ev) {
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+        const newLeft = Math.max(0, Math.min(sceneRect.width - el.offsetWidth, startLeftPx + dx));
+        const newTop = Math.max(0, Math.min(sceneRect.height - el.offsetHeight, startTopPx + dy));
+        el.style.left = newLeft + "px";
+        el.style.top = newTop + "px";
+      }
+      function onUp(ev) {
+        el.releasePointerCapture(ev.pointerId);
+        el.classList.remove("dragging");
+        el.removeEventListener("pointermove", onMove);
+        el.removeEventListener("pointerup", onUp);
+        state.decorPositions[el.dataset.id] = {
+          x: (el.offsetLeft / sceneRect.width) * 100,
+          y: (el.offsetTop / sceneRect.height) * 100
+        };
+        saveState();
+      }
+      el.addEventListener("pointermove", onMove);
+      el.addEventListener("pointerup", onUp);
+    });
+  });
+}
+
+function buyItem(id) {
+  const item = SHOP_ITEMS.find(it => it.id === id);
+  if (!item || state.shopOwned[id] || state.sprinkles < item.cost) return;
+  state.sprinkles -= item.cost;
+  state.shopOwned[id] = true;
+  renderRankBar();
+  saveState();
+  renderShop();
+  playTone();
+}
+
+// ---------- Celebration (confetti + tone, no assets) ----------
+// mini=true gives a smaller, quieter burst for the more frequent combo
+// milestones, so the full 24-piece version still feels special.
+function celebrate(mini) {
+  const colors = ["#e8a0ad", "#f0c14b", "#7fb88f", "#5a3825"];
+  const count = mini ? 10 : 24;
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement("div");
+    piece.className = "confetti-piece";
+    piece.style.left = Math.random() * 100 + "vw";
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.transform = "rotate(" + Math.random() * 360 + "deg)";
+    document.body.appendChild(piece);
+    const duration = 900 + Math.random() * 700;
+    piece.animate(
+      [
+        { transform: piece.style.transform, top: "-10px", opacity: 1 },
+        { transform: piece.style.transform, top: "100vh", opacity: 0.9 }
+      ],
+      { duration, easing: "ease-in" }
+    );
+    setTimeout(() => piece.remove(), duration + 50);
+  }
+  playTone(mini);
+}
+
+function playTone(soft) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = soft ? [659.25, 783.99] : [523.25, 659.25, 783.99];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.frequency.value = freq;
+      osc.type = "sine";
+      gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.35);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.12);
+      osc.stop(ctx.currentTime + i * 0.12 + 0.35);
+    });
+  } catch (e) {
+    // Web Audio unavailable — silently skip, nothing else depends on it.
+  }
+}
+
+// ---------- Tabs ----------
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    currentMode = tab.dataset.mode;
+    clearRushTimer();
+    if (currentMode === "quiz") startQuiz();
+    else if (currentMode === "match") startMatch();
+    else renderShop();
+  });
+});
+
+// ---------- Init ----------
+loadState();
+renderRankBar();
+if (checkDailyVisit()) {
+  renderWelcomeBanner();
+} else {
+  startQuiz();
+}
+// Background week sync — never blocks the screen above; if a Web App URL
+// is saved, this quietly checks her real current_week and takes effect on
+// the next round or the next time My Bakery is opened.
+syncCurrentWeek();
+</script>
+</body>
+</html>
