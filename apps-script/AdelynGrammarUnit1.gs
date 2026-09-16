@@ -204,11 +204,11 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
             "options": ["Common", "Proper", "Collective", "Compound"],
             "targets": [
-              { "index": 0, "answer": "Proper" },
-              { "index": 2, "answer": "Collective" },
-              { "index": 6, "answer": "Compound" },
-              { "index": 9, "answer": "Common" },
-              { "index": 12, "answer": "Common" }
+              {"index":0,"answer":"Proper","explanation":"names one specific person, place, or thing, so it's capitalized"},
+              {"index":2,"answer":"Collective","explanation":"names a group acting as one unit"},
+              {"index":6,"answer":"Compound","explanation":"two words joined into one noun idea"},
+              {"index":9,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"},
+              {"index":12,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"}
             ]
           },
           {
@@ -281,10 +281,10 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
             "options": ["Common", "Proper", "Collective", "Compound"],
             "targets": [
-              { "index": 2, "answer": "Collective" },
-              { "index": 5, "answer": "Compound" },
-              { "index": 7, "answer": "Proper" },
-              { "index": 9, "answer": "Common" }
+              {"index":2,"answer":"Collective","explanation":"names a group acting as one unit"},
+              {"index":5,"answer":"Compound","explanation":"two words joined into one noun idea"},
+              {"index":7,"answer":"Proper","explanation":"names one specific person, place, or thing, so it's capitalized"},
+              {"index":9,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"}
             ]
           },
           {
@@ -361,10 +361,10 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
             "options": ["Common", "Proper", "Collective", "Compound"],
             "targets": [
-              { "index": 0, "answer": "Proper" },
-              { "index": 2, "answer": "Common" },
-              { "index": 6, "answer": "Compound" },
-              { "index": 10, "answer": "Common" }
+              {"index":0,"answer":"Proper","explanation":"names one specific person, place, or thing, so it's capitalized"},
+              {"index":2,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"},
+              {"index":6,"answer":"Compound","explanation":"two words joined into one noun idea"},
+              {"index":10,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"}
             ]
           },
           {
@@ -445,9 +445,9 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
             "options": ["Common", "Proper", "Collective", "Compound"],
             "targets": [
-              { "index": 2, "answer": "Collective" },
-              { "index": 6, "answer": "Collective" },
-              { "index": 11, "answer": "Common" }
+              {"index":2,"answer":"Collective","explanation":"names a group acting as one unit"},
+              {"index":6,"answer":"Collective","explanation":"names a group acting as one unit"},
+              {"index":11,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"}
             ]
           }
         ]
@@ -537,9 +537,9 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
             "options": ["Subject", "Object", "Possessive", "Indefinite"],
             "targets": [
-              { "index": 0, "answer": "Indefinite" },
-              { "index": 3, "answer": "Object" },
-              { "index": 5, "answer": "Subject" }
+              {"index":0,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
+              {"index":3,"answer":"Object","explanation":"it's receiving the action, or following a preposition"},
+              {"index":5,"answer":"Subject","explanation":"it's doing the action in its clause"}
             ]
           },
           {
@@ -620,11 +620,11 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
             "options": ["Subject", "Object", "Possessive", "Indefinite"],
             "targets": [
-              { "index": 0, "answer": "Indefinite" },
-              { "index": 2, "answer": "Possessive" },
-              { "index": 7, "answer": "Indefinite" },
-              { "index": 9, "answer": "Possessive" },
-              { "index": 10, "answer": "Subject" }
+              {"index":0,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
+              {"index":2,"answer":"Possessive","explanation":"it shows ownership"},
+              {"index":7,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
+              {"index":9,"answer":"Possessive","explanation":"it shows ownership"},
+              {"index":10,"answer":"Subject","explanation":"it's doing the action in its clause"}
             ]
           },
           {
@@ -725,10 +725,10 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
             "options": ["Subject", "Object", "Possessive", "Indefinite"],
             "targets": [
-              { "index": 0, "answer": "Indefinite" },
-              { "index": 4, "answer": "Possessive" },
-              { "index": 9, "answer": "Indefinite" },
-              { "index": 15, "answer": "Subject" }
+              {"index":0,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
+              {"index":4,"answer":"Possessive","explanation":"it shows ownership"},
+              {"index":9,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
+              {"index":15,"answer":"Subject","explanation":"it's doing the action in its clause"}
             ]
           },
           {
@@ -809,9 +809,9 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
             "options": ["Subject", "Object", "Possessive", "Indefinite"],
             "targets": [
-              { "index": 0, "answer": "Indefinite" },
-              { "index": 2, "answer": "Indefinite" },
-              { "index": 8, "answer": "Indefinite" }
+              {"index":0,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
+              {"index":2,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
+              {"index":8,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"}
             ]
           }
         ]
@@ -901,9 +901,9 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the verbs you found in this sentence. Is each one action, linking, or helping?",
             "options": ["Action", "Linking", "Helping"],
             "targets": [
-              { "index": 2, "answer": "Linking" },
-              { "index": 6, "answer": "Helping" },
-              { "index": 7, "answer": "Action" }
+              {"index":2,"answer":"Linking","explanation":"connects the subject to a word that renames or describes it, instead of showing action"},
+              {"index":6,"answer":"Helping","explanation":"works with the main verb to show tense, ability, or mood"},
+              {"index":7,"answer":"Action","explanation":"shows something the subject does"}
             ]
           },
           {
@@ -980,9 +980,9 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the verbs you found in this sentence. Is each one action, linking, or helping?",
             "options": ["Action", "Linking", "Helping"],
             "targets": [
-              { "index": 1, "answer": "Helping" },
-              { "index": 2, "answer": "Action" },
-              { "index": 7, "answer": "Linking" }
+              {"index":1,"answer":"Helping","explanation":"works with the main verb to show tense, ability, or mood"},
+              {"index":2,"answer":"Action","explanation":"shows something the subject does"},
+              {"index":7,"answer":"Linking","explanation":"connects the subject to a word that renames or describes it, instead of showing action"}
             ]
           },
           {
@@ -1051,10 +1051,10 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the verbs you found in this sentence. Is each one action, linking, or helping?",
             "options": ["Action", "Linking", "Helping"],
             "targets": [
-              { "index": 1, "answer": "Helping" },
-              { "index": 2, "answer": "Action" },
-              { "index": 6, "answer": "Helping" },
-              { "index": 7, "answer": "Action" }
+              {"index":1,"answer":"Helping","explanation":"works with the main verb to show tense, ability, or mood"},
+              {"index":2,"answer":"Action","explanation":"shows something the subject does"},
+              {"index":6,"answer":"Helping","explanation":"works with the main verb to show tense, ability, or mood"},
+              {"index":7,"answer":"Action","explanation":"shows something the subject does"}
             ]
           },
           {
@@ -1135,8 +1135,8 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the verbs you found in this sentence. Is each one action, linking, or helping?",
             "options": ["Action", "Linking", "Helping"],
             "targets": [
-              { "index": 2, "answer": "Linking" },
-              { "index": 6, "answer": "Linking" }
+              {"index":2,"answer":"Linking","explanation":"connects the subject to a word that renames or describes it, instead of showing action"},
+              {"index":6,"answer":"Linking","explanation":"connects the subject to a word that renames or describes it, instead of showing action"}
             ]
           }
         ]

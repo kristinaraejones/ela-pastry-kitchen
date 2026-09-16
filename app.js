@@ -1265,7 +1265,7 @@ function taskBodyHTML(key, t) {
     if (s.done) {
       const misses = t.targets.filter(tg => s.labels[tg.index] !== tg.answer);
       if (misses.length) {
-        inner += `<div class="tag-review">${misses.map(tg => `<div class="tag-review-item"><b>${t.sentence[tg.index]}</b> — you said ${s.labels[tg.index] || "nothing"}, it's actually <b>${tg.answer}</b>.</div>`).join("")}</div>`;
+        inner += `<div class="tag-review">${misses.map(tg => `<div class="tag-review-item"><b>${t.sentence[tg.index]}</b> — you said ${s.labels[tg.index] || "nothing"}, it's actually <b>${tg.answer}</b>.${tg.explanation ? ` ${tg.explanation}` : ""}</div>`).join("")}</div>`;
       }
       inner += `<div class="score-result ${s.score.split("/")[0] === s.score.split("/")[1] ? "pass" : "retry"}">Scored automatically: ${s.score}</div>`;
     } else {
