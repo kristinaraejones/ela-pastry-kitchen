@@ -143,7 +143,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             ],
             "answers": [
               "Noun",
-              "Noun",
+              "Adjective",
               "Noun",
               "Verb",
               "Adjective",
@@ -168,7 +168,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             ],
             "explanations": [
               "possessive proper noun",
-              "noun (describes team)",
+              "noun used as an adjective (describes team)",
               "common/collective noun",
               "action verb",
               "article",
@@ -205,7 +205,6 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "options": ["Common", "Proper", "Collective", "Compound"],
             "targets": [
               { "index": 0, "answer": "Proper" },
-              { "index": 1, "answer": "Common" },
               { "index": 2, "answer": "Collective" },
               { "index": 6, "answer": "Compound" },
               { "index": 9, "answer": "Common" },
