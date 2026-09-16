@@ -740,17 +740,50 @@ function readAloudButton(elId, label) {
   return `<button class="btn read-aloud-btn" onclick="speakElementText('${elId}')">🔊 ${label || "Read this to me"}</button>`;
 }
 
+// Aligns correct/typed word lists via LCS instead of raw position, so one
+// extra/missing/split word (e.g. typing "milk man" for "milkman") doesn't
+// shift every later word out of alignment and get them all flagged wrong.
+function alignWords(correctWords, typedWords) {
+  const n = correctWords.length, m = typedWords.length;
+  const eq = (a, b) => a.toLowerCase() === b.toLowerCase();
+  const dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) {
+    for (let j = m - 1; j >= 0; j--) {
+      dp[i][j] = eq(correctWords[i], typedWords[j]) ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    }
+  }
+  const ops = [];
+  let i = 0, j = 0;
+  while (i < n && j < m) {
+    if (eq(correctWords[i], typedWords[j])) { ops.push({ correctWord: correctWords[i], typedWord: typedWords[j], match: true }); i++; j++; }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) { ops.push({ correctWord: correctWords[i], typedWord: "", match: false }); i++; }
+    else { ops.push({ correctWord: "", typedWord: typedWords[j], match: false }); j++; }
+  }
+  while (i < n) { ops.push({ correctWord: correctWords[i], typedWord: "", match: false }); i++; }
+  while (j < m) { ops.push({ correctWord: "", typedWord: typedWords[j], match: false }); j++; }
+  // Merge an adjacent delete+insert (in either order) into one substitution,
+  // so a plain misspelling still shows as a single chip like before.
+  const merged = [];
+  for (let k = 0; k < ops.length; k++) {
+    const cur = ops[k], next = ops[k + 1];
+    if (!cur.match && next && !next.match && (!cur.correctWord || !cur.typedWord) && (!next.correctWord || !next.typedWord)
+      && (cur.correctWord || next.correctWord) && (cur.typedWord || next.typedWord) && !(cur.correctWord && next.correctWord) && !(cur.typedWord && next.typedWord)) {
+      merged.push({ correctWord: cur.correctWord || next.correctWord, typedWord: cur.typedWord || next.typedWord, match: false });
+      k++;
+    } else {
+      merged.push(cur);
+    }
+  }
+  return merged;
+}
+
 function gradeSentence(correctText, typedText) {
   const tokenize = s => s.match(/[A-Za-z']+/g) || [];
   const correctWords = tokenize(correctText);
   const typedWords = tokenize(typedText);
-  const maxLen = Math.max(correctWords.length, typedWords.length);
-  const wordResults = [];
-  for (let i = 0; i < maxLen; i++) {
-    const cw = correctWords[i] || "";
-    const tw = typedWords[i] || "";
-    wordResults.push({ correctWord: cw, typedWord: tw, spellingCorrect: cw !== "" && cw.toLowerCase() === tw.toLowerCase() });
-  }
+  const wordResults = alignWords(correctWords, typedWords).map(op => ({
+    correctWord: op.correctWord, typedWord: op.typedWord, spellingCorrect: op.match
+  }));
   const correctTrim = correctText.trim(), typedTrim = typedText.trim();
   const startsCapCorrect = /^[A-Z]/.test(correctTrim);
   const startsCapTyped = /^[A-Z]/.test(typedTrim);
