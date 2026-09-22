@@ -842,6 +842,50 @@ function checkDictation(key, id) {
 }
 function tagAbbrev(type) { return TAG_ABBREV[type] || type.slice(0, 4).toUpperCase(); }
 
+// ---------- Retype-to-confirm for missed dictation words ----------
+// Requires the child to retype each missed word correctly before it counts
+// as reviewed, so a parent can confirm the word was actually learned, not
+// just shown the answer. wi is null for a standalone missed word, or the
+// index into a sentence's wordResults for a missed word inside a sentence.
+function correctionKey(wi) { return wi === null || wi === undefined ? "w" : `${wi}`; }
+function correctionBox(key, id, ri, wi, correctWord, r) {
+  const ck = correctionKey(wi);
+  const entry = (r.corrections && r.corrections[ck]) || null;
+  const inputId = `correction-${key}-${id}-${ri}-${ck}`;
+  if (entry && entry.confirmed) {
+    return `<div class="correction-box confirmed">✓ Retyped correctly — nice work!</div>`;
+  }
+  return `<div class="correction-box${entry && !entry.confirmed ? " wrong" : ""}">
+    <input type="text" id="${inputId}" placeholder="Retype it correctly..." value="${entry ? entry.typed : ""}">
+    <button class="btn" onclick="submitCorrection('${key}','${id}',${ri},${wi === null ? "null" : wi},'${correctWord.replace(/'/g, "\\'")}')">Check</button>
+    ${entry && !entry.confirmed ? `<div class="correction-msg">Not quite — try again.</div>` : ``}
+  </div>`;
+}
+function allCorrectionsConfirmed(results) {
+  return results.every(r => {
+    if (r.kind === "sentence") {
+      return r.grade.wordResults.every((wr, wi) => {
+        if (wr.spellingCorrect || !wr.correctWord) return true;
+        const entry = r.corrections && r.corrections[correctionKey(wi)];
+        return entry && entry.confirmed;
+      });
+    }
+    if (r.correct) return true;
+    const entry = r.corrections && r.corrections[correctionKey(null)];
+    return entry && entry.confirmed;
+  });
+}
+function submitCorrection(key, id, ri, wi, correctWord) {
+  const ck = correctionKey(wi);
+  const inputId = `correction-${key}-${id}-${ri}-${ck}`;
+  const typed = document.getElementById(inputId).value.trim();
+  const r = state[key].tasks[id].results[ri];
+  if (!r.corrections) r.corrections = {};
+  r.corrections[ck] = { typed, confirmed: typed.toLowerCase() === correctWord.toLowerCase() };
+  persistTask(key, id);
+  render();
+}
+
 // ---------- Reading fluency check (parent listens, marks each word) ----------
 
 function markFluencyWord(key, id, idx, correct) {
@@ -1079,15 +1123,17 @@ function taskBodyHTML(key, t) {
     const dictPromptId = `dict-prompt-${key}-${t.id}`;
     inner = `${trimReadAloud ? "" : readAloudButton(dictPromptId, "Read the instructions to me")}<div class="lesson-text" id="${dictPromptId}"><p>${t.prompt}</p></div>`;
     if (s.done && s.results) {
-      inner += s.results.map(r => {
+      inner += s.results.map((r, ri) => {
         if (r.kind === "sentence") {
           const chips = r.grade.wordResults.map(wr => `<span class="word-chip ${wr.spellingCorrect ? "chip-correct" : "chip-incorrect"}">${wr.typedWord || "—"}</span>`).join(" ");
           const missedWords = r.grade.wordResults.filter(wr => !wr.spellingCorrect && wr.correctWord).map(wr => wr.correctWord);
           const overallClass = (r.grade.allSpellingCorrect && r.grade.allGrammarPass) ? "correct" : "incorrect";
+          const missedBoxes = r.grade.wordResults.map((wr, wi) => (!wr.spellingCorrect && wr.correctWord) ? correctionBox(key, t.id, ri, wi, wr.correctWord, r) : "").join("");
           return `<div class="dict-result ${overallClass}">
             <div class="dict-result-typed" style="margin-bottom:6px;">Spelling, word by word:</div>
             <div style="margin-bottom:8px;">${chips}</div>
             ${missedWords.length ? `<div class="dict-result-answer">Correct spelling for missed word${missedWords.length > 1 ? "s" : ""}: <b>${missedWords.join(", ")}</b></div>` : ``}
+            ${missedBoxes}
             <div class="grammar-check">
               ${r.grade.grammar.map(g => `<div class="grammar-line ${g.pass ? "pass" : "fail"}">${g.pass ? "✓" : "✗"} ${g.label}</div>`).join("")}
             </div>
@@ -1096,11 +1142,15 @@ function taskBodyHTML(key, t) {
           const icon = r.correct ? "✓" : "✗";
           return `<div class="dict-result ${r.correct ? "correct" : "incorrect"}">
             <div class="dict-result-typed"><span class="dict-icon">${icon}</span> You wrote: <b>${r.typed || "(blank)"}</b></div>
-            ${!r.correct ? `<div class="dict-result-answer">Correct spelling: <b>${r.answer}</b></div>` : ``}
+            ${!r.correct ? `<div class="dict-result-answer">Correct spelling: <b>${r.answer}</b></div>${correctionBox(key, t.id, ri, null, r.answer, r)}` : ``}
           </div>`;
         }
       }).join("");
+      const allConfirmed = allCorrectionsConfirmed(s.results);
       inner += `<div class="score-result ${s.results.every(r => r.kind === "sentence" ? (r.grade.allSpellingCorrect && r.grade.allGrammarPass) : r.correct) ? "pass" : "retry"}">Scored automatically: ${s.score}${t.dynamic === "reviewPool" ? " — pool updated, mastered words drop out automatically" : ""}. Any missed word — even outside this week's list — has been added to the review file.</div>`;
+      if (!allConfirmed) {
+        inner += `<div class="score-result retry">✏️ Before moving on: retype each missed word above until it's spelled correctly.</div>`;
+      }
     } else if (words.length === 0) {
       inner += `<div class="empty-note">No review words yet — once ${CHILD_META[currentChild].name} misses a dictation word anywhere in the app, it'll show up here automatically.</div>`;
     } else {
