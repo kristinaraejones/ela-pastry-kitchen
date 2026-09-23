@@ -840,11 +840,39 @@ function alignWords(correctWords, typedWords) {
   return merged;
 }
 
+const GRADE_VERSION = 2; // bump when grading rules change; older saved results get re-graded
+
+// Spacing is not graded yet: a word typed as two ("news paper") or two words
+// run together ("cannot" for "can not") counts as right. Looks for a short run
+// of adjacent wrong ops whose letters, joined, match exactly, and marks them right.
+function forgiveSpacing(ops) {
+  const out = [];
+  let i = 0;
+  while (i < ops.length) {
+    if (!ops[i].match) {
+      let merged = false;
+      for (let len = Math.min(4, ops.length - i); len >= 2 && !merged; len--) {
+        const run = ops.slice(i, i + len);
+        if (run.some(o => o.match)) continue;
+        const c = run.map(o => o.correctWord).join("").toLowerCase();
+        const t = run.map(o => o.typedWord).join("").toLowerCase();
+        if (c && c === t) {
+          out.push({ correctWord: run.map(o => o.correctWord).filter(Boolean).join(" "), typedWord: run.map(o => o.typedWord).filter(Boolean).join(" "), match: true });
+          i += len; merged = true;
+        }
+      }
+      if (merged) continue;
+    }
+    out.push(ops[i]); i++;
+  }
+  return out;
+}
+
 function gradeSentence(correctText, typedText) {
   const tokenize = s => s.match(/[A-Za-z']+/g) || [];
   const correctWords = tokenize(correctText);
   const typedWords = tokenize(typedText);
-  const wordResults = alignWords(correctWords, typedWords).map(op => ({
+  const wordResults = forgiveSpacing(alignWords(correctWords, typedWords)).map(op => ({
     correctWord: op.correctWord, typedWord: op.typedWord, spellingCorrect: op.match
   }));
   const correctTrim = correctText.trim(), typedTrim = typedText.trim();
@@ -866,7 +894,7 @@ function gradeSentence(correctText, typedText) {
   // or extra word, the capital, the ending punctuation) costs 1 point, down to 0.
   const wrongItems = wordResults.filter(w => !w.spellingCorrect).length + grammar.filter(g => !g.pass).length;
   return {
-    wordResults, grammar,
+    v: GRADE_VERSION, wordResults, grammar,
     points: Math.max(0, SENTENCE_POINTS - wrongItems),
     allSpellingCorrect: wordResults.every(w => w.spellingCorrect),
     allGrammarPass: grammar.every(g => g.pass)
@@ -885,13 +913,26 @@ function regradeLegacyDictation() {
       if (t.type !== "graded-dictation") return;
       const st = state[key].tasks[t.id];
       if (!st || !st.done || !st.results) return;
-      if (!st.results.some(r => r.kind === "sentence" && r.grade && typeof r.grade.points !== "number")) return;
+      if (!st.results.some(r => r.kind === "sentence" && r.grade && r.grade.v !== GRADE_VERSION)) return;
       let got = 0, possible = 0;
       st.results = st.results.map(r => {
         if (r.kind === "sentence") {
           const grade = gradeSentence(r.answer, r.typed || "");
           got += grade.points; possible += SENTENCE_POINTS;
-          return Object.assign({}, r, { grade });
+          // Word positions can shift when spacing is forgiven, so carry retype progress over by word.
+          let corrections = r.corrections;
+          if (corrections && r.grade && r.grade.wordResults) {
+            const byWord = {};
+            Object.keys(corrections).forEach(k => {
+              const old = r.grade.wordResults[Number(k)];
+              if (old && old.correctWord) byWord[old.correctWord.toLowerCase()] = corrections[k];
+            });
+            corrections = {};
+            grade.wordResults.forEach((wr, wi) => {
+              if (!wr.spellingCorrect && wr.correctWord && byWord[wr.correctWord.toLowerCase()]) corrections[String(wi)] = byWord[wr.correctWord.toLowerCase()];
+            });
+          }
+          return Object.assign({}, r, { grade }, corrections ? { corrections } : {});
         }
         got += r.correct ? 1 : 0; possible += 1;
         return r;
