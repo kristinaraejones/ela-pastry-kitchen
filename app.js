@@ -1171,6 +1171,37 @@ function spanHit(p, sel) {
 }
 function phraseHit(p, sel) { return p.type === sel.type && spanHit(p, sel); }
 
+// Explains WHY a tagged chunk isn't one of the answers, not just that it's wrong.
+// Uses the other tagging tasks on the same sentence (subjects, verbs, clauses)
+// to tell a clause (has its own subject + verb) from a phrase (doesn't).
+function explainOffKeyTag(key, t, sel) {
+  const words = t.sentence.slice(sel.start, sel.end + 1);
+  const text = words.join(" ").replace(/[,.;:]+$/, "");
+  const sentenceKey = t.sentence.join(" ");
+  const sibs = DATA[key].tasks.filter(x => x.type === "phrase-tagger" && x.sentence && x.sentence.join(" ") === sentenceKey);
+  const all = sibs.flatMap(x => x.phrases || []);
+  const inside = list => list.filter(p => p.start >= sel.start && p.end <= sel.end);
+  const clean = p => t.sentence.slice(p.start, p.end + 1).join(" ").replace(/[,.;:]+$/, "");
+  const subjects = inside(all.filter(p => p.type === "Subject"));
+  const verbs = inside(all.filter(p => /Verb Predicate/.test(p.type)));
+  const hasSV = subjects.length > 0 && verbs.length > 0;
+  const opts = t.options || [];
+  const isPhraseLevel = opts.includes("Prepositional") || opts.includes("Appositive");
+  const isClauseLevel = opts.includes("Independent Clause");
+  if (isPhraseLevel && hasSV) {
+    const keyList = (t.phrases || []).map(p => `"${clean(p)}" (${p.type})`).join(" and ");
+    return `<b>"${text}"</b> — that's a <b>clause</b>, not a phrase. It has its own subject (<b>${subjects.map(clean).join(", ")}</b>) and its own verb (<b>${verbs.map(clean).join(", ")}</b>). A <b>phrase</b> is a group of words that does <i>not</i> have a subject and verb working together; a <b>clause</b> does. The phrases to mark here are ${keyList || "the ones that work as a single part"}.`;
+  }
+  if (isClauseLevel && !hasSV) {
+    return `<b>"${text}"</b> — that's a <b>phrase</b>, not a clause. It doesn't have its own subject <i>and</i> verb. A clause always needs both, like "Reynie carried…". Look for the chunks that could each be read as their own little statement.`;
+  }
+  const overlap = (t.phrases || []).find(p => sel.start <= p.end && sel.end >= p.start);
+  if (overlap) {
+    return `<b>"${text}"</b> — close, but not the exact chunk. The <b>${overlap.type}</b> here is <b>"${clean(overlap)}"</b>. ${overlap.explanation || ""}`;
+  }
+  return `<b>"${text}"</b> — that's not one of the parts we're looking for here.`;
+}
+
 function checkPhraseTagging(key, id) {
   const t = DATA[key].tasks.find(x => x.id === id);
   const s = state[key].tasks[id];
@@ -1468,7 +1499,7 @@ function taskBodyHTML(key, t) {
           const text = t.sentence.slice(sel.start, sel.end + 1).join(" ");
           const sameSpan = t.phrases.find(p => spanHit(p, sel));
           if (sameSpan) reviewLines.push(`<b>"${text}"</b> — you tagged it ${sel.type}, but it's actually <b>${sameSpan.type}</b>. ${sameSpan.explanation}`);
-          else reviewLines.push(`<b>"${text}"</b> — that's not one of the parts we're looking for here.`);
+          else reviewLines.push(explainOffKeyTag(key, t, sel));
         }
       });
       t.phrases.forEach(p => {
