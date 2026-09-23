@@ -1849,7 +1849,7 @@ function render() {
     const lockedCount = active.length - unlockedTasks.length;
     const stampText = status === "served" ? "SERVED ✓" : status === "burning" ? "BURNING 🔥" : "";
     card.innerHTML = `
-      ${sentBackTasks.length > 0 ? `<div class="sentback-badge">🔁 Refire (${sentBackTasks.length})</div>` : (currentView === "parent" && needsReview ? '<div class="review-badge">Review</div>' : "")}
+      ${sentBackTasks.length > 0 ? `<div class="sentback-badge">🔥 Try again (${sentBackTasks.length})</div>` : (currentView === "parent" && needsReview ? '<div class="review-badge">Review</div>' : "")}
       <div class="station-tag">${subjectTag(key)}</div>
       <div class="station-title">${DATA[key].name}</div>
       <div class="station-lesson">${active.length === 0 ? "Nothing loaded for this week yet" : `${unlockedTasks.length} item${unlockedTasks.length !== 1 ? "s" : ""} available${lockedCount > 0 ? ` · +${lockedCount} locked` : ""}`}</div>
@@ -1920,7 +1920,7 @@ function render() {
   });
   const banner = document.getElementById("sentBackBanner");
   banner.innerHTML = sentBackAll.length > 0 ? `<div class="sentback-banner">
-      <div class="sentback-banner-title">🔁 ${sentBackAll.length} plate${sentBackAll.length > 1 ? "s" : ""} sent back to refire — review before moving on:</div>
+      <div class="sentback-banner-title">🔥 ${sentBackAll.length} plate${sentBackAll.length > 1 ? "s need" : " needs"} another try! Tap to fix ${sentBackAll.length > 1 ? "them" : "it"} up:</div>
       <div class="sentback-chips">
         ${sentBackAll.map(item => `<span class="sentback-chip" onclick="openStationFn('${item.key}')">${item.subject}: ${item.label}</span>`).join("")}
       </div>

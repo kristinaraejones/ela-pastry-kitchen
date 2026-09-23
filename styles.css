@@ -42,14 +42,14 @@ body{margin:0;background:var(--chalk-bg);background-image:radial-gradient(circle
 .due-status{font-weight:700;}
 .due-status.ok{color:var(--herb);}
 .review-badge{position:absolute;top:8px;right:8px;background:var(--saffron);color:#5B4636;font-family:'JetBrains Mono',monospace;font-size:0.58rem;font-weight:700;padding:2px 6px;border-radius:9px;text-transform:uppercase;}
-.sentback-badge{position:absolute;top:8px;right:8px;background:var(--tomato);color:#fff;font-family:'JetBrains Mono',monospace;font-size:0.58rem;font-weight:700;padding:2px 6px;border-radius:9px;text-transform:uppercase;}
+.sentback-badge{position:absolute;top:8px;right:8px;background:var(--tomato);color:#fff;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;padding:2px 6px;border-radius:9px;}
 .sentback-banner{background:#FBE3E6;border:1px solid var(--tomato);border-radius:10px;padding:12px 14px;margin-bottom:16px;}
-.sentback-banner-title{font-family:'Pacifico',cursive;font-weight:700;font-size:1.05rem;color:#C0526A;margin-bottom:8px;}
+.sentback-banner-title{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.1rem;color:#C0526A;margin-bottom:8px;}
 .sentback-chips{display:flex;flex-wrap:wrap;gap:6px;}
-.sentback-chip{background:var(--tomato);color:#fff;font-family:'JetBrains Mono',monospace;font-size:0.72rem;padding:5px 10px;border-radius:6px;cursor:pointer;}
+.sentback-chip{background:var(--tomato);color:#fff;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9rem;padding:6px 12px;border-radius:14px;cursor:pointer;}
 .sentback-chip:hover{opacity:0.85;}
 .advance-banner{background:#E7F3E3;border:1px solid var(--herb);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-.advance-banner-title{font-family:'Pacifico',cursive;font-weight:700;font-size:1.05rem;color:#4F7A4A;}
+.advance-banner-title{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.1rem;color:#4F7A4A;}
 
 .detail{background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px;margin-top:16px;display:none;}
 .detail.open{display:block;}
