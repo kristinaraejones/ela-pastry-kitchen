@@ -873,6 +873,34 @@ function gradeSentence(correctText, typedText) {
   };
 }
 const SENTENCE_POINTS = 10;
+
+// One-time migration: dictation sentences finished under the old all-or-nothing
+// grader are re-graded with the 10-point rules from what she actually typed.
+// Retype-to-fix progress is kept (word positions don't change), and the new
+// score is saved back so every device shows it.
+function regradeLegacyDictation() {
+  if (!DATA || !state) return;
+  Object.keys(DATA).forEach(key => {
+    DATA[key].tasks.forEach(t => {
+      if (t.type !== "graded-dictation") return;
+      const st = state[key].tasks[t.id];
+      if (!st || !st.done || !st.results) return;
+      if (!st.results.some(r => r.kind === "sentence" && r.grade && typeof r.grade.points !== "number")) return;
+      let got = 0, possible = 0;
+      st.results = st.results.map(r => {
+        if (r.kind === "sentence") {
+          const grade = gradeSentence(r.answer, r.typed || "");
+          got += grade.points; possible += SENTENCE_POINTS;
+          return Object.assign({}, r, { grade });
+        }
+        got += r.correct ? 1 : 0; possible += 1;
+        return r;
+      });
+      st.score = `${got}/${possible}`;
+      persistTask(key, t.id);
+    });
+  });
+}
 // Points for one stored sentence result (older saved results had no points: all-or-nothing).
 function sentencePoints(r) {
   if (typeof r.grade.points === "number") return r.grade.points;
@@ -1717,6 +1745,7 @@ const stampedStations = new Set();
 const stampSeeded = {}; // per child: false until the first render has recorded already-served plates
 
 function render() {
+  regradeLegacyDictation();
   document.getElementById("childSwitcher").innerHTML = Object.keys(CHILD_META).map(id =>
     `<button class="child-pill kid-${id} ${currentChild === id ? "active" : ""}" onclick="switchChild('${id}')">${currentChild === id ? "✓ " : ""}${CHILD_META[id].name}</button>`
   ).join("");
