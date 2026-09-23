@@ -395,6 +395,18 @@ function nextMonthlyTestWeek() {
   const w = currentWeek();
   return isMonthlyTestWeek() ? w : w + (4 - (w % 4));
 }
+function pendingReviewCount() {
+  let n = 0;
+  Object.keys(DATA).forEach(key => DATA[key].tasks.forEach(t => {
+    const s = state[key].tasks[t.id];
+    if (s.needsReview && !s.reviewed) n++;
+  }));
+  return n;
+}
+function advanceAnyway() {
+  if (!confirm(`Week ${currentWeek()} isn't fully finished. Advance ${CHILD_META[currentChild].name} to Week ${currentWeek() + 1} anyway?`)) return;
+  advanceWeek();
+}
 function advanceWeek() {
   settings.weeks[currentChild] = currentWeek() + 1;
   apiPost("saveSetting", { key: `${currentChild}_current_week`, value: String(settings.weeks[currentChild]) }).catch(() => {});
@@ -1663,12 +1675,16 @@ function exportWeeksPdf() {
   doc.save(`ela-pastry-kitchen-${currentChild}-weeks-${from}-${to}.pdf`);
 }
 
+const stampedStations = new Set();
+const stampSeeded = {}; // per child: false until the first render has recorded already-served plates
+
 function render() {
   document.getElementById("childSwitcher").innerHTML = Object.keys(CHILD_META).map(id =>
     `<button class="child-pill kid-${id} ${currentChild === id ? "active" : ""}" onclick="switchChild('${id}')">${currentChild === id ? "✓ " : ""}${CHILD_META[id].name}</button>`
   ).join("");
   document.getElementById("board").dataset.child = currentChild;
   document.body.dataset.child = currentChild;
+  document.body.dataset.view = currentView;
   document.getElementById("boardSub").textContent = CHILD_META[currentChild].subtitle;
 
   document.getElementById("viewToggle").classList.toggle("parent", currentView === "parent");
@@ -1710,6 +1726,14 @@ function render() {
     const sentBackTasks = activeTasks(key).filter(t => state[key].tasks[t.id].sentBack && !state[key].tasks[t.id].done);
     const card = document.createElement("div");
     card.className = "station" + (status === "served" ? " done" : "") + (status === "burning" ? " burning" : "") + (openStation === key ? " active" : "");
+    // Stamp pop-in only the moment a plate is newly served (not on every re-render or first load).
+    if (status === "served") {
+      const stampId = `${currentChild}:${key}:${currentWeek()}`;
+      if (!stampedStations.has(stampId)) {
+        stampedStations.add(stampId);
+        if (stampSeeded[currentChild]) card.classList.add("stamp-new");
+      }
+    }
     card.onclick = () => openStationFn(key);
     const active = activeTasks(key);
     const doneN = active.filter(t => state[key].tasks[t.id].done).length;
@@ -1731,12 +1755,32 @@ function render() {
   document.getElementById("weekNumberText").innerHTML = `<span class="due-status ${isMonthlyTestWeek() ? "ok" : ""}">Week ${currentWeek()}${isMonthlyTestWeek() ? " — test week!" : ""}</span>`;
 
   const advanceBanner = document.getElementById("advanceBanner");
-  advanceBanner.innerHTML = (currentView !== "parent" && allSubjectsServed())
-    ? `<div class="advance-banner">
-        <div class="advance-banner-title">🎉 Every station served for Week ${currentWeek()}!</div>
-        <button class="btn primary" onclick="advanceWeek()">Advance to Week ${currentWeek() + 1}</button>
-      </div>`
-    : "";
+  // Only the parent advances the week. Kids see a "waiting" message once everything is served.
+  const served = allSubjectsServed();
+  if (currentView !== "parent") {
+    advanceBanner.innerHTML = served
+      ? `<div class="advance-banner">
+          <div><div class="advance-banner-title">🎉 All done with Week ${currentWeek()}!</div>
+          <div class="advance-banner-sub">Nice work! Waiting for Mom to check everything, then you'll move on to Week ${currentWeek() + 1}.</div></div>
+        </div>`
+      : "";
+  } else {
+    const nextWk = currentWeek() + 1, name = CHILD_META[currentChild].name;
+    if (served) {
+      const pending = pendingReviewCount();
+      advanceBanner.innerHTML = `<div class="advance-banner">
+        ${pending > 0
+          ? `<div><div class="advance-banner-title">✅ ${name} finished every section of Week ${currentWeek()}</div><div class="advance-banner-sub">${pending} written answer${pending > 1 ? "s are" : " is"} still waiting on your review (see "Waiting on You" above), then you can advance.</div></div>
+             <button class="btn" disabled>Advance ${name} to Week ${nextWk}</button>`
+          : `<div class="advance-banner-title">✅ ${name} finished every section of Week ${currentWeek()}</div><button class="btn primary" onclick="advanceWeek()">Advance ${name} to Week ${nextWk}</button>`}
+      </div>`;
+    } else {
+      advanceBanner.innerHTML = `<div class="advance-banner advance-banner-quiet">
+        <div class="advance-banner-sub">Week ${currentWeek()} isn't fully finished yet.</div>
+        <button class="btn" onclick="advanceAnyway()">Advance ${name} to Week ${nextWk} anyway</button>
+      </div>`;
+    }
+  }
 
   const termCtrl = document.getElementById("termFinalControl");
   termCtrl.style.display = currentView === "parent" ? "flex" : "none";
@@ -1756,6 +1800,7 @@ function render() {
     modeText.textContent = "Monthly Tests: forced locked";
     modeBtn.textContent = "Reset to automatic schedule";
   }
+  stampSeeded[currentChild] = true;
   document.getElementById("progressFill").style.width = (doneCount / keys.length * 100) + "%";
   document.getElementById("progressLabel").textContent = `${doneCount} / ${keys.length} plates served`;
 

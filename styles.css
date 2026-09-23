@@ -227,3 +227,35 @@ footer{margin-top:36px;text-align:center;font-family:'JetBrains Mono',monospace;
 body[data-child="kenley"]{background:#E2F1EE;background-image:none;}
 body[data-child="adelyn"]{background:#FCE5E9;background-image:none;}
 .board-titlebar .board-title{color:#B39A86;}
+
+/* Finished sections fade back so what's left stands out. */
+.station.done{opacity:.6;}
+.station.done:hover,.station.done.active{opacity:1;}
+/* Stamp slams down when a plate is newly served. */
+@keyframes stampIn{0%{transform:scale(2.6) rotate(-18deg);opacity:0;}55%{transform:scale(0.9) rotate(-6deg);opacity:1;}75%{transform:scale(1.12) rotate(-6deg);}100%{transform:scale(1) rotate(-6deg);opacity:.9;}}
+.station.done.stamp-new{opacity:1;animation:stationFade 1.8s ease 1.2s forwards;}
+.station.done.stamp-new .stamp{animation:stampIn .55s cubic-bezier(.2,.9,.3,1.2) both;}
+@keyframes stationFade{to{opacity:.6;}}
+/* Calmer parent view; the colored banner + header line + kid picker still say whose page it is. */
+body[data-view="parent"][data-child]{background:#F0EAE0;background-image:none;}
+/* Bigger tap targets on touch screens (iPad). 16px inputs also stop iOS zooming in on focus. */
+@media (pointer:coarse){
+  .btn{min-height:44px;padding:10px 18px;font-size:0.8rem;}
+  .child-pill{min-height:48px;}
+  .task-head{min-height:52px;}
+  .mc-option{padding:14px 12px;}
+  .word-slot{min-width:60px;padding:6px 4px;}
+  .word-label{padding:6px 10px;font-size:0.72rem;}
+  .pos-tray-options button{min-height:46px;padding:10px 16px;font-size:0.8rem;}
+  .review-actions button{min-height:44px;padding:10px 18px;}
+  .review-jump-chip{padding:9px 14px;}
+  .sentback-chip{padding:9px 14px;}
+  .sendback-box summary{padding:10px 0;}
+  .due-control button:not(.btn){width:40px;height:40px;}
+  .detail-close{min-height:44px;padding:8px 14px;}
+  input,textarea,select{font-size:16px;}
+}
+.advance-banner-sub{font-size:0.85rem;color:var(--chalk-text);margin:4px 0 8px;line-height:1.4;}
+.advance-banner-quiet{background:transparent;border:1px dashed var(--rail);padding:8px 12px;}
+.advance-banner-quiet .advance-banner-sub{margin:0 0 6px;color:var(--chalk-dim);}
+.advance-banner .btn[disabled]{opacity:.5;cursor:not-allowed;}
