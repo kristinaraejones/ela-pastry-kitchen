@@ -1171,6 +1171,110 @@ function spanHit(p, sel) {
 }
 function phraseHit(p, sel) { return p.type === sel.type && spanHit(p, sel); }
 
+// ---------- "Why" explanations for parts-of-speech and noun/pronoun/verb-type misses ----------
+
+const POS_DEFS = {
+  Noun: "names a person, place, thing, or idea",
+  Pronoun: "takes the place of a noun (she, they, everyone, mine)",
+  Verb: "shows an action or a state of being, or helps another verb",
+  Adjective: "describes a noun or pronoun — it tells which one, what kind, or how many (a, an, and the are adjectives called articles)",
+  Adverb: "describes a verb, an adjective, or another adverb — it tells how, when, where, or how much",
+  Preposition: "shows how a noun or pronoun relates to another word (where, when, which way), and starts a phrase like \"in the courtyard\"",
+  Conjunction: "joins words, phrases, or clauses (and, but, or, because)",
+  Interjection: "shows sudden feeling and stands apart from the sentence (Wow! Oh!)",
+  Gerund: "is an -ing verb form that works as a noun",
+  Participle: "is a verb form (-ing or -ed) that works as an adjective",
+  Infinitive: "is \"to\" plus a verb (to try, to relax)"
+};
+// Tips for the mix-ups kids actually make: [said][actual]
+const POS_CONTRAST = {
+  Noun: {
+    Adjective: "Watch for a noun doing an adjective's job: when a word describes another noun (like \"gymnastics\" in \"gymnastics team\"), it's working as an adjective in that sentence. Ask: is it naming something, or describing something?",
+    Verb: "Ask: can the subject DO this word, or is it a thing? If it's the action or the state of being, it's a verb.",
+    Pronoun: "A pronoun stands in for a noun. Try swapping in a name — if the sentence still makes sense, it's a pronoun."
+  },
+  Adjective: {
+    Noun: "An adjective only describes. If the word names the person, place, or thing itself, it's a noun.",
+    Adverb: "Adjectives describe nouns (which one? what kind?). Adverbs describe verbs, adjectives, or other adverbs (how? when? where? how much?).",
+    Pronoun: "If the word stands in for a noun, it's a pronoun. If it comes right before a noun and describes it, it's an adjective."
+  },
+  Adverb: {
+    Adjective: "Ask what the word is describing. If it describes a noun, it's an adjective. If it describes a verb, adjective, or adverb (how? when? where? how much?), it's an adverb.",
+    Preposition: "A preposition needs an object right after it (\"in the courtyard\"). An adverb stands alone and answers how, when, or where.",
+    Conjunction: "A conjunction joins two parts of a sentence. An adverb describes one word."
+  },
+  Verb: {
+    Noun: "Ask: does it show an action or a state of being? Then it's a verb. Nouns name things.",
+    Adjective: "Verbs tell what someone does or is. Adjectives describe nouns.",
+    Preposition: "Watch \"to\": before a verb (to try) it starts an infinitive; before a noun (to the market) it's a preposition."
+  },
+  Preposition: {
+    Conjunction: "A preposition is followed by a noun or pronoun (in the courtyard). A conjunction joins words, phrases, or clauses (and, but, because).",
+    Adverb: "A preposition always has an object after it. If nothing follows it, it's probably an adverb.",
+    Verb: "Prepositions relate a noun to another word; they don't show action."
+  },
+  Conjunction: {
+    Preposition: "A conjunction connects two things (and, but, or, because). A preposition starts a phrase with an object (in, on, through).",
+    Adverb: "Conjunctions join; adverbs describe."
+  },
+  Pronoun: {
+    Noun: "Pronouns take the place of nouns (she, they, everyone). If it names something itself, it's a noun.",
+    Adjective: "A possessive word by itself (mine, theirs) is a pronoun. Before a noun (her room) it describes the noun."
+  },
+  Gerund: {
+    Verb: "It ends in -ing but is doing a NOUN's job here (a subject or an object), so it's a gerund, not a verb.",
+    Noun: "It's a verb form (-ing) working as a noun, which makes it a gerund.",
+    Participle: "A participle describes a noun. A gerund IS the noun (the thing being done)."
+  },
+  Participle: {
+    Verb: "It looks like a verb but describes a noun here, so it's a participle.",
+    Adjective: "It describes a noun, but it's made from a verb (-ing/-ed), so it's a participle.",
+    Gerund: "A gerund acts as a noun. A participle describes one."
+  },
+  Infinitive: {
+    Preposition: "\"To\" before a VERB (to try) starts an infinitive. \"To\" before a NOUN (to the market) is a preposition.",
+    Verb: "\"To\" plus a verb make an infinitive together."
+  }
+};
+function posWhyHTML(word, given, correct, note) {
+  const parts = [];
+  const noteLc = (note || "").trim().toLowerCase();
+  const isArticle = noteLc === "article";
+  // Skip notes that just repeat the part of speech's name (the definition below covers it).
+  if (note && !isArticle && noteLc !== correct.toLowerCase()) parts.push(note.charAt(0).toUpperCase() + note.slice(1) + (/[.!?]$/.test(note) ? "" : "."));
+  if (isArticle) parts.push(`<b>"${word}"</b> is an <b>article</b> (a, an, the). Articles are a special kind of adjective: they point to a noun and tell which one or how many.`);
+  else if (POS_DEFS[correct]) parts.push(`<b>${correct}</b> means the word ${POS_DEFS[correct]}.`);
+  const tip = !isArticle && given && POS_CONTRAST[given] && POS_CONTRAST[given][correct];
+  if (tip) parts.push(tip);
+  else if (given && POS_DEFS[given] && given !== correct) parts.push(`(${given} is a word that ${POS_DEFS[given]} — not the job this word does here.)`);
+  return parts.join(" ");
+}
+
+const CONCEPT_DEFS = {
+  Common: "names any person, place, or thing, not one specific one",
+  Proper: "names one specific person, place, or thing, so it starts with a capital",
+  Collective: "names a group acting as one unit, like team, family, or class",
+  Compound: "is two words joined into one noun idea, like handstand or courtyard",
+  Subject: "does the action in its clause",
+  Object: "receives the action or comes after a preposition",
+  Possessive: "shows who owns something",
+  Indefinite: "points to no specific person or thing (everyone, someone, nobody)",
+  Action: "shows something the subject does",
+  Linking: "connects the subject to a word that describes or renames it (is, seems, tasted)",
+  Helping: "works with the main verb to show tense or mood (was stirring, has practiced)"
+};
+function conceptWhyHTML(word, given, tg, options) {
+  const expected = conceptAnswerText(tg, options);
+  const rightList = expected.split(" + ");
+  const bits = [];
+  const gotSome = (given || "").split(" + ").filter(g => rightList.includes(g));
+  if (rightList.length > 1) bits.push(`${gotSome.length ? `Partly right — <b>${gotSome.join(" + ")}</b> fits. ` : ""}This word is <b>both</b> ${rightList.map(a => `<b>${a}</b>, which ${CONCEPT_DEFS[a] || ""}`).join(", and ")}. A word can fit more than one kind, so tap every one that fits.`);
+  else if (CONCEPT_DEFS[expected]) bits.push(`<b>${expected}</b> means the word ${CONCEPT_DEFS[expected]}.`);
+  const givenList = (given || "").split(" + ").filter(Boolean).filter(g => !rightList.includes(g));
+  givenList.forEach(g => { if (CONCEPT_DEFS[g]) bits.push(`<b>${g}</b> would mean it ${CONCEPT_DEFS[g]} — that's not what this word does here.`); });
+  return bits.join(" ");
+}
+
 // Explains WHY a tagged chunk isn't one of the answers, not just that it's wrong.
 // Uses the other tagging tasks on the same sentence (subjects, verbs, clauses)
 // to tell a clause (has its own subject + verb) from a phrase (doesn't).
@@ -1451,7 +1555,7 @@ function taskBodyHTML(key, t) {
     if (s.done) {
       const misses = t.sentence.map((w, i) => i).filter(i => s.labels[i] !== t.answers[i]);
       if (misses.length) {
-        inner += `<div class="tag-review">${misses.map(i => `<div class="tag-review-item"><b>${t.sentence[i]}</b> — you said ${s.labels[i] || "nothing"}, it's actually <b>${t.answers[i]}</b>. ${t.explanations[i]}</div>`).join("")}</div>`;
+        inner += `<div class="tag-review">${misses.map(i => `<div class="tag-review-item"><b>${t.sentence[i]}</b> — you said ${s.labels[i] || "nothing"}, it's actually <b>${t.answers[i]}</b>. ${posWhyHTML(t.sentence[i], s.labels[i], t.answers[i], t.explanations[i])}</div>`).join("")}</div>`;
       }
       inner += `<div class="score-result ${s.score.split("/")[0] === s.score.split("/")[1] ? "pass" : "retry"}">Scored automatically: ${s.score}</div>`;
     } else {
@@ -1551,7 +1655,7 @@ function taskBodyHTML(key, t) {
     if (s.done) {
       const misses = t.targets.filter(tg => s.labels[tg.index] !== conceptAnswerText(tg, t.options));
       if (misses.length) {
-        inner += `<div class="tag-review">${misses.map(tg => `<div class="tag-review-item"><b>${t.sentence[tg.index]}</b> — you said ${s.labels[tg.index] || "nothing"}, it's actually <b>${conceptAnswerText(tg, t.options)}</b>.${tg.explanation ? ` ${tg.explanation}` : ""}</div>`).join("")}</div>`;
+        inner += `<div class="tag-review">${misses.map(tg => `<div class="tag-review-item"><b>${t.sentence[tg.index]}</b> — you said ${s.labels[tg.index] || "nothing"}, it's actually <b>${conceptAnswerText(tg, t.options)}</b>. ${conceptWhyHTML(t.sentence[tg.index], s.labels[tg.index], tg, t.options) || tg.explanation || ""}</div>`).join("")}</div>`;
       }
       inner += `<div class="score-result ${s.score.split("/")[0] === s.score.split("/")[1] ? "pass" : "retry"}">Scored automatically: ${s.score}</div>`;
     } else {
