@@ -177,3 +177,13 @@ footer{margin-top:36px;text-align:center;font-family:'JetBrains Mono',monospace;
 .setup-card input[type=text]{margin-bottom:10px;}
 .setup-error{color:var(--tomato);font-size:0.8rem;margin-bottom:10px;}
 .loading-note{text-align:center;color:var(--chalk-dim);font-family:'JetBrains Mono',monospace;font-size:0.8rem;padding:40px 0;}
+
+/* Tag picker is docked BELOW the sentence (in flow), never floated over it: the sentence words must always stay visible. */
+.word-slot.active-word .word-text{outline:2px solid var(--saffron);border-radius:4px;}
+.pos-tray{margin:0 0 12px;padding:10px;background:var(--card-bg);border:1px solid var(--saffron);border-radius:8px;}
+.pos-tray-title{font-size:0.82rem;color:var(--chalk-text);margin-bottom:8px;}
+.pos-tray-options{display:flex;flex-wrap:wrap;gap:6px;}
+.pos-tray-options button{font-family:'JetBrains Mono',monospace;font-size:0.72rem;padding:6px 10px;background:var(--rail);border:1px solid var(--card-border);border-radius:4px;color:var(--chalk-text);cursor:pointer;}
+.pos-tray-options button:hover{border-color:var(--saffron);}
+.pos-tray-options button.picked{background:var(--saffron);color:#000;border-color:var(--saffron);}
+.pos-tray-options button.tray-done{border-color:var(--herb);color:var(--herb);}

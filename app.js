@@ -789,32 +789,48 @@ function gradeSentence(correctText, typedText) {
   const startsCapTyped = /^[A-Z]/.test(typedTrim);
   const endPunctCorrect = (correctTrim.match(/[.!?]$/) || [])[0] || "(none)";
   const endPunctTyped = (typedTrim.match(/[.!?]$/) || [])[0] || "(none)";
+  // The dictation voice doesn't stress anything, so a child can't hear whether
+  // a statement ends in "." or "!" — treat those two as interchangeable. A
+  // question mark still has to match a question mark.
+  const isStop = p => p === "." || p === "!";
+  const punctPass = endPunctCorrect === endPunctTyped || (isStop(endPunctCorrect) && isStop(endPunctTyped));
+  const punctLabel = isStop(endPunctCorrect) ? "Ending punctuation (. or !)" : `Ending punctuation (${endPunctCorrect})`;
   const grammar = [
     { label: "Capital letter to start the sentence", pass: !startsCapCorrect || startsCapTyped },
-    { label: `Ending punctuation (${endPunctCorrect})`, pass: endPunctCorrect === endPunctTyped }
+    { label: punctLabel, pass: punctPass }
   ];
+  // Each sentence is worth 10 points; every wrong item (a misspelled, missing,
+  // or extra word, the capital, the ending punctuation) costs 1 point, down to 0.
+  const wrongItems = wordResults.filter(w => !w.spellingCorrect).length + grammar.filter(g => !g.pass).length;
   return {
     wordResults, grammar,
+    points: Math.max(0, SENTENCE_POINTS - wrongItems),
     allSpellingCorrect: wordResults.every(w => w.spellingCorrect),
     allGrammarPass: grammar.every(g => g.pass)
   };
+}
+const SENTENCE_POINTS = 10;
+// Points for one stored sentence result (older saved results had no points: all-or-nothing).
+function sentencePoints(r) {
+  if (typeof r.grade.points === "number") return r.grade.points;
+  return (r.grade.allSpellingCorrect && r.grade.allGrammarPass) ? SENTENCE_POINTS : 0;
 }
 
 function checkDictation(key, id) {
   const t = DATA[key].tasks.find(x => x.id === id);
   const words = t.dynamic === "reviewPool" ? state[key].tasks[id]._reviewWords : t.words;
-  let correctCount = 0;
+  let correctCount = 0, possible = 0;
   const results = [];
   words.forEach((w, i) => {
     if (w.kind === "sentence") {
       const typed = document.getElementById(`dict-${key}-${id}-${i}`).value.trim();
       const grade = gradeSentence(w.answer, typed);
-      const isRight = grade.allSpellingCorrect && grade.allGrammarPass;
-      if (isRight) correctCount++;
+      correctCount += grade.points;
+      possible += SENTENCE_POINTS;
       results.push({ kind: "sentence", typed, answer: w.answer, grade });
       logGradedAnswer(key, {
         word: w.answer, question: "Dictation sentence", given: typed, correct: w.answer,
-        wasCorrect: grade.allSpellingCorrect && grade.allGrammarPass
+        wasCorrect: grade.points === SENTENCE_POINTS
       });
       grade.wordResults.forEach(wr => {
         if (!wr.spellingCorrect && wr.correctWord) logMiss(wr.correctWord, subjectTag(key) + " (in a sentence)", null);
@@ -823,6 +839,7 @@ function checkDictation(key, id) {
       const typed = document.getElementById(`dict-${key}-${id}-${i}`).value.trim();
       const isRight = typed.toLowerCase() === w.answer.toLowerCase();
       if (isRight) correctCount++;
+      possible += 1;
       results.push({ kind: "word", typed, correct: isRight, answer: w.answer, context: w.context || null });
       logGradedAnswer(key, { word: w.answer, question: "Dictation word", given: typed, correct: w.answer, wasCorrect: isRight });
       if (t.dynamic === "reviewPool") {
@@ -834,7 +851,7 @@ function checkDictation(key, id) {
     }
   });
   state[key].tasks[id].results = results;
-  state[key].tasks[id].score = `${correctCount}/${words.length}`;
+  state[key].tasks[id].score = `${correctCount}/${possible}`;
   state[key].tasks[id].done = true;
   if (t.dynamic === "spellingMonthBank") markTested(banksCache[currentChild].spelling || [], "spelling");
   persistTask(key, id);
@@ -860,6 +877,10 @@ function correctionBox(key, id, ri, wi, correctWord, r) {
     <button class="btn" onclick="submitCorrection('${key}','${id}',${ri},${wi === null ? "null" : wi},'${correctWord.replace(/'/g, "\\'")}')">Check</button>
     ${entry && !entry.confirmed ? `<div class="correction-msg">Not quite — try again.</div>` : ``}
   </div>`;
+}
+function dictationPassed(s) {
+  const parts = (s.score || "0/1").split("/").map(Number);
+  return parts[0] === parts[1] || parts[0] / parts[1] >= 0.7;
 }
 function allCorrectionsConfirmed(results) {
   return results.every(r => {
@@ -932,8 +953,34 @@ function openConceptPopup(key, id, idx) {
   conceptPopupOpen = (conceptPopupOpen && conceptPopupOpen.key === key && conceptPopupOpen.id === id && conceptPopupOpen.idx === idx) ? null : { key, id, idx };
   render();
 }
-function selectConceptAnswer(key, id, idx, option) {
-  state[key].tasks[id].labels[idx] = option;
+// A concept-check target's answer is a string, or an array when a word is
+// legitimately two things at once (e.g. courtyard = common AND compound).
+// Stored/compared as one string, in option order, joined by " + ".
+function conceptAnswerText(target, options) {
+  let ans = target.answer;
+  // Older seeded rows stored just "Compound"/"Collective"; those nouns are also common.
+  if (!Array.isArray(ans) && options.includes("Common") && (ans === "Compound" || ans === "Collective")) ans = ["Common", ans];
+  if (!Array.isArray(ans)) return ans;
+  return options.filter(o => ans.includes(o)).join(" + ");
+}
+// Noun-type and pronoun-role checks let you pick MORE than one answer (a word can
+// be common AND compound; an indefinite pronoun can also be the subject). Verb
+// checks (one role per verb) stay single-pick.
+function conceptIsMulti(t) {
+  return !!t.multi || t.targets.some(tg => Array.isArray(tg.answer)) || t.options.includes("Common") || t.options.includes("Indefinite");
+}
+function closeConceptPopup() { conceptPopupOpen = null; render(); }
+function selectConceptAnswer(key, id, idx, option, multi) {
+  const labels = state[key].tasks[id].labels;
+  if (multi) {
+    const t = DATA[key].tasks.find(x => x.id === id);
+    const cur = (labels[idx] || "").split(" + ").filter(Boolean);
+    const next = cur.includes(option) ? cur.filter(o => o !== option) : cur.concat(option);
+    labels[idx] = next.length ? t.options.filter(o => next.includes(o)).join(" + ") : null;
+    render();
+    return;
+  }
+  labels[idx] = option;
   conceptPopupOpen = null;
   render();
 }
@@ -943,9 +990,10 @@ function checkConceptCheck(key, id) {
   let correct = 0;
   t.targets.forEach(tg => {
     const given = s.labels[tg.index];
-    const wasCorrect = given === tg.answer;
+    const expected = conceptAnswerText(tg, t.options);
+    const wasCorrect = given === expected;
     if (wasCorrect) correct++;
-    logGradedAnswer(key, { word: t.sentence[tg.index], question: "Concept check", given, correct: tg.answer, wasCorrect });
+    logGradedAnswer(key, { word: t.sentence[tg.index], question: "Concept check", given, correct: expected, wasCorrect });
   });
   s.score = `${correct}/${t.targets.length}`;
   s.done = true;
@@ -1127,10 +1175,11 @@ function taskBodyHTML(key, t) {
         if (r.kind === "sentence") {
           const chips = r.grade.wordResults.map(wr => `<span class="word-chip ${wr.spellingCorrect ? "chip-correct" : "chip-incorrect"}">${wr.typedWord || "—"}</span>`).join(" ");
           const missedWords = r.grade.wordResults.filter(wr => !wr.spellingCorrect && wr.correctWord).map(wr => wr.correctWord);
-          const overallClass = (r.grade.allSpellingCorrect && r.grade.allGrammarPass) ? "correct" : "incorrect";
+          const pts = sentencePoints(r);
+          const overallClass = pts === SENTENCE_POINTS ? "correct" : "incorrect";
           const missedBoxes = r.grade.wordResults.map((wr, wi) => (!wr.spellingCorrect && wr.correctWord) ? correctionBox(key, t.id, ri, wi, wr.correctWord, r) : "").join("");
           return `<div class="dict-result ${overallClass}">
-            <div class="dict-result-typed" style="margin-bottom:6px;">Spelling, word by word:</div>
+            <div class="dict-result-typed" style="margin-bottom:6px;">Spelling, word by word: <b>${pts}/${SENTENCE_POINTS} points</b></div>
             <div style="margin-bottom:8px;">${chips}</div>
             ${missedWords.length ? `<div class="dict-result-answer">Correct spelling for missed word${missedWords.length > 1 ? "s" : ""}: <b>${missedWords.join(", ")}</b></div>` : ``}
             ${missedBoxes}
@@ -1147,7 +1196,7 @@ function taskBodyHTML(key, t) {
         }
       }).join("");
       const allConfirmed = allCorrectionsConfirmed(s.results);
-      inner += `<div class="score-result ${s.results.every(r => r.kind === "sentence" ? (r.grade.allSpellingCorrect && r.grade.allGrammarPass) : r.correct) ? "pass" : "retry"}">Scored automatically: ${s.score}${t.dynamic === "reviewPool" ? " — pool updated, mastered words drop out automatically" : ""}. Any missed word — even outside this week's list — has been added to the review file.</div>`;
+      inner += `<div class="score-result ${dictationPassed(s) ? "pass" : "retry"}">Scored automatically: ${s.score}${t.dynamic === "reviewPool" ? " — pool updated, mastered words drop out automatically" : ""}. Any missed word — even outside this week's list — has been added to the review file.</div>`;
       if (!allConfirmed) {
         inner += `<div class="score-result retry">✏️ Before moving on: retype each missed word above until it's spelled correctly.</div>`;
       }
@@ -1202,6 +1251,7 @@ function taskBodyHTML(key, t) {
       ${trimReadAloud ? "" : readAloudButton(posSentenceId, "Read the sentence to me")}
       <div id="${posSentenceId}" style="opacity:.75;font-size:0.82rem;">${t.sentence.join(" ")}</div>
       <div class="pos-row">`;
+    let openTray = "";
     t.sentence.forEach((word, i) => {
       const label = s.labels[i];
       let cls = "", shownLabel = label;
@@ -1210,13 +1260,13 @@ function taskBodyHTML(key, t) {
         if (label !== t.answers[i]) shownLabel = `${label || "—"} → ${t.answers[i]}`;
       }
       const popupOpen = !s.done && posPopupOpen && posPopupOpen.key === key && posPopupOpen.id === t.id && posPopupOpen.idx === i;
-      inner += `<div class="word-slot" onclick="${s.done ? "" : `openPosPopup('${key}','${t.id}',${i})`}">
+      inner += `<div class="word-slot ${popupOpen ? "active-word" : ""}" onclick="${s.done ? "" : `openPosPopup('${key}','${t.id}',${i})`}">
         <div class="word-text">${word}</div>
         <div class="word-label ${cls}">${shownLabel || "+ tag"}</div>
-        ${popupOpen ? `<div class="pos-popup">${t.options.map(o => `<button onclick="event.stopPropagation();selectPos('${key}','${t.id}',${i},'${o}')">${o}</button>`).join("")}</div>` : ""}
       </div>`;
+      if (popupOpen) openTray = `<div class="pos-tray"><div class="pos-tray-title">What is "<b>${word}</b>"?</div><div class="pos-tray-options">${t.options.map(o => `<button onclick="selectPos('${key}','${t.id}',${i},'${o}')">${o}</button>`).join("")}</div></div>`;
     });
-    inner += `</div>`;
+    inner += `</div>${openTray}`;
     if (s.done) {
       const misses = t.sentence.map((w, i) => i).filter(i => s.labels[i] !== t.answers[i]);
       if (misses.length) {
@@ -1292,6 +1342,7 @@ function taskBodyHTML(key, t) {
     // context so the sentence still reads naturally.
     const conceptPromptId = `concept-prompt-${key}-${t.id}`;
     inner = `${trimReadAloud ? "" : readAloudButton(conceptPromptId)}<div class="lesson-text" id="${conceptPromptId}"><p>${t.prompt}</p></div><div class="pos-row">`;
+    let openConceptTray = "";
     t.sentence.forEach((word, i) => {
       const target = t.targets.find(tg => tg.index === i);
       if (!target) {
@@ -1301,21 +1352,25 @@ function taskBodyHTML(key, t) {
       const label = s.labels[i];
       let cls = "", shownLabel = label;
       if (s.done) {
-        cls = label === target.answer ? "correct" : "incorrect";
-        if (label !== target.answer) shownLabel = `${label || "—"} → ${target.answer}`;
+        cls = label === conceptAnswerText(target, t.options) ? "correct" : "incorrect";
+        if (cls === "incorrect") shownLabel = `${label || "—"} → ${conceptAnswerText(target, t.options)}`;
       }
       const popupOpen = !s.done && conceptPopupOpen && conceptPopupOpen.key === key && conceptPopupOpen.id === t.id && conceptPopupOpen.idx === i;
-      inner += `<div class="word-slot" onclick="${s.done ? "" : `openConceptPopup('${key}','${t.id}',${i})`}">
+      inner += `<div class="word-slot ${popupOpen ? "active-word" : ""}" onclick="${s.done ? "" : `openConceptPopup('${key}','${t.id}',${i})`}">
         <div class="word-text">${word}</div>
         <div class="word-label ${cls}">${shownLabel || "+ tag"}</div>
-        ${popupOpen ? `<div class="pos-popup">${t.options.map(o => `<button onclick="event.stopPropagation();selectConceptAnswer('${key}','${t.id}',${i},'${o}')">${o}</button>`).join("")}</div>` : ""}
       </div>`;
+      if (popupOpen) {
+        const multi = conceptIsMulti(t);
+        const picked = (label || "").split(" + ");
+        openConceptTray = `<div class="pos-tray"><div class="pos-tray-title">${multi ? `What kind of noun is "<b>${word}</b>"? It can be more than one — tap every one that fits, then Done.` : `What kind of noun is "<b>${word}</b>"?`}</div><div class="pos-tray-options">${t.options.map(o => `<button class="${multi && picked.includes(o) ? "picked" : ""}" onclick="selectConceptAnswer('${key}','${t.id}',${i},'${o}',${multi})">${o}</button>`).join("")}${multi ? `<button class="tray-done" onclick="closeConceptPopup()">Done</button>` : ""}</div></div>`;
+      }
     });
-    inner += `</div>`;
+    inner += `</div>${openConceptTray}`;
     if (s.done) {
-      const misses = t.targets.filter(tg => s.labels[tg.index] !== tg.answer);
+      const misses = t.targets.filter(tg => s.labels[tg.index] !== conceptAnswerText(tg, t.options));
       if (misses.length) {
-        inner += `<div class="tag-review">${misses.map(tg => `<div class="tag-review-item"><b>${t.sentence[tg.index]}</b> — you said ${s.labels[tg.index] || "nothing"}, it's actually <b>${tg.answer}</b>.${tg.explanation ? ` ${tg.explanation}` : ""}</div>`).join("")}</div>`;
+        inner += `<div class="tag-review">${misses.map(tg => `<div class="tag-review-item"><b>${t.sentence[tg.index]}</b> — you said ${s.labels[tg.index] || "nothing"}, it's actually <b>${conceptAnswerText(tg, t.options)}</b>.${tg.explanation ? ` ${tg.explanation}` : ""}</div>`).join("")}</div>`;
       }
       inner += `<div class="score-result ${s.score.split("/")[0] === s.score.split("/")[1] ? "pass" : "retry"}">Scored automatically: ${s.score}</div>`;
     } else {
@@ -1723,7 +1778,6 @@ function render() {
         </div>`).join("");
   }
 
-  positionOpenPopup();
 }
 
 // Keeps any open tap-to-tag popup (pos-tagger) fully on-screen, regardless

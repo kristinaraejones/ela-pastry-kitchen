@@ -205,9 +205,9 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "options": ["Common", "Proper", "Collective", "Compound"],
             "targets": [
               {"index":0,"answer":"Proper","explanation":"names one specific person, place, or thing, so it's capitalized"},
-              {"index":2,"answer":"Collective","explanation":"names a group acting as one unit"},
-              {"index":6,"answer":"Compound","explanation":"two words joined into one noun idea"},
-              {"index":9,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"},
+              {"index":2,"answer":["Common", "Collective"],"explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"},
+              {"index":6,"answer":["Common", "Compound"],"explanation": "it is BOTH: common (a general name, not one specific one) and compound (two words joined into one noun idea)"},
+              {"index":9,"answer":["Common", "Compound"],"explanation": "it is BOTH: common (a general name, not one specific one) and compound (two words joined into one noun idea)"},
               {"index":12,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"}
             ]
           },
@@ -281,10 +281,10 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
             "options": ["Common", "Proper", "Collective", "Compound"],
             "targets": [
-              {"index":2,"answer":"Collective","explanation":"names a group acting as one unit"},
-              {"index":5,"answer":"Compound","explanation":"two words joined into one noun idea"},
+              {"index":2,"answer":["Common", "Collective"],"explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"},
+              {"index":5,"answer":["Common", "Compound"],"explanation": "it is BOTH: common (a general name, not one specific one) and compound (two words joined into one noun idea)"},
               {"index":7,"answer":"Proper","explanation":"names one specific person, place, or thing, so it's capitalized"},
-              {"index":9,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"}
+              {"index":9,"answer":["Common","Collective"],"explanation":"it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"}
             ]
           },
           {
@@ -362,8 +362,8 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "options": ["Common", "Proper", "Collective", "Compound"],
             "targets": [
               {"index":0,"answer":"Proper","explanation":"names one specific person, place, or thing, so it's capitalized"},
-              {"index":2,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"},
-              {"index":6,"answer":"Compound","explanation":"two words joined into one noun idea"},
+              {"index":2,"answer":["Common","Collective"],"explanation":"it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"},
+              {"index":6,"answer":["Common", "Compound"],"explanation": "it is BOTH: common (a general name, not one specific one) and compound (two words joined into one noun idea)"},
               {"index":10,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"}
             ]
           },
@@ -445,8 +445,8 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
             "options": ["Common", "Proper", "Collective", "Compound"],
             "targets": [
-              {"index":2,"answer":"Collective","explanation":"names a group acting as one unit"},
-              {"index":6,"answer":"Collective","explanation":"names a group acting as one unit"},
+              {"index":2,"answer":["Common", "Collective"],"explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"},
+              {"index":6,"answer":["Common", "Collective"],"explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"},
               {"index":11,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"}
             ]
           }
@@ -537,7 +537,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
             "options": ["Subject", "Object", "Possessive", "Indefinite"],
             "targets": [
-              {"index":0,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
+              {"index":0,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"},
               {"index":3,"answer":"Object","explanation":"it's receiving the action, or following a preposition"},
               {"index":5,"answer":"Subject","explanation":"it's doing the action in its clause"}
             ]
@@ -620,9 +620,9 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
             "options": ["Subject", "Object", "Possessive", "Indefinite"],
             "targets": [
-              {"index":0,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
+              {"index":0,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"},
               {"index":2,"answer":"Possessive","explanation":"it shows ownership"},
-              {"index":7,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
+              {"index":7,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"},
               {"index":9,"answer":"Possessive","explanation":"it shows ownership"},
               {"index":10,"answer":"Subject","explanation":"it's doing the action in its clause"}
             ]
@@ -725,9 +725,9 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
             "options": ["Subject", "Object", "Possessive", "Indefinite"],
             "targets": [
-              {"index":0,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
+              {"index":0,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"},
               {"index":4,"answer":"Possessive","explanation":"it shows ownership"},
-              {"index":9,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
+              {"index":9,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"},
               {"index":15,"answer":"Subject","explanation":"it's doing the action in its clause"}
             ]
           },
@@ -809,9 +809,9 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
             "options": ["Subject", "Object", "Possessive", "Indefinite"],
             "targets": [
-              {"index":0,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
-              {"index":2,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"},
-              {"index":8,"answer":"Indefinite","explanation":"it refers to a nonspecific person or amount"}
+              {"index":0,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"},
+              {"index":2,"answer":["Object","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the object in its clause"},
+              {"index":8,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"}
             ]
           }
         ]
