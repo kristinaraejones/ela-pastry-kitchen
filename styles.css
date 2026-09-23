@@ -189,3 +189,41 @@ footer{margin-top:36px;text-align:center;font-family:'JetBrains Mono',monospace;
 .pos-tray-options button.tray-done{border-color:var(--herb);color:var(--herb);}
 /* A student's submitted answer waiting on parent review: blue, so it stands out from the tan teacher notes. */
 .submitted-text.student-answer,.review-item .submitted-text.student-answer{background:var(--sky-bg);border-left:4px solid var(--sky);color:#1F3F66;}
+.review-jump-chip{display:inline-block;background:var(--sky-bg);border:1px solid var(--sky);color:#1F3F66;border-radius:14px;padding:4px 10px;font-size:0.78rem;cursor:pointer;margin:0 6px 6px 0;}
+.review-jump-chip:hover{background:var(--sky);color:#fff;}
+.waiting-on-you{margin:0 0 16px;padding:12px 14px;background:var(--sky-bg);border:1px solid var(--sky);border-left:6px solid var(--sky);border-radius:10px;}
+.waiting-on-you h3{font-family:'Pacifico',cursive;color:var(--sky);font-size:1.15rem;margin:0 0 8px;}
+.btn.redo-btn{background:#FFFBF3;border:1.5px solid var(--tan);color:var(--tan-text);margin-top:12px;}
+.btn.redo-btn:hover{background:var(--tan-bg);}
+.sendback-box{margin-top:10px;font-size:0.82rem;}
+.sendback-box summary{cursor:pointer;color:var(--tan-text);font-weight:600;}
+.sendback-box textarea{margin-top:6px;}
+
+/* Title on top-center; big color-coded kid picker so it's obvious whose work this is. */
+.board{--kid:#3E9C9A;}
+.board[data-child="kenley"]{--kid:#3E9C9A;}
+.board[data-child="adelyn"]{--kid:#D9707D;}
+.board-titlebar{text-align:center;margin:4px 0 8px;}
+.board-titlebar .board-title{font-size:2.4rem;}
+.who-label{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk-dim);margin-bottom:8px;}
+.child-switcher{gap:10px;margin-bottom:14px;}
+.child-pill{flex:1;max-width:170px;font-size:1.05rem;padding:9px 16px;border-radius:12px;border-width:2.5px;text-align:center;}
+.child-pill.kid-kenley{border-color:#3E9C9A;color:#3E9C9A;}
+.child-pill.kid-adelyn{border-color:#D9707D;color:#D9707D;}
+.child-pill.kid-kenley.active{background:#3E9C9A;border-color:#3E9C9A;color:#fff;box-shadow:0 4px 12px rgba(62,156,154,0.45);}
+.child-pill.kid-adelyn.active{background:#D9707D;border-color:#D9707D;color:#fff;box-shadow:0 4px 12px rgba(217,112,125,0.45);}
+.child-pill:not(.active){opacity:.7;}
+.child-pill:hover:not(.active){opacity:1;}
+.board-header{border-bottom:4px solid var(--kid);}
+.kid-banner{display:inline-block;background:var(--kid);color:#fff;font-family:'Pacifico',cursive;font-size:1.15rem;padding:3px 14px;border-radius:14px;margin-bottom:6px;}
+
+/* Subject cards get a top edge in the selected kid's color. */
+.station{border-top:4px solid color-mix(in srgb, var(--kid) 60%, #fff);}
+.station:hover{border-color:var(--kid);}
+.station.done{border-color:var(--herb);border-top-color:var(--herb);}
+.station.burning{border-top-color:var(--saffron);}
+
+/* Whole page takes a soft tint of the selected kid's color; cards stay cream so they pop. */
+body[data-child="kenley"]{background:#E2F1EE;background-image:none;}
+body[data-child="adelyn"]{background:#FCE5E9;background-image:none;}
+.board-titlebar .board-title{color:#9A7548;}

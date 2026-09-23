@@ -17,11 +17,12 @@
 </head>
 <body>
 <div class="board" id="board" style="display:none;">
+  <div class="board-titlebar"><div class="board-title" id="boardTitle">The ELA Pastry Kitchen</div></div>
   <div class="pastry-garland"><span>🥐</span><span>🍰</span><span>🧁</span><span>🍪</span><span>🥧</span></div>
+  <div class="who-label">Who's working today?</div>
   <div class="child-switcher" id="childSwitcher"></div>
   <div class="board-header">
     <div>
-      <div class="board-title" id="boardTitle">The ELA Pastry Kitchen</div>
       <div class="board-sub" id="boardSub">GRADE 7 · ELA · FALL TERM</div>
     </div>
     <div class="toggle" id="viewToggle" onclick="toggleView()">
@@ -60,12 +61,14 @@
   </div>
   <div id="advanceBanner"></div>
   <div id="sentBackBanner"></div>
+  <div class="waiting-on-you" id="waitingOnYou" style="display:none;">
+    <h3>Waiting on You</h3>
+    <div id="reviewList"></div>
+  </div>
   <div class="stations" id="stationsGrid"></div>
   <div class="detail" id="detailPanel"></div>
   <div class="week-report" id="weekReportPanel" style="display:none;"></div>
   <div class="review-queue" id="reviewQueue" style="display:none;">
-    <h3>Needs Your Eyes</h3>
-    <div id="reviewList" style="margin-bottom:20px;"></div>
     <h3>Review Bank</h3>
     <div id="reviewBank" style="margin-bottom:20px;"></div>
     <h3>Recent Graded Answers</h3>

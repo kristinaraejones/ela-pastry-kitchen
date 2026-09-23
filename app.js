@@ -323,8 +323,17 @@ function buildChildFromBootstrap(resp) {
   return { DATA, state };
 }
 
+// A blank, not-started state for one task (right shape for its type).
+function freshTaskState(t) {
+  const base = { open: false, done: false, needsReview: false, reviewed: false, sentBack: false, answers: {}, score: null, parentComment: null, results: null };
+  if (t.type === "pos-tagger") base.labels = new Array(t.sentence.length).fill(null);
+  if (t.type === "phrase-tagger") base.selections = [];
+  if (t.type === "concept-check") base.labels = {};
+  return base;
+}
+
 function deriveStatus(s) {
-  if (s.sentBack) return "sent_back";
+  if (s.sentBack && !s.done) return "sent_back";
   if (s.reviewed) return "reviewed";
   if (s.needsReview) return "needs_review";
   if (s.done) return "complete";
@@ -333,7 +342,7 @@ function deriveStatus(s) {
 
 // Human-readable version of deriveStatus, shared by the past-week report and the PDF export.
 function statusLabel(s) {
-  if (s.sentBack) return "Sent back — awaiting resubmission";
+  if (s.sentBack && !s.done) return "Sent back — awaiting resubmission";
   if (s.reviewed) return "Reviewed & approved";
   if (s.needsReview) return "Submitted — awaiting review";
   if (s.done) return "Complete";
@@ -480,6 +489,12 @@ function maxAuthoredWeek() {
   });
   return max;
 }
+function jumpToReview(key, id, week) {
+  parentNavWeek = week;
+  render();
+  const el = document.getElementById(`review-${key}-${id}`);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+}
 function navPrevWeek() {
   parentNavWeek = Math.max(1, parentNavWeek - 1);
   render();
@@ -502,13 +517,49 @@ function redoStation(key) {
     reason: `Scored below 70% (${Math.round((stationScorePct(key) || 0) * 100)}%)`,
     items
   };
-  burnLogCache[currentChild].unshift(record);
+  (burnLogCache[currentChild] = burnLogCache[currentChild] || []).unshift(record);
   apiPost("addBurnLog", { student: currentChild, ...record }).catch(() => {});
   activeTasks(key).forEach(t => {
-    state[key].tasks[t.id] = { open: false, done: false, needsReview: false, reviewed: false, answers: {}, score: null, results: null };
+    state[key].tasks[t.id] = freshTaskState(t);
     persistTask(key, t.id);
   });
   render();
+}
+
+// ---------- Reset / send back ONE section (task), not the whole subject ----------
+
+// Reflections keep the written text so it can be edited rather than retyped.
+function resetOneTask(key, id, by, comment) {
+  const t = DATA[key].tasks.find(x => x.id === id);
+  const old = state[key].tasks[id];
+  const was = old.score ? `scored ${old.score}` : old.needsReview ? "submitted, awaiting review" : old.done ? "completed" : "not finished";
+  const record = {
+    station: DATA[key].name, tag: subjectTag(key), date: new Date().toLocaleDateString(),
+    reason: by === "parent" ? "Section sent back by parent" : "Section redone by student to improve it",
+    items: [`${t.label}: was ${was}${comment ? ` — note: ${comment}` : ""}`]
+  };
+  (burnLogCache[currentChild] = burnLogCache[currentChild] || []).unshift(record);
+  apiPost("addBurnLog", { student: currentChild, ...record }).catch(() => {});
+  const fresh = freshTaskState(t);
+  if (t.type === "reflection" && old.answers) fresh.answers = old.answers;
+  fresh.open = by !== "parent";
+  if (by === "parent") { fresh.sentBack = true; fresh.parentComment = comment || "Please take another look at this part and resubmit."; }
+  state[key].tasks[id] = fresh;
+  persistTask(key, id);
+  render();
+}
+function sendBackSection(key, id) {
+  const box = document.getElementById(`sendback-${key}-${id}`);
+  resetOneTask(key, id, "parent", box ? box.value.trim() : "");
+}
+function redoSection(key, id) {
+  if (!confirm("Start this section over? Your current answers here will be cleared so you can try again.")) return;
+  resetOneTask(key, id, "student", "");
+}
+// Students can redo any finished section to improve it, except read-only lesson
+// steps and sampled tests (a redo would just re-roll the questions).
+function canStudentRedo(t, s) {
+  return currentView !== "parent" && s.done && !t.dynamic && !t.termFinal && !t.monthlyTest && t.type !== "read" && t.type !== "external";
 }
 
 function toggleView() {
@@ -1412,6 +1463,12 @@ function taskBodyHTML(key, t) {
       inner += `<button class="btn primary" onclick="submitMC('${key}','${t.id}')">Submit answers</button>`;
     }
   }
+  if (s.sentBack && !s.done && s.parentComment && t.type !== "reflection") {
+    inner = `<div class="parent-feedback">📝 Sent back — please redo this part: ${s.parentComment}</div>` + inner;
+  }
+  if (canStudentRedo(t, s)) {
+    inner += `<button class="btn redo-btn" onclick="redoSection('${key}','${t.id}')">🔄 Redo this section to improve it</button>`;
+  }
   return `<div class="task-body ${s.open ? "open" : ""}">${inner}</div>`;
 }
 
@@ -1502,13 +1559,28 @@ function renderPastTaskReport(key, t, s) {
   let extra = (s.done && AUTO_GRADED_TYPES.includes(t.type))
     ? taskBodyHTML(key, t).replace('class="task-body ', 'class="task-body open ')
     : renderTaskContent(t);
+  const awaiting = t.type === "reflection" && s.needsReview && !s.reviewed;
   if (t.type === "reflection" && s.answers && s.answers.text) {
     extra += `<div class="submitted-text student-answer">${s.answers.text}</div>`;
     if (s.parentComment) extra += `<div class="parent-feedback">📝 ${s.parentComment}</div>`;
   }
-  return `<div class="review-item">
+  if (awaiting) {
+    // Review happens right here, next to the prompt and sample answer it responds to.
+    extra += `<textarea id="comment-${key}-${t.id}" placeholder="Optional feedback (shown either way — required reading if you send it back)" style="min-height:50px;margin-top:6px;"></textarea>
+      <div class="review-actions">
+        <button onclick="sendBackReflection('${key}','${t.id}')">Refire (send back)</button>
+        <button class="approve" onclick="approveReflection('${key}','${t.id}')">Approve</button>
+      </div>`;
+  }
+  if (s.done && !awaiting) {
+    extra += `<details class="sendback-box"><summary>↩ Send back just this section</summary>
+      <textarea id="sendback-${key}-${t.id}" placeholder="Optional note about what to fix (she'll see it)" style="min-height:44px;"></textarea>
+      <div class="review-actions"><button onclick="sendBackSection('${key}','${t.id}')">Send back &amp; reset this section</button></div>
+    </details>`;
+  }
+  return `<div class="review-item${awaiting ? " needs-attention" : ""}" id="review-${key}-${t.id}">
     <strong>${t.label}</strong>
-    <div class="meta">${statusLabel(s)}${s.score ? " · Scored " + s.score : ""}</div>
+    <div class="meta">${awaiting ? "Submitted by " + CHILD_META[currentChild].name + " — awaiting your review" : statusLabel(s)}${s.score ? " · Scored " + s.score : ""}</div>
     ${extra}
   </div>`;
 }
@@ -1593,13 +1665,16 @@ function exportWeeksPdf() {
 
 function render() {
   document.getElementById("childSwitcher").innerHTML = Object.keys(CHILD_META).map(id =>
-    `<button class="child-pill ${currentChild === id ? "active" : ""}" onclick="switchChild('${id}')">${CHILD_META[id].name}</button>`
+    `<button class="child-pill kid-${id} ${currentChild === id ? "active" : ""}" onclick="switchChild('${id}')">${currentChild === id ? "✓ " : ""}${CHILD_META[id].name}</button>`
   ).join("");
+  document.getElementById("board").dataset.child = currentChild;
+  document.body.dataset.child = currentChild;
   document.getElementById("boardSub").textContent = CHILD_META[currentChild].subtitle;
 
   document.getElementById("viewToggle").classList.toggle("parent", currentView === "parent");
   document.getElementById("toggleKnob").textContent = currentView === "parent" ? "PARENT" : CHILD_META[currentChild].name.toUpperCase();
   document.getElementById("reviewQueue").style.display = currentView === "parent" ? "block" : "none";
+  if (currentView !== "parent") document.getElementById("waitingOnYou").style.display = "none";
 
   if (currentView === "parent" && parentNavWeek === null) parentNavWeek = currentWeek();
   const showingWeekReport = currentView === "parent";
@@ -1763,19 +1838,11 @@ function render() {
       });
     });
     const list = document.getElementById("reviewList");
+    document.getElementById("waitingOnYou").style.display = items.length === 0 ? "none" : "block"; // only takes space at the top when something needs you
     list.innerHTML = items.length === 0
-      ? `<div class="empty-note">Nothing waiting on you right now.</div>`
-      : items.map(({ key, t, s }) => `
-        <div class="review-item needs-attention">
-          <strong>${DATA[key].name} — ${t.label}</strong>
-          <div class="meta">Submitted by ${CHILD_META[currentChild].name}, awaiting review</div>
-          <div class="submitted-text student-answer">${s.answers.text}</div>
-          <textarea id="comment-${key}-${t.id}" placeholder="Optional feedback (shown either way — required reading if you send it back)" style="min-height:50px;margin-top:6px;"></textarea>
-          <div class="review-actions">
-            <button onclick="sendBackReflection('${key}','${t.id}')">Refire (send back)</button>
-            <button class="approve" onclick="approveReflection('${key}','${t.id}')">Approve</button>
-          </div>
-        </div>`).join("");
+      ? ""
+      : `<div class="lesson-text" style="font-size:0.82rem;">Review each one in the week outline below, right next to the lesson it answers (marked in blue). Tap to jump to it:</div>
+        <div class="sentback-chips">${items.map(({ key, t }) => `<span class="review-jump-chip" onclick="jumpToReview('${key}','${t.id}',${Number(t.week_number) || 1})">Week ${t.week_number} · ${DATA[key].name}: ${t.label}</span>`).join("")}</div>`;
   }
 
 }
