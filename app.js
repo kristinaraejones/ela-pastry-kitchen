@@ -914,9 +914,8 @@ function regradeLegacyDictation() {
         // Re-score finished tagging tasks under the current matching rules (e.g. "flashlight" alone now counts as a direct object).
         const ps = state[key].tasks[t.id];
         if (!ps || !ps.done || !ps.selections || !t.phrases) return;
-        let ok = 0;
-        ps.selections.forEach(sel => { if (t.phrases.some(p => phraseHit(p, sel))) ok++; });
-        const fresh = `${ok}/${t.phrases.length}`;
+        const sc = phraseScore(t, ps.selections);
+        const fresh = `${sc.ok}/${sc.total}`;
         if (ps.score !== fresh) { ps.score = fresh; persistTask(key, t.id); }
         return;
       }
@@ -1171,6 +1170,18 @@ function spanHit(p, sel) {
 }
 function phraseHit(p, sel) { return p.type === sel.type && spanHit(p, sel); }
 
+// Score = right chunks out of (chunks to find + chunks she made up that aren't
+// any answer). Marking something that isn't one of the parts (e.g. a clause where
+// phrases were asked for) costs a point; a right chunk with the wrong label only
+// loses that one item, not two.
+function phraseScore(t, selections) {
+  const seen = new Set();
+  const sels = (selections || []).filter(sel => { const k = sel.start + "-" + sel.end + "-" + sel.type; if (seen.has(k)) return false; seen.add(k); return true; });
+  const ok = sels.filter(sel => t.phrases.some(p => phraseHit(p, sel))).length;
+  const extra = sels.filter(sel => !t.phrases.some(p => spanHit(p, sel))).length;
+  return { ok, extra, total: t.phrases.length + extra };
+}
+
 // ---------- "Why" explanations for parts-of-speech and noun/pronoun/verb-type misses ----------
 
 const POS_DEFS = {
@@ -1309,15 +1320,19 @@ function explainOffKeyTag(key, t, sel) {
 function checkPhraseTagging(key, id) {
   const t = DATA[key].tasks.find(x => x.id === id);
   const s = state[key].tasks[id];
-  let correct = 0;
-  s.selections.forEach(sel => { if (t.phrases.some(p => phraseHit(p, sel))) correct++; });
+  const sc = phraseScore(t, s.selections);
+  s.selections.forEach(sel => {
+    if (!t.phrases.some(p => spanHit(p, sel))) {
+      logGradedAnswer(key, { word: t.sentence.slice(sel.start, sel.end + 1).join(" "), question: "Phrase/clause tagging (extra chunk)", given: sel.type, correct: "(not one of the parts)", wasCorrect: false });
+    }
+  });
   t.phrases.forEach(p => {
     const phraseText = t.sentence.slice(p.start, p.end + 1).join(" ");
     const match = s.selections.find(sel => spanHit(p, sel));
     const wasCorrect = !!match && match.type === p.type;
     logGradedAnswer(key, { word: phraseText, question: "Phrase/clause tagging", given: match ? match.type : "(missed)", correct: p.type, wasCorrect });
   });
-  s.score = `${correct}/${t.phrases.length}`;
+  s.score = `${sc.ok}/${sc.total}`;
   s.done = true;
   persistTask(key, id);
   render();
