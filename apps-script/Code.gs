@@ -204,7 +204,7 @@ function readAnswerLog_(student) {
       };
     })
     .reverse()
-    .slice(0, 100);
+    .filter(function (r, i) { return i < 100 || (r.game === 'Case Files' && i < 600); });
 }
 
 function readSettings_() {

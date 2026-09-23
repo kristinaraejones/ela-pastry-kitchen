@@ -259,3 +259,8 @@ body[data-view="parent"][data-child]{background:#F0EAE0;background-image:none;}
 .advance-banner-quiet{background:transparent;border:1px dashed var(--rail);padding:8px 12px;}
 .advance-banner-quiet .advance-banner-sub{margin:0 0 6px;color:var(--chalk-dim);}
 .advance-banner .btn[disabled]{opacity:.5;cursor:not-allowed;}
+.cf-report{background:var(--tan-bg);border-left:3px solid var(--tan);border-radius:6px;padding:10px 12px;margin:8px 0;font-size:0.84rem;line-height:1.5;}
+.cf-summary{color:var(--chalk-dim);margin:3px 0 6px;font-size:0.78rem;}
+.cf-miss-title{margin-top:8px;font-weight:700;}
+.cf-miss{margin:3px 0;}
+.cf-empty,.cf-note{color:var(--chalk-dim);font-size:0.76rem;margin-top:6px;}

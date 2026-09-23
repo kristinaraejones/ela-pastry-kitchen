@@ -1564,6 +1564,43 @@ function renderTaskContent(t) {
 // once s.done is true, so the reused markup is effectively read-only.)
 const AUTO_GRADED_TYPES = ["graded-mc", "graded-dictation", "fluency-read", "pos-tagger", "phrase-tagger", "concept-check"];
 
+// ---------- Case Files vocab report (parent view) ----------
+
+function escHtml(str) {
+  return String(str == null ? "" : str).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+}
+function isCaseFilesTask(t) {
+  return t.type === "external" && /case-files/i.test(t.url || "");
+}
+// Which vocab words she has played in Case Files, and which she missed, from
+// the answer log the game pushes to the Sheet (vocabulary questions only).
+function caseFilesVocabReportHTML() {
+  const rows = (answerLogCache[currentChild] || []).filter(r =>
+    /case files/i.test(r.game || "") && /vocab/i.test(r.subject || "") && !/^TEST/i.test(r.word || ""));
+  if (rows.length === 0) {
+    return `<div class="cf-report"><b>📚 Case Files vocabulary</b><div class="cf-empty">No vocabulary answers from Case Files have come in yet. Once ${CHILD_META[currentChild].name} plays a round, the words she practiced and any she missed will show here.</div></div>`;
+  }
+  const byWord = {};
+  rows.forEach(r => {
+    const w = byWord[r.word] || (byWord[r.word] = { word: r.word, tries: 0, right: 0, misses: [], last: r.timestamp });
+    w.tries++;
+    if (r.correct) w.right++; else w.misses.push(r);
+    if (r.timestamp > w.last) w.last = r.timestamp;
+  });
+  const words = Object.values(byWord).sort((x, y) => x.word.localeCompare(y.word));
+  const missed = words.filter(w => w.misses.length > 0);
+  const chips = words.map(w => `<span class="word-chip ${w.misses.length ? "chip-incorrect" : "chip-correct"}">${escHtml(w.word)}${w.misses.length ? ` ✗${w.misses.length}` : " ✓"}</span>`).join(" ");
+  const missLines = missed.map(w => w.misses.map(m =>
+    `<div class="cf-miss"><b>${escHtml(w.word)}</b> — she chose "${escHtml(m.givenAnswer)}"; the right answer is "${escHtml(m.correctAnswer)}".</div>`).join("")).join("");
+  const lastPlay = new Date(rows.reduce((mx, r) => (r.timestamp > mx ? r.timestamp : mx), rows[0].timestamp)).toLocaleDateString();
+  return `<div class="cf-report"><b>📚 Case Files vocabulary</b>
+    <div class="cf-summary">${words.length} word${words.length === 1 ? "" : "s"} practiced · ${missed.length} with a miss · last played ${lastPlay}</div>
+    <div>${chips}</div>
+    ${missed.length ? `<div class="cf-miss-title">Missed:</div>${missLines}` : `<div class="cf-summary">No misses — every word she's answered so far was right. 🎉</div>`}
+    <div class="cf-note">Shows her most recent answers on record, so very old play may drop off.</div>
+  </div>`;
+}
+
 function renderPastTaskReport(key, t, s) {
   // taskBodyHTML's wrapper only shows its content when the task row has
   // been toggled open (s.open) — force it open here without mutating the
@@ -1571,6 +1608,7 @@ function renderPastTaskReport(key, t, s) {
   let extra = (s.done && AUTO_GRADED_TYPES.includes(t.type))
     ? taskBodyHTML(key, t).replace('class="task-body ', 'class="task-body open ')
     : renderTaskContent(t);
+  if (isCaseFilesTask(t) && currentChild === "kenley") extra += caseFilesVocabReportHTML();
   const awaiting = t.type === "reflection" && s.needsReview && !s.reviewed;
   if (t.type === "reflection" && s.answers && s.answers.text) {
     extra += `<div class="submitted-text student-answer">${s.answers.text}</div>`;
