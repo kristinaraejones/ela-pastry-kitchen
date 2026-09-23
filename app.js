@@ -910,6 +910,16 @@ function regradeLegacyDictation() {
   if (!DATA || !state) return;
   Object.keys(DATA).forEach(key => {
     DATA[key].tasks.forEach(t => {
+      if (t.type === "phrase-tagger") {
+        // Re-score finished tagging tasks under the current matching rules (e.g. "flashlight" alone now counts as a direct object).
+        const ps = state[key].tasks[t.id];
+        if (!ps || !ps.done || !ps.selections || !t.phrases) return;
+        let ok = 0;
+        ps.selections.forEach(sel => { if (t.phrases.some(p => phraseHit(p, sel))) ok++; });
+        const fresh = `${ok}/${t.phrases.length}`;
+        if (ps.score !== fresh) { ps.score = fresh; persistTask(key, t.id); }
+        return;
+      }
       if (t.type !== "graded-dictation") return;
       const st = state[key].tasks[t.id];
       if (!st || !st.done || !st.results) return;
@@ -1153,14 +1163,22 @@ function choosePhraseType(type) {
 }
 function cancelPhraseRange() { pendingPhraseRange = null; render(); }
 function clearPhraseSelections(key, id) { state[key].tasks[id].selections = []; render(); }
+// A direct/indirect object may be tagged as the whole noun phrase ("the flashlight")
+// or as just the noun ("flashlight") — both are correct grammar, so both count.
+function spanHit(p, sel) {
+  if (p.start === sel.start && p.end === sel.end) return true;
+  return (p.type === "Direct Object" || p.type === "Indirect Object") && p.end > p.start && sel.start === p.end && sel.end === p.end;
+}
+function phraseHit(p, sel) { return p.type === sel.type && spanHit(p, sel); }
+
 function checkPhraseTagging(key, id) {
   const t = DATA[key].tasks.find(x => x.id === id);
   const s = state[key].tasks[id];
   let correct = 0;
-  s.selections.forEach(sel => { if (t.phrases.some(p => p.start === sel.start && p.end === sel.end && p.type === sel.type)) correct++; });
+  s.selections.forEach(sel => { if (t.phrases.some(p => phraseHit(p, sel))) correct++; });
   t.phrases.forEach(p => {
     const phraseText = t.sentence.slice(p.start, p.end + 1).join(" ");
-    const match = s.selections.find(sel => sel.start === p.start && sel.end === p.end);
+    const match = s.selections.find(sel => spanHit(p, sel));
     const wasCorrect = !!match && match.type === p.type;
     logGradedAnswer(key, { word: phraseText, question: "Phrase/clause tagging", given: match ? match.type : "(missed)", correct: p.type, wasCorrect });
   });
@@ -1421,7 +1439,7 @@ function taskBodyHTML(key, t) {
       if (sel) {
         tagLabel = tagAbbrev(sel.type);
         if (s.done) {
-          const match = t.phrases.some(p => p.start === sel.start && p.end === sel.end && p.type === sel.type);
+          const match = t.phrases.some(p => phraseHit(p, sel));
           cls = match ? "correct" : "incorrect";
         }
       }
@@ -1445,16 +1463,16 @@ function taskBodyHTML(key, t) {
     if (s.done) {
       const reviewLines = [];
       s.selections.forEach(sel => {
-        const exact = t.phrases.find(p => p.start === sel.start && p.end === sel.end && p.type === sel.type);
+        const exact = t.phrases.find(p => phraseHit(p, sel));
         if (!exact) {
           const text = t.sentence.slice(sel.start, sel.end + 1).join(" ");
-          const sameSpan = t.phrases.find(p => p.start === sel.start && p.end === sel.end);
+          const sameSpan = t.phrases.find(p => spanHit(p, sel));
           if (sameSpan) reviewLines.push(`<b>"${text}"</b> — you tagged it ${sel.type}, but it's actually <b>${sameSpan.type}</b>. ${sameSpan.explanation}`);
           else reviewLines.push(`<b>"${text}"</b> — that's not one of the parts we're looking for here.`);
         }
       });
       t.phrases.forEach(p => {
-        const found = s.selections.some(sel => sel.start === p.start && sel.end === p.end);
+        const found = s.selections.some(sel => spanHit(p, sel));
         if (!found) {
           const text = t.sentence.slice(p.start, p.end + 1).join(" ");
           reviewLines.push(`<b>"${text}"</b> — you didn't tag this one. It's the <b>${p.type}</b>. ${p.explanation}`);
@@ -1724,7 +1742,7 @@ function renderWeekReportPanel() {
       sections.push(isPast ? renderPastTaskReport(key, t, s) : renderUpcomingTaskPreview(t));
     });
   });
-  const titleSuffix = week < currentWeek() ? "completed record" : week === currentWeek() ? "in progress" : "preview";
+  const titleSuffix = week < currentWeek() ? "Completed Record" : week === currentWeek() ? "In Progress" : "Preview";
   panel.innerHTML = `
     <div class="week-report-title">Week ${week} — ${titleSuffix}</div>
     ${anyContent ? sections.join("") : `<div class="empty-note">Nothing planned yet for Week ${week}.</div>`}
