@@ -1503,7 +1503,7 @@ function renderPastTaskReport(key, t, s) {
     ? taskBodyHTML(key, t).replace('class="task-body ', 'class="task-body open ')
     : renderTaskContent(t);
   if (t.type === "reflection" && s.answers && s.answers.text) {
-    extra += `<div class="submitted-text">${s.answers.text}</div>`;
+    extra += `<div class="submitted-text student-answer">${s.answers.text}</div>`;
     if (s.parentComment) extra += `<div class="parent-feedback">📝 ${s.parentComment}</div>`;
   }
   return `<div class="review-item">
@@ -1769,7 +1769,7 @@ function render() {
         <div class="review-item needs-attention">
           <strong>${DATA[key].name} — ${t.label}</strong>
           <div class="meta">Submitted by ${CHILD_META[currentChild].name}, awaiting review</div>
-          <div class="submitted-text">${s.answers.text}</div>
+          <div class="submitted-text student-answer">${s.answers.text}</div>
           <textarea id="comment-${key}-${t.id}" placeholder="Optional feedback (shown either way — required reading if you send it back)" style="min-height:50px;margin-top:6px;"></textarea>
           <div class="review-actions">
             <button onclick="sendBackReflection('${key}','${t.id}')">Refire (send back)</button>
