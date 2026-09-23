@@ -226,4 +226,4 @@ footer{margin-top:36px;text-align:center;font-family:'JetBrains Mono',monospace;
 /* Whole page takes a soft tint of the selected kid's color; cards stay cream so they pop. */
 body[data-child="kenley"]{background:#E2F1EE;background-image:none;}
 body[data-child="adelyn"]{background:#FCE5E9;background-image:none;}
-.board-titlebar .board-title{color:#9A7548;}
+.board-titlebar .board-title{color:#7D6154;}
