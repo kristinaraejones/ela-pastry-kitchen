@@ -3,610 +3,242 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adelyn's Word Bakery</title>
+<title>Adelyn's Rainbow Bakery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --sky: #cdeaf7;
-    --sky-soft: #e8f6fd;
-    --cream: #fdf6ec;
-    --cream-dim: #f3e7d3;
-    --crust: #5a3825;
-    --crust-soft: #7a5238;
-    --icing-pink: #e8a0ad;
-    --icing-pink-deep: #d9788a;
-    --butter: #f0c14b;
-    --mint: #7fb88f;
-    --panel: #fffaf2;
-    --shelf: #c9905e;
-    --mono: "Courier New", Courier, monospace;
-    --serif: Georgia, "Times New Roman", serif;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    min-height: 100vh;
-    background:
-      radial-gradient(circle at 15% 0%, rgba(255,255,255,0.5), transparent 45%),
-      var(--cream);
-    color: var(--crust);
-    font-family: var(--serif);
-    padding: 20px 14px 60px;
-  }
-  .wrap { max-width: 720px; margin: 0 auto; }
+:root{--plum:#5c1a6e;--ink:#3d2352;--soft:#6b4a7e;--pink:#ff4f9a;--bg:#fdf0f7;--sky:#e9f2ff;--line:#f3d4ea;--btn:#8a2fa0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:700}
+.disp{font-family:'Fredoka','Nunito',system-ui,sans-serif}
+.ol{stroke:#5b3a6e;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.ol2{stroke:#5b3a6e;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.ol1{stroke:#5b3a6e;stroke-width:1.2}
+button{font-family:inherit}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:22px 20px 30px}
 
-  header {
-    border-bottom: 3px dashed var(--icing-pink-deep);
-    padding-bottom: 14px;
-    margin-bottom: 18px;
-  }
-  .stamp {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--icing-pink-deep);
-    text-transform: uppercase;
-  }
-  h1 {
-    font-family: var(--serif);
-    font-size: clamp(24px, 6vw, 34px);
-    margin: 6px 0 4px;
-    color: var(--crust);
-  }
-  .subtitle { color: var(--crust-soft); font-size: 14px; font-style: italic; }
+/* header */
+.site-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand h1{margin:0;font-size:clamp(26px,4vw,36px);line-height:1;color:var(--plum)}
+.subtitle{font-size:15px;color:var(--soft);margin-top:4px}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:flex;align-items:center;gap:7px;padding:8px 14px;background:#fff;border-radius:999px;border:3px solid #eadcf2;font:800 15px 'Nunito',sans-serif;color:var(--ink);min-height:44px}
+.toggle{cursor:pointer}
+.toggle.on{background:var(--btn);border-color:var(--btn);color:#fff}
 
-  .rank-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--panel);
-    border: 1px solid var(--cream-dim);
-    border-radius: 14px;
-    padding: 10px 16px;
-    margin-bottom: 18px;
-    font-family: var(--mono);
-    font-size: 13px;
-    box-shadow: 0 2px 6px rgba(90,56,37,0.08);
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .rank-bar .rank-name { color: var(--icing-pink-deep); font-weight: bold; }
-  .rank-bar .sprinkles { color: var(--butter); font-weight: bold; }
-  .rank-bar .day-streak { color: var(--mint); }
+/* tabs */
+.tabs{display:flex;gap:8px;margin:18px 0 16px;flex-wrap:wrap}
+.tab{border:3px solid var(--line);background:#fff;color:var(--plum);font:600 18px 'Fredoka',sans-serif;padding:10px 22px;border-radius:999px;cursor:pointer;min-height:48px}
+.tab.active{background:var(--btn);border-color:var(--btn);color:#fff;box-shadow:0 4px 0 #5c1a6e}
 
-  .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-  .tab {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    background: transparent;
-    color: var(--crust-soft);
-    border: 1px solid var(--cream-dim);
-    padding: 8px 14px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-  .tab:hover { border-color: var(--icing-pink-deep); color: var(--crust); }
-  .tab.active {
-    background: var(--icing-pink-deep);
-    color: #fff;
-    border-color: var(--icing-pink-deep);
-    font-weight: bold;
-  }
+.card{background:#fff;border-radius:30px;border:3px solid var(--line);box-shadow:0 8px 0 var(--line);padding:22px 24px}
+.title{margin:0;font-size:32px;color:var(--btn);line-height:1.1}
+.label{font-size:16px;font-weight:800;color:var(--soft);margin:14px 0 8px}
+.small{font-size:14px;color:var(--soft)}
+.lead{font-size:18px;font-weight:800;color:var(--soft);line-height:1.35}
+.big-lead{color:var(--ink);font-size:19px}
+.note-good{font-size:16px;font-weight:800;color:#2e7d52;margin-top:4px}
+.grow{flex:1 1 auto;min-height:6px}
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;flex:1}
+.center.left{align-items:stretch;text-align:left}
+.card-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-top:12px}
+.row-c{display:flex;gap:10px;justify-content:center}
+.row-b{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.pinkline{font-size:14px;font-weight:800;color:#c2266a}
 
-  .card {
-    background: var(--panel);
-    color: var(--crust);
-    border-radius: 16px;
-    padding: 26px 22px;
-    box-shadow: 0 10px 28px rgba(90,56,37,0.16);
-    position: relative;
-    min-height: 280px;
-    border: 1px solid var(--cream-dim);
-  }
+/* buttons */
+.btn{border:none;cursor:pointer;background:var(--btn);color:#fff;font:600 20px 'Fredoka',sans-serif;padding:13px 26px;border-radius:999px;box-shadow:0 5px 0 #5c1a6e;min-height:52px}
+.btn:hover{background:#9b3bb2}.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #5c1a6e}
+.btn2{white-space:nowrap;flex:none;border:2.5px solid #b99cff;cursor:pointer;background:#fff;color:var(--plum);font:800 15px 'Nunito',sans-serif;padding:8px 14px;border-radius:999px;min-height:44px;display:inline-flex;align-items:center;gap:6px}
+.btn2:hover{background:#f4eeff}
+.link{border:none;background:none;cursor:pointer;color:var(--btn);font:800 16px 'Nunito',sans-serif;text-decoration:underline;text-underline-offset:3px;padding:10px 0;min-height:44px}
 
-  /* ---- Intro / welcome-back screen ---- */
-  .intro-emoji { font-size: 46px; margin-bottom: 6px; }
-  .intro-title {
-    font-family: var(--serif);
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0 0 10px;
-  }
-  .intro-body { font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
-  .begin-btn {
-    font-family: var(--mono);
-    font-size: 13px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    background: var(--icing-pink-deep);
-    color: #fff;
-    border: none;
-    border-radius: 20px;
-    padding: 12px 22px;
-    cursor: pointer;
-  }
-  .begin-btn:hover { background: #c2606f; }
+/* bake layout */
+.bake-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:22px;align-items:stretch}
+@media (max-width:900px){.bake-grid{grid-template-columns:1fr}}
+.qcard{display:flex;flex-direction:column;gap:12px;min-height:560px}
+.qtop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.chip{padding:6px 14px;border-radius:999px;background:#f1e6ff;color:var(--plum);font-weight:800;font-size:14px}
+.progress{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px;color:var(--soft)}
+.bar{width:120px;height:14px;border-radius:999px;background:#f3eaf7;overflow:hidden;border:2px solid #eadcf2}
+.bar div{height:100%;border-radius:999px;background:linear-gradient(90deg,#ff6b8b,#ffa94d,#ffe066,#7bd88f,#74c0fc,#b197fc);transition:width .5s}
+.qhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.big{font-size:clamp(34px,5vw,46px);font-weight:700;line-height:1.05;color:var(--btn);overflow-wrap:anywhere}
+.mid{font-size:clamp(19px,2.4vw,23px);font-weight:500;line-height:1.35;color:var(--ink)}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:520px){.opts{grid-template-columns:1fr}}
+.ans{display:flex;align-items:center;gap:12px;text-align:left;min-height:80px;padding:12px 14px;border-radius:22px;border:3px solid;font:700 16px/1.3 'Nunito',sans-serif;color:var(--ink);cursor:pointer;box-shadow:0 5px 0 rgba(91,58,110,.18);transition:transform .12s}
+.ans:hover{transform:translateY(-3px)}
+.ans:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(91,58,110,.18)}
+.a0{background:#ffe0ee;border-color:#ff9cc8}.a1{background:#ece3ff;border-color:#b99cff}.a2{background:#dcf7ec;border-color:#7fd6b2}.a3{background:#fff4c7;border-color:#ffd24d}
+.letter{flex:none;width:38px;height:38px;border-radius:13px;background:#fff;border:2.5px solid #5b3a6e;display:flex;align-items:center;justify-content:center;font:700 17px 'Fredoka',sans-serif}
+.slots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:52px;margin-top:6px}
+.slotch{width:36px;height:48px;border-bottom:4px solid #ff8cc6;display:flex;align-items:flex-end;justify-content:center;font:700 28px 'Fredoka',sans-serif;color:var(--btn)}
+.tiles{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.tile{width:46px;height:52px;border-radius:14px;border:3px solid #b99cff;background:#f4eeff;font:700 24px 'Fredoka',sans-serif;color:var(--plum);cursor:pointer;box-shadow:0 4px 0 #d6c6f5}
+.tile:hover{transform:translateY(-2px)}
+.tile:disabled{opacity:.25;cursor:default;transform:none}
+.hintbox{padding:10px 14px;border-radius:18px;background:#fff8e0;border:2px dashed #ffd24d;font-size:15px;line-height:1.35}
+.yay{font-size:38px;font-weight:700;color:#2e7d52}
+.oops{font-size:34px;font-weight:700;color:var(--plum)}
+.es-card{display:flex;flex-direction:column;gap:6px;padding:14px 18px;border-radius:24px;background:#fff8e0;border:3px solid #ffd24d}
+.es-label{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8a5c00}
+.es-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.es-word{font-size:30px;font-weight:700;color:var(--plum)}
+.es-ex{font-size:17px;line-height:1.35}
 
-  /* ---- Customer / mascot ---- */
-  .customer-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .customer-avatar { font-size: 32px; line-height: 1; }
-  .speech-bubble {
-    position: relative;
-    background: var(--sky-soft);
-    border: 1.5px solid var(--sky);
-    border-radius: 14px;
-    padding: 10px 14px;
-    font-size: 14px;
-    line-height: 1.5;
-    flex: 1;
-  }
-  .speech-bubble .customer-name { font-weight: bold; color: var(--crust-soft); }
-  .special-flag {
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    background: var(--butter);
-    color: var(--crust);
-    border-radius: 10px;
-    padding: 3px 8px;
-    margin-bottom: 8px;
-  }
-  .rush-flag {
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    background: var(--icing-pink-deep);
-    color: #fff;
-    border-radius: 10px;
-    padding: 3px 8px;
-    margin-bottom: 8px;
-    margin-left: 6px;
-    animation: rush-pulse 0.8s ease-in-out infinite;
-  }
-  .rush-flag.rush-closed { animation: none; background: var(--crust-soft); }
-  @keyframes rush-pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.07); }
-  }
-  .rush-bar-track {
-    height: 6px;
-    background: var(--cream-dim);
-    border-radius: 3px;
-    overflow: hidden;
-    margin: 2px 0 14px;
-  }
-  .rush-bar-fill {
-    height: 100%;
-    background: var(--icing-pink-deep);
-    width: 100%;
-  }
+/* start screen */
+.treat-pick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
+.treatbtn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 10px;border-radius:22px;border:3px solid #eadcf2;background:#fff;cursor:pointer;font:800 14px 'Nunito',sans-serif;color:var(--ink)}
+.treatbtn .mini{width:78%}
+.treatbtn.on{border-color:var(--pink);background:#fff0f7;box-shadow:0 4px 0 #ffc2dd}
+.pack-pick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.pack-pick{grid-template-columns:1fr}.treat-pick{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.packbtn{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:20px;border:3px solid #eadcf2;background:#fff;cursor:pointer;text-align:left;font:800 15px 'Nunito',sans-serif;color:var(--ink);min-height:60px}
+.packbtn.on{border-color:var(--btn);background:#f7f0ff;box-shadow:0 4px 0 #d9c6f2}
+.packbtn:disabled{cursor:default;background:#f7f4f9;color:#7d6a8a}
+.packbtn:disabled .thumbs{filter:grayscale(1);opacity:.35}
+.thumbs{display:flex;flex:none}
+.thumb{width:32px;height:32px;margin-right:-6px;display:block}
+.thumb svg{width:100%;height:100%}
+.pk{display:flex;flex-direction:column}.pk small{font-size:12px;font-weight:700;opacity:.85}
 
-  .ticket-label {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--icing-pink-deep);
-    margin-bottom: 8px;
-  }
-  .ticket-label.review { color: var(--mint); }
+/* gift + reveal */
+.gifts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.giftbtn{border:none;background:none;cursor:pointer;padding:4px;border-radius:24px}
+.giftbtn:hover svg{transform:translateY(-6px) scale(1.05)}
+.giftbtn svg{transition:transform .15s;display:block}
+.wiggle{display:block;animation:wig 1.6s ease-in-out infinite}
+@keyframes wig{0%,100%{transform:rotate(0)}10%{transform:rotate(-6deg)}20%{transform:rotate(6deg)}30%{transform:rotate(-3deg)}40%{transform:rotate(0)}}
+.reveal{width:190px;height:190px;border-radius:40px;background:#fff5fb;border:3px solid #ff9cc8;display:flex;align-items:center;justify-content:center;padding:20px}
+.reveal svg{width:100%;height:100%}
+.rare-badge{padding:6px 18px;border-radius:999px;background:#ffd54f;color:var(--plum);font:700 20px 'Fredoka',sans-serif;border:3px solid #5b3a6e;animation:tw 1s ease-in-out infinite alternate}
+.new-badge{padding:5px 14px;border-radius:999px;background:#dcf7ec;color:#1f6b45;font:800 15px 'Nunito',sans-serif}
+.namein{width:100%;font:700 22px 'Fredoka',sans-serif;color:var(--plum);padding:12px 16px;border-radius:18px;border:3px solid #b99cff;background:#fbf8ff}
 
-  .word-display {
-    font-family: var(--serif);
-    font-size: 28px;
-    font-weight: bold;
-    margin: 2px 0 4px;
-    color: var(--crust);
-  }
-  .root-note {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--crust-soft);
-    margin-bottom: 14px;
-  }
+/* stage */
+.stage-wrap{display:flex}
+.stage{position:relative;flex:1;border-radius:30px;background:var(--sky);border:3px solid #fff;box-shadow:0 8px 0 #d9e5f7;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:66px 18px 40px;min-height:560px}
+.sky{position:absolute;inset:0;width:100%;height:100%}
+.sky path{fill:none;stroke-width:26px}
+.stage .treat-box{width:min(100%,520px)}
+.stage-top{position:absolute;left:12px;right:12px;top:12px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.frost-row{display:flex;align-items:center;gap:7px;padding:6px 10px 6px 14px;background:rgba(255,255,255,.9);border-radius:999px;font-size:14px;font-weight:800;color:var(--plum)}
+.sw{width:40px;height:40px;border-radius:50%;border:3px solid #fff;cursor:pointer;box-shadow:0 2px 6px rgba(91,58,110,.25)}
+.sw.on{box-shadow:0 0 0 3px #fff,0 0 0 6px var(--btn)}
+.pack-badge{padding:8px 14px;background:rgba(255,255,255,.9);border-radius:999px;font-weight:800;font-size:14px;color:var(--plum);align-self:center}
+.stage-hint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-weight:800;font-size:14px;color:var(--soft)}
+.treat-box{position:relative;aspect-ratio:1/1;width:100%}
+.treat-svg{position:absolute;inset:0;width:100%;height:100%}
+.top,.mtop{position:absolute}
+.top svg,.mtop svg{width:100%;height:100%;display:block;pointer-events:none;filter:drop-shadow(0 3px 2px rgba(91,58,110,.22))}
+.top{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.top.dragging{cursor:grabbing;z-index:5;filter:drop-shadow(0 8px 6px rgba(91,58,110,.3))}
+.pop{animation:pop .75s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes pop{0%{transform:translateY(-70px) scale(.2);opacity:0}60%{opacity:1}100%{transform:none;opacity:1}}
+.done-spark{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;animation:tw 1.1s ease-in-out infinite alternate}
+@keyframes tw{from{opacity:.35}to{opacity:1}}
 
-  .options { display: flex; flex-direction: column; gap: 10px; }
-  .option-btn {
-    text-align: left;
-    background: #fff;
-    border: 1.5px solid var(--cream-dim);
-    border-radius: 10px;
-    padding: 12px 14px;
-    font-family: var(--serif);
-    font-size: 15px;
-    cursor: pointer;
-    transition: all 0.12s ease;
-    color: var(--crust);
-  }
-  .option-btn:hover:not(:disabled) { border-color: var(--icing-pink-deep); background: #fffdf9; transform: translateY(-1px); }
-  .option-btn.correct { background: #e2f1e6; border-color: var(--mint); animation: pop 0.35s ease; }
-  .option-btn.wrong { background: #f9e3e6; border-color: var(--icing-pink-deep); }
-  .option-btn:disabled { cursor: default; }
+/* shelf */
+.shelf-strip{margin-top:26px}
+.shelf-strip h2{margin:0 0 8px;font-size:22px;font-weight:600;color:var(--plum)}
+.shelf{display:flex;gap:14px;padding:12px 16px;min-height:150px;border-radius:26px;background:#fff;border:3px solid var(--line);border-bottom:10px solid #f7c6de;align-items:flex-start;overflow-x:auto}
+.big-shelf{flex-wrap:wrap}
+.shelf-item{display:flex;flex-direction:column;align-items:center;gap:4px;width:130px;flex:none}
+.shelf-item .mini{width:122px;border-radius:20px;background:var(--sky);padding:4px}
+.shelf-name{font-size:12px;font-weight:800;text-align:center;line-height:1.2}
+.shelf-empty{flex:1;align-self:center;text-align:center;font-weight:800;font-size:16px;color:#8a7896}
+.mini{position:relative}
 
-  @keyframes pop {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.04); }
-    100% { transform: scale(1); }
-  }
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-4px); }
-    75% { transform: translateX(4px); }
-  }
-  .card.shake-it { animation: shake 0.3s ease; }
+/* collection */
+.coll-row{margin-bottom:10px}
+.coll-name{font:600 17px 'Fredoka',sans-serif;color:var(--plum);margin-bottom:6px}
+.coll{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.coll-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:18px;border:2.5px solid #eadcf2;background:#faf7fc;font-size:11px;font-weight:800;text-align:center;color:#8a7896}
+.coll-item svg{width:52px;height:52px;filter:grayscale(1) brightness(1.5);opacity:.3}
+.coll-item.got{background:#fff5fb;border-color:#ff9cc8;color:var(--ink)}
+.coll-item.got svg{filter:none;opacity:1}
+.stats-row{display:flex;gap:18px;flex-wrap:wrap;margin:14px 0;font-size:16px;color:var(--soft)}
 
-  .feedback {
-    margin-top: 16px;
-    font-family: var(--mono);
-    font-size: 13px;
-    min-height: 20px;
-  }
-  .feedback.good { color: #3d6b47; }
-  .feedback.bad { color: var(--icing-pink-deep); }
-  .combo-tag {
-    color: var(--butter);
-    font-weight: bold;
-    margin-left: 8px;
-    display: inline-block;
-    animation: combo-pop 0.4s ease;
-  }
-  .combo-tag.tier2 { color: #e8862c; }
-  .combo-tag.tier3 { color: var(--icing-pink-deep); font-size: 1.12em; }
-  @keyframes combo-pop {
-    0% { transform: scale(0.5) rotate(-8deg); opacity: 0; }
-    60% { transform: scale(1.18) rotate(4deg); opacity: 1; }
-    100% { transform: scale(1) rotate(0); }
-  }
+/* match mode (kept from the original game, restyled) */
+.ticket-label{display:inline-block;padding:6px 14px;border-radius:999px;background:#f1e6ff;color:var(--plum);font-weight:800;font-size:14px;margin-bottom:12px}
+.customer-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.customer-avatar{flex:none}
+.speech-bubble{background:#fff8e0;border:2px solid #ffd24d;border-radius:18px;padding:10px 14px;font-size:16px;line-height:1.35}
+.match-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.match-col-label{font:600 17px 'Fredoka',sans-serif;color:var(--plum);margin-bottom:8px}
+.match-item{padding:12px 14px;margin-bottom:8px;border-radius:16px;border:3px solid #eadcf2;background:#fff;cursor:pointer;font-size:15px;line-height:1.3;min-height:48px}
+.match-item:hover{background:#faf5ff}
+.match-item.selected{border-color:var(--btn);background:#f4eeff}
+.match-item.matched{border-color:#2e9e62;background:#d3f8e0;cursor:default;opacity:.8}
+.match-item.wrong-flash{border-color:#d9475f;background:#ffe3e6}
+.feedback{min-height:26px;margin-top:10px;font-size:17px;font-weight:800}
+.feedback.good{color:#2e7d52}.feedback.bad{color:#b3243c}
+.next-btn{display:none;margin-top:12px;border:none;cursor:pointer;background:var(--btn);color:#fff;font:600 18px 'Fredoka',sans-serif;padding:12px 24px;border-radius:999px;box-shadow:0 5px 0 #5c1a6e;min-height:48px}
+.next-btn.show{display:inline-block}
+.combo-tag{display:inline-block;margin-left:8px;padding:3px 10px;border-radius:999px;background:#ffd54f;color:var(--plum);font-size:13px}
+.confetti-piece{position:fixed;top:-10px;width:10px;height:14px;border-radius:3px;z-index:50;pointer-events:none}
 
-  .fly-point {
-    position: fixed;
-    font-family: var(--mono);
-    font-weight: bold;
-    font-size: 15px;
-    color: var(--butter);
-    pointer-events: none;
-    z-index: 998;
-    white-space: nowrap;
-  }
+/* parent settings (kept) */
+.parent-settings{margin-top:22px;border-top:2px dashed #eadcf2;padding-top:14px}
+.parent-settings summary{cursor:pointer;font:600 17px 'Fredoka',sans-serif;color:var(--soft);min-height:44px;display:flex;align-items:center}
+.settings-body{font-size:15px;font-weight:700;line-height:1.5}
+.settings-body input{font:700 15px 'Nunito',sans-serif;padding:8px 10px;border-radius:10px;border:2px solid #d9c6f2;margin:4px 0}
+.settings-save-btn{border:none;background:var(--btn);color:#fff;font:700 14px 'Nunito',sans-serif;padding:9px 14px;border-radius:999px;cursor:pointer;margin:4px 0 4px 6px;min-height:40px}
+.settings-note{font-size:13px;color:var(--soft);font-weight:700}
+.box-section-title{font:600 16px 'Fredoka',sans-serif;color:var(--plum);margin:14px 0 6px}
+.report-row{padding:6px 0;border-bottom:1px solid #f1e6f5;font-size:14px}
+.report-correct{color:#1f6b45}.report-wrong{color:#9e1f36}
 
-  .next-btn {
-    margin-top: 18px;
-    font-family: var(--mono);
-    font-size: 13px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    background: var(--crust);
-    color: var(--butter);
-    border: none;
-    border-radius: 20px;
-    padding: 10px 20px;
-    cursor: pointer;
-    display: none;
-  }
-  .next-btn.show { display: inline-block; }
-  .next-btn:hover { background: var(--crust-soft); }
+footer{margin-top:26px;text-align:center;font-size:13px;color:#8a7896}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-  /* ---- Match mode ---- */
-  .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
-  .match-col-label {
-    font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--crust-soft); margin-bottom: 6px;
-  }
-  .match-item {
-    background: #fff;
-    border: 1.5px solid var(--cream-dim);
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    margin-bottom: 8px;
-  }
-  .match-item.selected { border-color: var(--butter); background: #fff8e2; }
-  .match-item.matched { background: #e2f1e6; border-color: var(--mint); opacity: 0.7; cursor: default; }
-  .match-item.wrong-flash { background: #f9e3e6; border-color: var(--icing-pink-deep); }
-
-  .empty-state {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--crust-soft);
-    text-align: center;
-    padding: 30px 10px;
-  }
-
-  /* ---- My Bakery tab: decorate-the-cake scene ---- */
-  .shop-scene {
-    background: var(--sky-soft);
-    border-radius: 14px;
-    padding: 0;
-    margin-bottom: 20px;
-    height: 270px;
-    position: relative;
-    overflow: hidden;
-  }
-  .cake-stand-label {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    background: #fff;
-    border: 1.5px solid var(--icing-pink-deep);
-    border-radius: 20px;
-    padding: 4px 12px;
-    color: var(--icing-pink-deep);
-    white-space: nowrap;
-    z-index: 3;
-  }
-  .cake {
-    position: absolute;
-    bottom: 46px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 62%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 1;
-  }
-  .cake .tier-top {
-    width: 60%;
-    height: 46px;
-    background: linear-gradient(180deg, #fff9f0 0%, #ffeccb 100%);
-    border: 3px solid var(--crust-soft);
-    border-radius: 10px;
-    margin-bottom: -3px;
-  }
-  .cake .tier-bottom {
-    width: 100%;
-    height: 62px;
-    background: linear-gradient(180deg, #fbe3ea 0%, #f3bdcb 100%);
-    border: 3px solid var(--crust-soft);
-    border-radius: 10px;
-  }
-  .cake-plate {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 74%;
-    height: 16px;
-    background: var(--shelf);
-    border-radius: 50%;
-    box-shadow: 0 3px 0 var(--crust-soft);
-    z-index: 0;
-  }
-  .cake-table {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 30px;
-    background: var(--crust-soft);
-  }
-  .decor-slots {
-    position: absolute;
-    top: 15%;
-    left: 12%;
-    right: 12%;
-    bottom: 20%;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    align-items: center;
-    justify-items: center;
-    z-index: 2;
-  }
-  .decor-slot {
-    font-size: 22px;
-    filter: grayscale(1) opacity(0.22);
-    transition: filter 0.3s ease;
-  }
-  .decor-slot.owned {
-    visibility: hidden;
-  }
-  .cake-topping {
-    position: absolute;
-    font-size: 26px;
-    cursor: grab;
-    z-index: 4;
-    touch-action: none;
-    user-select: none;
-    animation: bounce-in 0.35s ease;
-  }
-  .cake-topping.dragging {
-    cursor: grabbing;
-    transform: scale(1.18);
-    filter: drop-shadow(0 4px 6px rgba(90,56,37,0.35));
-    z-index: 5;
-  }
-  .cake-hint {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--crust-soft);
-    margin: -6px 0 14px;
-  }
-
-  .box-section-title {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--icing-pink-deep);
-    margin: 18px 0 10px;
-  }
-  .treat-shelf {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    font-size: 30px;
-    background: #fff;
-    border: 1px dashed var(--cream-dim);
-    border-radius: 10px;
-    padding: 14px;
-    min-height: 50px;
-  }
-  .treat-shelf .treat { animation: bounce-in 0.3s ease; }
-  @keyframes bounce-in {
-    0% { transform: scale(0.4); opacity: 0; }
-    70% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(1); }
-  }
-  .shop-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 10px;
-  }
-  .shop-item {
-    background: #fff;
-    border: 1px solid var(--cream-dim);
-    border-radius: 10px;
-    padding: 10px;
-    text-align: center;
-    font-size: 13px;
-  }
-  .shop-item .shop-emoji { font-size: 28px; display: block; margin-bottom: 4px; }
-  .shop-buy-btn {
-    margin-top: 6px;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    background: var(--icing-pink-deep);
-    color: #fff;
-    border: none;
-    border-radius: 14px;
-    padding: 6px 10px;
-    cursor: pointer;
-    width: 100%;
-  }
-  .shop-buy-btn:disabled { background: var(--cream-dim); color: var(--crust-soft); cursor: default; }
-  .shop-buy-btn.owned { background: var(--mint); }
-
-  .parent-settings {
-    margin-top: 22px;
-    border: 1px dashed var(--cream-dim);
-    border-radius: 10px;
-    padding: 10px 14px;
-  }
-  .parent-settings summary {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--crust-soft);
-    cursor: pointer;
-  }
-  .settings-body { margin-top: 10px; font-size: 13px; }
-  .settings-body input[type="number"] {
-    width: 60px;
-    padding: 4px 6px;
-    border: 1px solid var(--cream-dim);
-    border-radius: 6px;
-    font-size: 13px;
-    margin-top: 4px;
-  }
-  .settings-save-btn {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    background: var(--crust);
-    color: var(--butter);
-    border: none;
-    border-radius: 14px;
-    padding: 6px 12px;
-    margin-left: 8px;
-    cursor: pointer;
-  }
-  .settings-note {
-    display: block;
-    color: var(--crust-soft);
-    font-size: 11px;
-    margin-top: 8px;
-    line-height: 1.5;
-  }
-  .parent-report {
-    max-height: 200px;
-    overflow-y: auto;
-    margin-bottom: 6px;
-  }
-  .report-list { display: flex; flex-direction: column; gap: 6px; }
-  .report-row {
-    font-size: 12px;
-    padding: 6px 8px;
-    border-radius: 8px;
-    border: 1px solid var(--cream-dim);
-  }
-  .report-row.report-correct { border-color: #b9dcae; background: #f2f9ee; }
-  .report-row.report-wrong { border-color: #f0b8b8; background: #fdf0f0; }
-  .report-row .settings-note { margin-top: 2px; }
-
-  footer {
-    text-align: center;
-    margin-top: 22px;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--crust-soft);
-    letter-spacing: 1px;
-  }
-
-  @media (max-width: 480px) {
-    .match-grid { grid-template-columns: 1fr; }
-  }
-
-  .confetti-piece {
-    position: fixed;
-    top: -10px;
-    width: 8px;
-    height: 14px;
-    opacity: 0.9;
-    pointer-events: none;
-    z-index: 999;
-  }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div class="stamp">The Vocabulary Bakeshop</div>
-    <h1>ADELYN'S WORD BAKERY</h1>
-    <div class="subtitle">Run the counter, serve every customer, and grow your very own bakery.</div>
+  <header class="site-top">
+    <div class="brand">
+      <svg viewBox="0 0 100 100" width="56" height="56" aria-hidden="true">
+        <path d="M22 58 L30 94 L70 94 L78 58 Z" fill="#b99cff" class="ol"/>
+        <path d="M36 60 L40 92 M50 60 L50 92 M64 60 L60 92" fill="none" class="ol2"/>
+        <path d="M16 60 C8 48 22 38 30 42 C28 26 48 22 52 32 C58 20 78 26 72 40 C86 38 92 54 84 60 Z" fill="#ffb8dc" class="ol"/>
+        <circle cx="52" cy="18" r="9" fill="#ff4d6d" class="ol"/>
+      </svg>
+      <div>
+        <h1 class="disp">Adelyn's Rainbow Bakery</h1>
+        <div class="subtitle">Answer word questions, open gifts, decorate your treats</div>
+      </div>
+    </div>
+    <div class="pills">
+      <div class="pill" style="border-color:#ffd24d">
+        <svg viewBox="0 0 100 100" width="22" height="22" aria-hidden="true"><polygon points="50,6 61,38 95,38 67,58 78,92 50,72 22,92 33,58 5,38 39,38" fill="#ffd84d" class="ol"/></svg>
+        <span id="streakStat">0 in a row</span>
+      </div>
+      <div class="pill" style="border-color:#ff9cc8">
+        <svg viewBox="0 0 100 100" width="22" height="22" aria-hidden="true"><path d="M50 88 C20 68 6 50 16 32 C26 14 46 18 50 34 C54 18 74 14 84 32 C94 50 80 68 50 88 Z" fill="#ff5fa2" class="ol"/></svg>
+        <span id="rightStat">0 words right</span>
+      </div>
+      <div class="pill" style="border-color:#b99cff"><span id="dayStat">0 day streak</span></div>
+      <button class="pill toggle" id="readToggle"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="currentColor"/><path d="M16 9 Q18 12 16 15 M18.5 6.5 Q22 12 18.5 17.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Read to me: off</span></button>
+    </div>
   </header>
 
-  <div class="rank-bar">
-    <div><span class="rank-name" id="rankName">Kitchen Helper</span></div>
-    <div class="sprinkles" id="sprinklesDisplay">✨ 0</div>
-    <div class="day-streak" id="dayStreakDisplay">🔥 0 day streak</div>
-  </div>
-
-  <div class="tabs">
+  <nav class="tabs">
     <button class="tab active" data-mode="quiz">Bake!</button>
     <button class="tab" data-mode="match">Match Orders</button>
     <button class="tab" data-mode="shop">My Bakery</button>
-  </div>
+  </nav>
 
-  <div class="card" id="gameCard">
-    <!-- populated by JS -->
-  </div>
+  <div id="gameCard"></div>
 
-  <footer>ADELYN'S WORD BAKERY &middot; Vocabulary, Grade 4 &middot; works fully offline, saved right here on this device</footer>
+  <footer>Adelyn's Rainbow Bakery &middot; Vocabulary, Grade 4 &middot; progress saves right here on this device</footer>
 </div>
 
 <script>
+
 // ---------- Word bank ----------
 // Pulled straight from Adelyn's real Vocabulary & Reading curriculum
 // (root words + frequency words, all 36 weeks).
@@ -959,7 +591,6 @@ function rootNoteLine(item) {
   return "Frequency word — shows up all over her reading";
 }
 
-// ---------- Daily visit / streak / welcome banner ----------
 function checkDailyVisit() {
   const today = todayStr();
   if (state.lastVisitDate === today) return false;
@@ -975,175 +606,6 @@ function checkDailyVisit() {
   return true;
 }
 
-function renderWelcomeBanner() {
-  const card = document.getElementById("gameCard");
-  card.innerHTML = `
-    <div class="intro-emoji">\uD83E\uDDC1</div>
-    <div class="intro-title">Welcome back to the bakery!</div>
-    <div class="intro-body">Day streak: <b>${state.dayStreak} \uD83D\uDD25</b> \u2014 here's <b>+15 \u2728</b> for showing up today.
-    The counter's getting busy \u2014 ready to take some orders?</div>
-    <button class="begin-btn" id="beginDayBtn">Open the bakery \u2192</button>
-  `;
-  document.getElementById("beginDayBtn").onclick = () => {
-    renderRankBar();
-    startQuiz();
-  };
-}
-
-// ---------- Quiz mode (Bake!) ----------
-function startQuiz() {
-  quizPool = buildRoundPool(3, 2);
-  quizIndex = 0;
-  pendingSpecial = state.specialDateUsed !== todayStr();
-  saveState();
-  renderQuizQuestion();
-}
-
-// Stops the rush-order countdown (leaving the question, answering, or
-// bailing out of quiz mode entirely) so it never keeps ticking in the
-// background or leaks a stale interval onto the next question.
-function clearRushTimer() {
-  if (rushIntervalId !== null) { clearInterval(rushIntervalId); rushIntervalId = null; }
-  currentRush = null;
-}
-
-function renderQuizQuestion() {
-  clearRushTimer();
-  const card = document.getElementById("gameCard");
-  card.classList.remove("shake-it");
-  if (quizIndex >= quizPool.length) {
-    card.innerHTML = '<div class="empty-state">\uD83C\uDF89 The line has cleared \u2014 great shift! Come back for another batch of orders whenever you like.<br><br>' +
-      '<button class="next-btn show" id="restartQuiz">Start a new batch</button></div>';
-    document.getElementById("restartQuiz").onclick = startQuiz;
-    return;
-  }
-  const item = quizPool[quizIndex];
-  const useDefinitionQuestion = Math.random() < 0.55;
-  const isReview = !isActive(item);
-  const isSpecial = quizIndex === 0 && pendingSpecial;
-  const isRush = Math.random() < RUSH_CHANCE;
-  const customer = randomCustomer();
-  const ticketLabel = isReview
-    ? "Order #" + (quizIndex + 1) + " of " + quizPool.length + " \u2014 \u21BB RE-BAKE"
-    : "Order #" + (quizIndex + 1) + " of " + quizPool.length;
-
-  let optionsHtml = "";
-  let askLine = "";
-
-  if (useDefinitionQuestion) {
-    const opts = shuffle([item.definition, ...pickDistractorDefinitions(item, 3)]);
-    optionsHtml = opts.map(o =>
-      `<button class="option-btn" data-correct="${o === item.definition}">${o}</button>`
-    ).join("");
-    askLine = "\u201cI keep hearing the word \u2018" + item.word + "\u2019 \u2014 what does that even mean?\u201d";
-  } else {
-    const blanked = blankOutWord(item.example, item.word);
-    const opts = shuffle([item.word, ...pickDistractorWords(item, 3)]);
-    optionsHtml = opts.map(o =>
-      `<button class="option-btn" data-correct="${o.toLowerCase() === item.word.toLowerCase()}">${o}</button>`
-    ).join("");
-    askLine = "\u201cCan you fill in my order note? \u2018" + blanked + "\u2019\u201d";
-  }
-
-  // For a fill-in-the-blank order, the word itself is the answer — showing
-  // it above the sentence would give it away for free. Only the
-  // definition-question shows the word up front; the fill-in-blank reveals
-  // word + root note as part of the feedback, after she's answered.
-  const wordBlockHtml = useDefinitionQuestion
-    ? `<div class="word-display">${item.word}</div><div class="root-note">${rootNoteLine(item)}</div>`
-    : "";
-
-  card.innerHTML = `
-    <div class="ticket-label ${isReview ? 'review' : ''}">${ticketLabel}</div>
-    ${isSpecial ? '<div class="special-flag">\u2B50 Today\'s Special \u2014 Double Sprinkles</div>' : ''}
-    ${isRush ? '<div class="rush-flag" id="rushFlag">\uD83C\uDFC3 Rush order \u2014 answer fast for 2x!</div>' : ''}
-    <div class="customer-row">
-      <div class="customer-avatar">${customer.emoji}</div>
-      <div class="speech-bubble"><span class="customer-name">${customer.name}:</span> ${askLine}</div>
-    </div>
-    ${isRush ? '<div class="rush-bar-track"><div class="rush-bar-fill" id="rushBarFill"></div></div>' : ''}
-    <div id="wordBlock">${wordBlockHtml}</div>
-    <div class="options">${optionsHtml}</div>
-    <div class="feedback" id="feedback"></div>
-    <button class="next-btn" id="nextBtn">Next order \u2192</button>
-  `;
-
-  card.querySelectorAll(".option-btn").forEach(btn => {
-    btn.addEventListener("click", () => handleQuizAnswer(btn, item, isSpecial, useDefinitionQuestion));
-  });
-
-  if (isRush) {
-    currentRush = { deadline: Date.now() + RUSH_WINDOW_MS };
-    const fill = document.getElementById("rushBarFill");
-    rushIntervalId = setInterval(() => {
-      const remaining = currentRush.deadline - Date.now();
-      if (remaining <= 0) {
-        fill.style.width = "0%";
-        document.getElementById("rushFlag").textContent = "Rush window closed \u2014 still worth normal sprinkles.";
-        document.getElementById("rushFlag").classList.add("rush-closed");
-        clearInterval(rushIntervalId);
-        rushIntervalId = null;
-        return;
-      }
-      fill.style.width = (remaining / RUSH_WINDOW_MS * 100) + "%";
-    }, 100);
-  }
-}
-
-function handleQuizAnswer(btn, item, isSpecial, useDefinitionQuestion) {
-  const allBtns = document.querySelectorAll(".option-btn");
-  allBtns.forEach(b => b.disabled = true);
-  const isCorrect = btn.dataset.correct === "true";
-  const rushBonus = !!currentRush && Date.now() <= currentRush.deadline;
-  clearRushTimer();
-  const fb = document.getElementById("feedback");
-
-  recordAnswer(item.id, isCorrect, {
-    subject: "vocabulary",
-    word: item.word,
-    question: useDefinitionQuestion ? "What does this word mean?" : "Fill in the blank",
-    givenAnswer: btn.textContent,
-    correctAnswer: useDefinitionQuestion ? item.definition : item.word,
-    wasCorrect: isCorrect,
-  });
-  if (isSpecial) { state.specialDateUsed = todayStr(); pendingSpecial = false; }
-
-  if (!useDefinitionQuestion) {
-    document.getElementById("wordBlock").innerHTML =
-      `<div class="word-display">${item.word}</div><div class="root-note">${rootNoteLine(item)} \u2014 ${item.definition}</div>`;
-  }
-
-  if (isCorrect) {
-    btn.classList.add("correct");
-    let gain = 10 + Math.min(state.streak, 10);
-    if (isSpecial) gain *= 2;
-    if (rushBonus) gain *= 2;
-    state.lifetimePoints += gain;
-    state.sprinkles += gain;
-    state.streak += 1;
-    fb.className = "feedback good";
-    fb.innerHTML = "\u2713 " + randomLine(CORRECT_LINES) + " +" + gain + " \u2728" +
-      (rushBonus ? '<span class="combo-tag tier2">\ud83c\udfc3 Rush bonus!</span>' : "") +
-      comboTagHtml(state.streak);
-    flyPoints(btn, gain);
-    if (state.streak > 0 && state.streak % 4 === 0) celebrate(state.streak % 8 !== 0);
-  } else {
-    btn.classList.add("wrong");
-    allBtns.forEach(b => { if (b.dataset.correct === "true") b.classList.add("correct"); });
-    state.streak = 0;
-    fb.className = "feedback bad";
-    fb.textContent = "\u2717 " + randomLine(WRONG_LINES);
-    document.getElementById("gameCard").classList.add("shake-it");
-  }
-
-  renderRankBar();
-  saveState();
-  document.getElementById("nextBtn").classList.add("show");
-  document.getElementById("nextBtn").onclick = () => {
-    quizIndex++;
-    renderQuizQuestion();
-  };
-}
 
 // ---------- Match mode (Match Orders) ----------
 function startMatch() {
@@ -1163,7 +625,7 @@ function renderMatch() {
   card.innerHTML = `
     <div class="ticket-label">Match Orders</div>
     <div class="customer-row">
-      <div class="customer-avatar">\uD83E\uDDD1\u200D\uD83C\uDF73</div>
+      <div class="customer-avatar"><svg viewBox="0 0 100 100" width="54" height="54" aria-hidden="true"><path d="M22 58 L30 94 L70 94 L78 58 Z" fill="#b99cff" class="ol"/><path d="M16 60 C8 48 22 38 30 42 C28 26 48 22 52 32 C58 20 78 26 72 40 C86 38 92 54 84 60 Z" fill="#ffb8dc" class="ol"/><circle cx="52" cy="18" r="9" fill="#ff4d6d" class="ol"/></svg></div>
       <div class="speech-bubble">The counter's stacked with mixed-up order tickets \u2014 match each word to its definition before they pile up!</div>
     </div>
     <div class="match-grid">
@@ -1249,7 +711,7 @@ function tryMatch() {
     state.streak += 1;
     matchedCount++;
     fb.className = "feedback good";
-    fb.innerHTML = "\u2713 Match! +" + gain + " \u2728 (" + matchedCount + " of " + matchPool.length + " orders filled)" + comboTagHtml(state.streak);
+    fb.innerHTML = "\u2713 Match! (" + matchedCount + " of " + matchPool.length + " orders filled)" + comboTagHtml(state.streak);
     flyPoints(matchSelectedDef.el, gain);
     if (matchedCount === matchPool.length) {
       fb.innerHTML += " \u2014 Whole board cleared!";
@@ -1275,113 +737,6 @@ function tryMatch() {
   saveState();
 }
 
-// ---------- My Bakery (shop + treat collection) ----------
-function renderShop() {
-  const card = document.getElementById("gameCard");
-  const ownedCount = SHOP_ITEMS.filter(it => state.shopOwned[it.id]).length;
-  const masteredWords = WORDS.filter(w => {
-    const m = state.mastery[w.id];
-    return m && m.correct > 0 && !m.needsReview;
-  });
-
-  const decorSlotsHtml = SHOP_ITEMS.map(it => {
-    const owned = !!state.shopOwned[it.id];
-    return `<span class="decor-slot ${owned ? 'owned' : ''}" title="${owned ? it.name : it.name + ' (not bought yet)'}">${it.emoji}</span>`;
-  }).join("");
-
-  const toppingsHtml = SHOP_ITEMS.map((it, i) => {
-    if (!state.shopOwned[it.id]) return "";
-    const pos = state.decorPositions[it.id] || DEFAULT_DECOR_POS[i];
-    return `<span class="cake-topping" data-id="${it.id}" title="${it.name} \u2014 drag me!" style="left:${pos.x}%; top:${pos.y}%;">${it.emoji}</span>`;
-  }).join("");
-
-  const shelfTreats = masteredWords.length
-    ? masteredWords.map(w => `<span class="treat" title="${w.word}">${treatFor(w.id)}</span>`).join("")
-    : '<span style="font-size:13px; font-family: var(--mono); color: var(--crust-soft);">No treats baked yet \u2014 master a word in Bake! to add one to the shelf.</span>';
-
-  const shopHtml = SHOP_ITEMS.map(it => {
-    const owned = !!state.shopOwned[it.id];
-    const canAfford = state.sprinkles >= it.cost;
-    return `<div class="shop-item">
-      <span class="shop-emoji">${it.emoji}</span>
-      ${it.name}<br><span style="color: var(--crust-soft); font-size:11px;">\u2728 ${it.cost}</span>
-      <button class="shop-buy-btn ${owned ? 'owned' : ''}" data-id="${it.id}" ${owned || !canAfford ? 'disabled' : ''}>
-        ${owned ? '\u2713 Placed' : canAfford ? 'Buy' : 'Need more \u2728'}
-      </button>
-    </div>`;
-  }).join("");
-
-  card.innerHTML = `
-    <div class="ticket-label">Decorate Your Cake (${ownedCount} of ${SHOP_ITEMS.length})</div>
-    <div class="cake-hint">\uD83D\uDC46 Drag any topping to move it around the cake.</div>
-    <div class="shop-scene" id="cakeScene">
-      <div class="cake-stand-label">Adelyn's Cake</div>
-      <div class="cake">
-        <div class="tier-top"></div>
-        <div class="tier-bottom"></div>
-      </div>
-      <div class="cake-plate"></div>
-      <div class="cake-table"></div>
-      <div class="decor-slots">${decorSlotsHtml}</div>
-      ${toppingsHtml}
-    </div>
-    <div class="box-section-title">Treat Shelf (${masteredWords.length} mastered)</div>
-    <div class="treat-shelf">${shelfTreats}</div>
-    <div class="box-section-title">Decoration Box \u2014 tap a faded item above to spot what it is, then buy it here</div>
-    <div class="shop-grid">${shopHtml}</div>
-
-    <details class="parent-settings" id="parentSettingsDetails" ${parentSettingsOpen ? "open" : ""}>
-      <summary>Parent Settings</summary>
-      <div class="settings-body">
-        <label for="webAppUrlInput">ELA Pastry Kitchen Web App URL (auto-sync her current week):</label><br>
-        <input type="text" id="webAppUrlInput" placeholder="https://script.google.com/macros/s/.../exec"
-          value="${state.webAppUrl}" style="width:100%; max-width:340px;">
-        <button class="settings-save-btn" id="saveUrlBtn">Save &amp; Sync Now</button>
-        <p class="settings-note" id="syncStatusNote">${syncStatusLine()}</p>
-
-        <div class="box-section-title">Words to work on</div>
-        <div class="parent-report">${missedWordsReportHtml()}</div>
-
-        <div class="box-section-title">Recent answers</div>
-        <div class="parent-report">${recentAnswersHtml()}</div>
-
-        <label for="currentWeekInput">Or set her current week by hand:</label><br>
-        <input type="number" id="currentWeekInput" min="1" max="36" value="${state.currentWeek}">
-        <button class="settings-save-btn" id="saveWeekBtn">Save</button>
-        <span id="weekSavedNote" class="settings-note"></span>
-        <p class="settings-note">Words from any week after this number stay hidden either way. With a Web
-        App URL saved above, this number updates itself every time the game opens \u2014 set it by hand only
-        if you're not using auto-sync, or want to override it for now.</p>
-      </div>
-    </details>
-  `;
-
-  card.querySelectorAll(".shop-buy-btn").forEach(btn => {
-    btn.addEventListener("click", () => buyItem(btn.dataset.id));
-  });
-
-  attachDragHandlers(document.getElementById("cakeScene"));
-
-  const detailsEl = document.getElementById("parentSettingsDetails");
-  detailsEl.addEventListener("toggle", () => { parentSettingsOpen = detailsEl.open; });
-
-  document.getElementById("saveWeekBtn").addEventListener("click", () => {
-    const input = document.getElementById("currentWeekInput");
-    const week = Math.max(1, Math.min(36, parseInt(input.value, 10) || 1));
-    input.value = week;
-    state.currentWeek = week;
-    saveState();
-    document.getElementById("weekSavedNote").textContent = "\u2713 Saved \u2014 now on week " + week + ".";
-  });
-
-  document.getElementById("saveUrlBtn").addEventListener("click", async () => {
-    state.webAppUrl = document.getElementById("webAppUrlInput").value.trim();
-    saveState();
-    document.getElementById("syncStatusNote").textContent = "Syncing\u2026";
-    await syncCurrentWeek();
-    renderShop();
-  });
-}
 
 function missedWordsReportHtml() {
   const needsReview = WORDS.filter(w => {
@@ -1409,7 +764,7 @@ function recentAnswersHtml() {
       ? ""
       : ` — answered "${a.givenAnswer}", correct answer "${a.correctAnswer}"`;
     return `<div class="report-row ${a.correct ? "report-correct" : "report-wrong"}">
-      ${a.correct ? "✅" : "❌"} <strong>${a.word}</strong>${detail}
+      ${a.correct ? "\u2713" : "\u2717"} <strong>${a.word}</strong>${detail}
       <div class="settings-note">${when}</div>
     </div>`;
   }).join("");
@@ -1425,59 +780,12 @@ function syncStatusLine() {
     : "\u26A0 Couldn't reach the Sheet at last try (" + when + ") \u2014 using last known week " + state.currentWeek + ".";
 }
 
-function attachDragHandlers(sceneEl) {
-  sceneEl.querySelectorAll(".cake-topping").forEach(el => {
-    el.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      const sceneRect = sceneEl.getBoundingClientRect();
-      const startLeftPx = el.offsetLeft;
-      const startTopPx = el.offsetTop;
-      const startX = e.clientX;
-      const startY = e.clientY;
-      el.setPointerCapture(e.pointerId);
-      el.classList.add("dragging");
-
-      function onMove(ev) {
-        const dx = ev.clientX - startX;
-        const dy = ev.clientY - startY;
-        const newLeft = Math.max(0, Math.min(sceneRect.width - el.offsetWidth, startLeftPx + dx));
-        const newTop = Math.max(0, Math.min(sceneRect.height - el.offsetHeight, startTopPx + dy));
-        el.style.left = newLeft + "px";
-        el.style.top = newTop + "px";
-      }
-      function onUp(ev) {
-        el.releasePointerCapture(ev.pointerId);
-        el.classList.remove("dragging");
-        el.removeEventListener("pointermove", onMove);
-        el.removeEventListener("pointerup", onUp);
-        state.decorPositions[el.dataset.id] = {
-          x: (el.offsetLeft / sceneRect.width) * 100,
-          y: (el.offsetTop / sceneRect.height) * 100
-        };
-        saveState();
-      }
-      el.addEventListener("pointermove", onMove);
-      el.addEventListener("pointerup", onUp);
-    });
-  });
-}
-
-function buyItem(id) {
-  const item = SHOP_ITEMS.find(it => it.id === id);
-  if (!item || state.shopOwned[id] || state.sprinkles < item.cost) return;
-  state.sprinkles -= item.cost;
-  state.shopOwned[id] = true;
-  renderRankBar();
-  saveState();
-  renderShop();
-  playTone();
-}
 
 // ---------- Celebration (confetti + tone, no assets) ----------
 // mini=true gives a smaller, quieter burst for the more frequent combo
 // milestones, so the full 24-piece version still feels special.
 function celebrate(mini) {
-  const colors = ["#e8a0ad", "#f0c14b", "#7fb88f", "#5a3825"];
+  const colors = ["#ff8cc6", "#ffd84d", "#7bd88f", "#74c0fc", "#b99cff"];
   const count = mini ? 10 : 24;
   for (let i = 0; i < count; i++) {
     const piece = document.createElement("div");
@@ -1519,31 +827,596 @@ function playTone(soft) {
   }
 }
 
-// ---------- Tabs ----------
+
+const DONE_SPARKS = "<path d=\"M90 104 Q92.88 117.12 106 120 Q92.88 122.88 90 136 Q87.12 122.88 74 120 Q87.12 117.12 90 104 Z\" fill=\"#ffd54f\"></path><path d=\"M440 96 Q442.52 107.48 454 110 Q442.52 112.52 440 124 Q437.48 112.52 426 110 Q437.48 107.48 440 96 Z\" fill=\"#ff8cc6\"></path><path d=\"M40 388 Q42.16 397.84 52 400 Q42.16 402.16 40 412 Q37.84 402.16 28 400 Q37.84 397.84 40 388 Z\" fill=\"#b99cff\"></path><path d=\"M486 365 Q488.7 377.3 501 380 Q488.7 382.7 486 395 Q483.3 382.7 471 380 Q483.3 377.3 486 365 Z\" fill=\"#8fd3ff\"></path><path d=\"M260 19 Q261.98 28.02 271 30 Q261.98 31.98 260 41 Q258.02 31.98 249 30 Q258.02 28.02 260 19 Z\" fill=\"#ffd54f\"></path>";
+
+// =====================================================================
+// RAINBOW BAKERY — treats, gift boxes, topping packs, display case,
+// 7 question types, Spanish card + read-aloud. Everything below builds
+// on the word bank, pacing, mastery and parent logging above.
+// =====================================================================
+const EXTRA = {"telephone": {"pos": "n", "syn": "phone", "es": "el teléfono", "esEx": "Adelyn llamó a su abuela por teléfono."}, "television": {"pos": "n", "syn": "TV", "es": "la televisión", "esEx": "Vimos un programa de animales en la televisión."}, "telescope": {"pos": "n", "syn": "spyglass", "es": "el telescopio", "esEx": "Con el telescopio vimos los cráteres de la luna."}, "however": {"pos": "conj", "syn": "but", "es": "sin embargo", "esEx": "Quería ir a la playa; sin embargo, empezó a llover."}, "although": {"pos": "conj", "syn": "even though", "es": "aunque", "esEx": "Aunque estaba cansada, terminó su tarea."}, "particular": {"pos": "adj", "syn": "specific", "es": "particular", "esEx": "Kenley tiene un puesto favorito en particular."}, "paragraph": {"pos": "n", "syn": "passage", "es": "el párrafo", "esEx": "Adelyn escribió un párrafo sobre el mercado."}, "biography": {"pos": "n", "syn": "life story", "es": "la biografía", "esEx": "Leímos la biografía de una inventora famosa."}, "photograph": {"pos": "n", "syn": "picture", "es": "la fotografía", "esEx": "Papá tomó una fotografía del atardecer."}, "determine": {"pos": "v", "syn": "figure out", "es": "determinar", "esEx": "Usamos un mapa para determinar la mejor ruta."}, "additional": {"pos": "adj", "syn": "extra", "es": "adicional", "esEx": "La maestra le dio una hoja adicional."}, "recognize": {"pos": "v", "syn": "identify", "es": "reconocer", "esEx": "No pude reconocer la ciudad de noche."}, "transport": {"pos": "v", "syn": "carry", "es": "transportar", "esEx": "Un barco puede transportar muchos contenedores."}, "portable": {"pos": "adj", "syn": "movable", "es": "portátil", "esEx": "Llevamos una bocina portátil en el tren."}, "report": {"pos": "v", "syn": "tell", "es": "informar", "esEx": "Adelyn va a informar lo que aprendió."}, "purpose": {"pos": "n", "syn": "reason", "es": "el propósito", "esEx": "El propósito del viaje era visitar a una amiga."}, "environment": {"pos": "n", "syn": "surroundings", "es": "el medio ambiente", "esEx": "Debemos cuidar el medio ambiente."}, "achieve": {"pos": "v", "syn": "accomplish", "es": "lograr", "esEx": "Practicó mucho para lograr su meta."}, "predict": {"pos": "v", "syn": "forecast", "es": "predecir", "esEx": "¿Puedes predecir qué pasará en el cuento?"}, "dictionary": {"pos": "n", "syn": "", "es": "el diccionario", "esEx": "Busqué la palabra en el diccionario."}, "dictate": {"pos": "v", "syn": "", "es": "dictar", "esEx": "Mamá va a dictar las palabras de ortografía."}, "ordinary": {"pos": "adj", "syn": "normal", "es": "ordinario", "esEx": "Fue un día ordinario, sin sorpresas."}, "opportunity": {"pos": "n", "syn": "chance", "es": "la oportunidad", "esEx": "Tuvimos la oportunidad de ver ballenas."}, "various": {"pos": "adj", "syn": "several", "es": "varios", "esEx": "Probamos varios sabores de helado."}, "inspect": {"pos": "v", "syn": "check", "es": "inspeccionar", "esEx": "El cocinero va a inspeccionar las frutas."}, "respect": {"pos": "n", "syn": "admiration", "es": "el respeto", "esEx": "Tratamos a los demás con respeto."}, "spectator": {"pos": "n", "syn": "viewer", "es": "el espectador", "esEx": "Cada espectador aplaudió al final."}, "especially": {"pos": "adv", "syn": "particularly", "es": "especialmente", "esEx": "Me gustan las frutas, especialmente el mango."}, "considerable": {"pos": "adj", "syn": "large", "es": "considerable", "esEx": "Caminamos una distancia considerable."}, "eventually": {"pos": "adv", "syn": "finally", "es": "finalmente", "esEx": "Finalmente llegamos a la cima de la montaña."}, "construct": {"pos": "v", "syn": "build", "es": "construir", "esEx": "Vamos a construir un castillo de arena."}, "instruct": {"pos": "v", "syn": "teach", "es": "instruir", "esEx": "El chef va a instruir a los ayudantes."}, "structure": {"pos": "n", "syn": "building", "es": "la estructura", "esEx": "La torre es una estructura muy alta."}, "appropriate": {"pos": "adj", "syn": "suitable", "es": "apropiado", "esEx": "Llevamos ropa apropiada para la lluvia."}, "obvious": {"pos": "adj", "syn": "clear", "es": "obvio", "esEx": "Era obvio que el perro tenía hambre."}, "generally": {"pos": "adv", "syn": "usually", "es": "generalmente", "esEx": "Generalmente desayunamos a las ocho."}, "interrupt": {"pos": "v", "syn": "cut in", "es": "interrumpir", "esEx": "Es de mala educación interrumpir."}, "erupt": {"pos": "v", "syn": "burst", "es": "hacer erupción", "esEx": "El volcán puede hacer erupción."}, "disrupt": {"pos": "v", "syn": "disturb", "es": "perturbar", "esEx": "El ruido puede perturbar la clase."}, "entire": {"pos": "adj", "syn": "whole", "es": "entero", "esEx": "Se comió el pastel entero."}, "immediately": {"pos": "adv", "syn": "at once", "es": "inmediatamente", "esEx": "Adelyn reconoció a su prima inmediatamente."}, "gradually": {"pos": "adv", "syn": "slowly", "es": "poco a poco", "esEx": "La planta creció poco a poco."}, "describe": {"pos": "v", "syn": "explain", "es": "describir", "esEx": "Describe tu comida favorita."}, "subscribe": {"pos": "v", "syn": "sign up", "es": "suscribirse", "esEx": "Quiero suscribirme a una revista de ciencia."}, "script": {"pos": "n", "syn": "lines", "es": "el guion", "esEx": "Los actores leyeron el guion."}, "numerous": {"pos": "adj", "syn": "many", "es": "numeroso", "esEx": "Vimos numerosas estrellas en el cielo."}, "tremendous": {"pos": "adj", "syn": "huge", "es": "tremendo", "esEx": "Hubo una tormenta tremenda."}, "enormous": {"pos": "adj", "syn": "gigantic", "es": "enorme", "esEx": "La ballena era enorme."}, "biology": {"pos": "n", "syn": "life science", "es": "la biología", "esEx": "En biología estudiamos los seres vivos."}, "antibiotic": {"pos": "n", "syn": "medicine", "es": "el antibiótico", "esEx": "El doctor le dio un antibiótico."}, "biodegradable": {"pos": "adj", "syn": "", "es": "biodegradable", "esEx": "Esta bolsa es biodegradable."}, "rarely": {"pos": "adv", "syn": "seldom", "es": "rara vez", "esEx": "Rara vez llueve en el desierto."}, "frequently": {"pos": "adv", "syn": "often", "es": "frecuentemente", "esEx": "Visitamos el mercado frecuentemente."}, "constantly": {"pos": "adv", "syn": "always", "es": "constantemente", "esEx": "El río corre constantemente."}, "photocopy": {"pos": "n", "syn": "copy", "es": "la fotocopia", "esEx": "Hice una fotocopia del mapa."}, "photosynthesis": {"pos": "n", "syn": "", "es": "la fotosíntesis", "esEx": "Las plantas hacen la fotosíntesis con el sol."}, "photogenic": {"pos": "adj", "syn": "", "es": "fotogénico", "esEx": "Nuestro gato es muy fotogénico."}, "suddenly": {"pos": "adv", "syn": "all at once", "es": "de repente", "esEx": "De repente, empezó a llover."}, "previously": {"pos": "adv", "syn": "before", "es": "anteriormente", "esEx": "Anteriormente vivimos en otra ciudad."}, "currently": {"pos": "adv", "syn": "now", "es": "actualmente", "esEx": "Actualmente estamos en México."}, "permit": {"pos": "v", "syn": "allow", "es": "permitir", "esEx": "Mamá va a permitir una galleta más."}, "submit": {"pos": "v", "syn": "hand in", "es": "entregar", "esEx": "Voy a entregar mi tarea hoy."}, "dismiss": {"pos": "v", "syn": "send away", "es": "despedir", "esEx": "La maestra va a despedir a la clase."}, "approximately": {"pos": "adv", "syn": "about", "es": "aproximadamente", "esEx": "El viaje dura aproximadamente dos horas."}, "examine": {"pos": "v", "syn": "inspect", "es": "examinar", "esEx": "Vamos a examinar la hoja con una lupa."}, "observe": {"pos": "v", "syn": "watch", "es": "observar", "esEx": "Me gusta observar los pájaros."}, "visible": {"pos": "adj", "syn": "seen", "es": "visible", "esEx": "La luna es visible esta noche."}, "invisible": {"pos": "adj", "syn": "unseen", "es": "invisible", "esEx": "El aire es invisible."}, "vision": {"pos": "n", "syn": "sight", "es": "la visión", "esEx": "El águila tiene muy buena visión."}, "compare": {"pos": "v", "syn": "", "es": "comparar", "esEx": "Vamos a comparar dos manzanas."}, "contrast": {"pos": "n", "syn": "difference", "es": "el contraste", "esEx": "Hay un gran contraste entre el día y la noche."}, "illustrate": {"pos": "v", "syn": "show", "es": "ilustrar", "esEx": "Adelyn va a ilustrar su cuento."}, "audience": {"pos": "n", "syn": "crowd", "es": "el público", "esEx": "El público aplaudió mucho."}, "audible": {"pos": "adj", "syn": "hearable", "es": "audible", "esEx": "Su voz era apenas audible."}, "audio": {"pos": "n", "syn": "sound", "es": "el audio", "esEx": "Escuchamos el audio del libro."}, "summarize": {"pos": "v", "syn": "sum up", "es": "resumir", "esEx": "Resume el cuento en tres oraciones."}, "conclude": {"pos": "v", "syn": "decide", "es": "concluir", "esEx": "Podemos concluir que la planta necesita agua."}, "suggest": {"pos": "v", "syn": "propose", "es": "sugerir", "esEx": "¿Qué postre puedes sugerir?"}, "thermometer": {"pos": "n", "syn": "", "es": "el termómetro", "esEx": "El termómetro marca treinta grados."}, "thermal": {"pos": "adj", "syn": "heat-related", "es": "térmico", "esEx": "Llevamos ropa térmica a la nieve."}, "thermos": {"pos": "n", "syn": "flask", "es": "el termo", "esEx": "El chocolate sigue caliente en el termo."}, "indicate": {"pos": "v", "syn": "show", "es": "indicar", "esEx": "La flecha va a indicar el camino."}, "reveal": {"pos": "v", "syn": "uncover", "es": "revelar", "esEx": "El mago va a revelar su secreto."}, "demonstrate": {"pos": "v", "syn": "show", "es": "demostrar", "esEx": "Kenley va a demostrar cómo hacer pan."}, "automatic": {"pos": "adj", "syn": "self-operating", "es": "automático", "esEx": "La puerta es automática."}, "automobile": {"pos": "n", "syn": "car", "es": "el automóvil", "esEx": "El automóvil es rojo."}, "autopilot": {"pos": "n", "syn": "", "es": "el piloto automático", "esEx": "El avión usa el piloto automático."}, "establish": {"pos": "v", "syn": "set up", "es": "establecer", "esEx": "Queremos establecer una rutina."}, "maintain": {"pos": "v", "syn": "keep up", "es": "mantener", "esEx": "Debemos mantener limpia la cocina."}, "require": {"pos": "v", "syn": "need", "es": "requerir", "esEx": "Esta receta va a requerir tres huevos."}, "geography": {"pos": "n", "syn": "", "es": "la geografía", "esEx": "En geografía estudiamos los mapas."}, "geology": {"pos": "n", "syn": "", "es": "la geología", "esEx": "La geología estudia las rocas."}, "geometry": {"pos": "n", "syn": "", "es": "la geometría", "esEx": "En geometría dibujamos figuras."}, "accomplish": {"pos": "v", "syn": "complete", "es": "lograr", "esEx": "Podemos lograr mucho en equipo."}, "attempt": {"pos": "v", "syn": "try", "es": "intentar", "esEx": "Voy a intentar hacer una voltereta."}, "succeed": {"pos": "v", "syn": "win", "es": "tener éxito", "esEx": "Si practicas, vas a tener éxito."}, "triangle": {"pos": "n", "syn": "", "es": "el triángulo", "esEx": "Un triángulo tiene tres lados."}, "tricycle": {"pos": "n", "syn": "", "es": "el triciclo", "esEx": "Mi prima anda en triciclo."}, "tripod": {"pos": "n", "syn": "stand", "es": "el trípode", "esEx": "Pusimos la cámara en el trípode."}, "struggle": {"pos": "v", "syn": "work hard", "es": "esforzarse", "esEx": "Tuve que esforzarme para subir la colina."}, "hesitate": {"pos": "v", "syn": "pause", "es": "dudar", "esEx": "No dudes en pedir ayuda."}, "wonder": {"pos": "v", "syn": "ask yourself", "es": "preguntarse", "esEx": "Me pregunto qué hay en la caja."}, "unhappy": {"pos": "adj", "syn": "sad", "es": "infeliz", "esEx": "El gatito estaba infeliz bajo la lluvia."}, "unable": {"pos": "adj", "syn": "not able", "es": "incapaz", "esEx": "Estaba incapaz de alcanzar la repisa."}, "unfair": {"pos": "adj", "syn": "not fair", "es": "injusto", "esEx": "Ese juego fue injusto."}, "imagine": {"pos": "v", "syn": "picture", "es": "imaginar", "esEx": "Imagina un castillo en las nubes."}, "realize": {"pos": "v", "syn": "notice", "es": "darse cuenta", "esEx": "Me di cuenta de que olvidé mi sombrero."}, "recall": {"pos": "v", "syn": "remember", "es": "recordar", "esEx": "¿Puedes recordar su nombre?"}, "rewrite": {"pos": "v", "syn": "redo", "es": "reescribir", "esEx": "Voy a reescribir mi cuento."}, "replay": {"pos": "v", "syn": "play again", "es": "repetir", "esEx": "Vamos a repetir el video."}, "rebuild": {"pos": "v", "syn": "remake", "es": "reconstruir", "esEx": "Vamos a reconstruir la torre de bloques."}, "remind": {"pos": "v", "syn": "prompt", "es": "recordar", "esEx": "Recuérdame comprar pan."}, "remain": {"pos": "v", "syn": "stay", "es": "permanecer", "esEx": "Por favor, permanece en tu asiento."}, "continue": {"pos": "v", "syn": "keep going", "es": "continuar", "esEx": "Vamos a continuar el viaje mañana."}, "preview": {"pos": "n", "syn": "sneak peek", "es": "el avance", "esEx": "Vimos el avance de la película."}, "prepare": {"pos": "v", "syn": "get ready", "es": "preparar", "esEx": "Vamos a preparar la cena juntas."}, "preheat": {"pos": "v", "syn": "heat first", "es": "precalentar", "esEx": "Hay que precalentar el horno."}, "reduce": {"pos": "v", "syn": "lessen", "es": "reducir", "esEx": "Queremos reducir la basura."}, "increase": {"pos": "v", "syn": "grow", "es": "aumentar", "esEx": "El calor va a aumentar al mediodía."}, "decrease": {"pos": "v", "syn": "shrink", "es": "disminuir", "esEx": "El ruido va a disminuir de noche."}, "disagree": {"pos": "v", "syn": "differ", "es": "no estar de acuerdo", "esEx": "A veces no estamos de acuerdo."}, "dislike": {"pos": "v", "syn": "not like", "es": "no gustar", "esEx": "No me gusta el brócoli crudo."}, "disappear": {"pos": "v", "syn": "vanish", "es": "desaparecer", "esEx": "El sol va a desaparecer detrás de la montaña."}, "improve": {"pos": "v", "syn": "get better", "es": "mejorar", "esEx": "Quiero mejorar mi letra."}, "prevent": {"pos": "v", "syn": "stop", "es": "prevenir", "esEx": "El casco ayuda a prevenir golpes."}, "protect": {"pos": "v", "syn": "guard", "es": "proteger", "esEx": "El bloqueador nos ayuda a proteger la piel."}, "mistake": {"pos": "n", "syn": "error", "es": "el error", "esEx": "Todos cometemos errores."}, "misspell": {"pos": "v", "syn": "", "es": "escribir mal", "esEx": "Es fácil escribir mal esta palabra."}, "mislead": {"pos": "v", "syn": "fool", "es": "engañar", "esEx": "Ese letrero puede engañar a la gente."}, "provide": {"pos": "v", "syn": "give", "es": "proporcionar", "esEx": "El árbol va a proporcionar sombra."}, "produce": {"pos": "v", "syn": "make", "es": "producir", "esEx": "Las abejas producen miel."}, "create": {"pos": "v", "syn": "make", "es": "crear", "esEx": "Vamos a crear un postre nuevo."}, "submarine": {"pos": "n", "syn": "", "es": "el submarino", "esEx": "El submarino viajó bajo el mar."}, "subway": {"pos": "n", "syn": "metro", "es": "el metro", "esEx": "Tomamos el metro en la ciudad."}, "substitute": {"pos": "n", "syn": "replacement", "es": "el sustituto", "esEx": "Usamos plátano como sustituto del huevo."}, "develop": {"pos": "v", "syn": "grow", "es": "desarrollar", "esEx": "Las semillas van a desarrollar raíces."}, "discover": {"pos": "v", "syn": "find", "es": "descubrir", "esEx": "Vamos a descubrir una playa nueva."}, "explore": {"pos": "v", "syn": "travel through", "es": "explorar", "esEx": "Nos gusta explorar ciudades nuevas."}, "international": {"pos": "adj", "syn": "worldwide", "es": "internacional", "esEx": "Fuimos a un aeropuerto internacional."}, "interact": {"pos": "v", "syn": "communicate", "es": "interactuar", "esEx": "Los delfines interactúan entre ellos."}, "interview": {"pos": "n", "syn": "", "es": "la entrevista", "esEx": "Hice una entrevista a mi abuela."}, "investigate": {"pos": "v", "syn": "look into", "es": "investigar", "esEx": "Vamos a investigar de dónde viene el cacao."}, "research": {"pos": "v", "syn": "study", "es": "investigar", "esEx": "Voy a investigar sobre los volcanes."}, "analyze": {"pos": "v", "syn": "study", "es": "analizar", "esEx": "Vamos a analizar los resultados."}, "joyful": {"pos": "adj", "syn": "happy", "es": "alegre", "esEx": "Fue una fiesta muy alegre."}, "careful": {"pos": "adj", "syn": "cautious", "es": "cuidadoso", "esEx": "Sé cuidadosa con el cuchillo."}, "helpful": {"pos": "adj", "syn": "useful", "es": "útil", "esEx": "Este mapa es muy útil."}, "calculate": {"pos": "v", "syn": "figure out", "es": "calcular", "esEx": "Vamos a calcular el precio total."}, "estimate": {"pos": "v", "syn": "guess", "es": "estimar", "esEx": "Estima cuántas uvas hay en el plato."}, "measure": {"pos": "v", "syn": "", "es": "medir", "esEx": "Vamos a medir la harina."}, "careless": {"pos": "adj", "syn": "sloppy", "es": "descuidado", "esEx": "Fue un error descuidado."}, "fearless": {"pos": "adj", "syn": "brave", "es": "valiente", "esEx": "La exploradora fue valiente."}, "harmless": {"pos": "adj", "syn": "safe", "es": "inofensivo", "esEx": "Esta araña es inofensiva."}, "include": {"pos": "v", "syn": "contain", "es": "incluir", "esEx": "La receta va a incluir fresas."}, "exclude": {"pos": "v", "syn": "leave out", "es": "excluir", "esEx": "No queremos excluir a nadie del juego."}, "combine": {"pos": "v", "syn": "mix", "es": "combinar", "esEx": "Vamos a combinar la harina y el azúcar."}, "comfortable": {"pos": "adj", "syn": "cozy", "es": "cómodo", "esEx": "Esta almohada es muy cómoda."}, "flexible": {"pos": "adj", "syn": "bendable", "es": "flexible", "esEx": "La gimnasta es muy flexible."}, "reliable": {"pos": "adj", "syn": "dependable", "es": "confiable", "esEx": "Nuestro perro es un amigo confiable."}, "separate": {"pos": "v", "syn": "split", "es": "separar", "esEx": "Hay que separar las claras de las yemas."}, "divide": {"pos": "v", "syn": "split", "es": "dividir", "esEx": "Vamos a dividir la pizza en ocho."}, "connect": {"pos": "v", "syn": "join", "es": "conectar", "esEx": "Voy a conectar los puntos."}, "celebration": {"pos": "n", "syn": "party", "es": "la celebración", "esEx": "Hubo una gran celebración en la plaza."}, "decision": {"pos": "n", "syn": "choice", "es": "la decisión", "esEx": "Fue una decisión difícil."}, "invention": {"pos": "n", "syn": "creation", "es": "el invento", "esEx": "La bombilla fue un gran invento."}, "relate": {"pos": "v", "syn": "connect", "es": "relacionar", "esEx": "Podemos relacionar el cuento con nuestra vida."}, "depend": {"pos": "v", "syn": "rely", "es": "depender", "esEx": "Las plantas dependen del sol."}, "rely": {"pos": "v", "syn": "depend", "es": "confiar", "esEx": "Puedes confiar en mí."}, "zoology": {"pos": "n", "syn": "", "es": "la zoología", "esEx": "La zoología estudia los animales."}, "technology": {"pos": "n", "syn": "", "es": "la tecnología", "esEx": "La tecnología nos ayuda a viajar."}, "mythology": {"pos": "n", "syn": "", "es": "la mitología", "esEx": "Leímos cuentos de la mitología griega."}, "trust": {"pos": "v", "syn": "believe in", "es": "confiar", "esEx": "Confío en mi hermana."}, "value": {"pos": "v", "syn": "treasure", "es": "valorar", "esEx": "Valoramos mucho a nuestra familia."}, "appreciate": {"pos": "v", "syn": "be thankful for", "es": "apreciar", "esEx": "Aprecio tu ayuda."}, "dehydrate": {"pos": "v", "syn": "dry out", "es": "deshidratar", "esEx": "El sol puede deshidratar las frutas."}, "hydroelectric": {"pos": "adj", "syn": "", "es": "hidroeléctrico", "esEx": "La presa es una planta hidroeléctrica."}, "hydrogen": {"pos": "n", "syn": "", "es": "el hidrógeno", "esEx": "El agua tiene hidrógeno y oxígeno."}, "admire": {"pos": "v", "syn": "look up to", "es": "admirar", "esEx": "Admiro a mi abuela."}, "encourage": {"pos": "v", "syn": "cheer on", "es": "animar", "esEx": "Vamos a animar a nuestro equipo."}, "inspire": {"pos": "v", "syn": "motivate", "es": "inspirar", "esEx": "El mar me inspira a dibujar."}, "malfunction": {"pos": "v", "syn": "break down", "es": "fallar", "esEx": "La máquina puede fallar si se moja."}, "malnutrition": {"pos": "n", "syn": "", "es": "la desnutrición", "esEx": "La buena comida previene la desnutrición."}, "malady": {"pos": "n", "syn": "illness", "es": "la enfermedad", "esEx": "El médico curó la enfermedad."}, "motivate": {"pos": "v", "syn": "inspire", "es": "motivar", "esEx": "Las estrellas me motivan a leer."}, "persuade": {"pos": "v", "syn": "convince", "es": "persuadir", "esEx": "Quiero persuadir a papá de ir al parque."}, "convince": {"pos": "v", "syn": "persuade", "es": "convencer", "esEx": "Me convenció de probar la sopa."}, "nonfiction": {"pos": "n", "syn": "", "es": "la no ficción", "esEx": "Me gustan los libros de no ficción."}, "nonstop": {"pos": "adj", "syn": "continuous", "es": "sin parar", "esEx": "Fue un vuelo sin escalas."}, "nonsense": {"pos": "n", "syn": "silliness", "es": "el disparate", "esEx": "Ese cuento es puro disparate."}, "argue": {"pos": "v", "syn": "disagree", "es": "discutir", "esEx": "Mis primos discuten por los juguetes."}, "debate": {"pos": "n", "syn": "discussion", "es": "el debate", "esEx": "Tuvimos un debate sobre los perros y los gatos."}, "discuss": {"pos": "v", "syn": "talk about", "es": "conversar", "esEx": "Vamos a conversar sobre el libro."}, "artist": {"pos": "n", "syn": "painter", "es": "el artista", "esEx": "La artista pintó un mural."}, "scientist": {"pos": "n", "syn": "researcher", "es": "el científico", "esEx": "La científica estudia las plantas."}, "tourist": {"pos": "n", "syn": "traveler", "es": "el turista", "esEx": "Muchos turistas visitan la catedral."}, "explain": {"pos": "v", "syn": "describe", "es": "explicar", "esEx": "¿Me puedes explicar la receta?"}, "clarify": {"pos": "v", "syn": "explain", "es": "aclarar", "esEx": "Vamos a aclarar las instrucciones."}, "confuse": {"pos": "v", "syn": "mix up", "es": "confundir", "esEx": "Esas dos palabras me confunden."}, "inventor": {"pos": "n", "syn": "creator", "es": "el inventor", "esEx": "El inventor creó una máquina nueva."}, "visitor": {"pos": "n", "syn": "guest", "es": "el visitante", "esEx": "Tuvimos un visitante en casa."}, "actor": {"pos": "n", "syn": "performer", "es": "el actor", "esEx": "El actor hizo reír a todos."}, "puzzle": {"pos": "n", "syn": "riddle", "es": "el rompecabezas", "esEx": "Armamos un rompecabezas de mil piezas."}, "curious": {"pos": "adj", "syn": "interested", "es": "curioso", "esEx": "El gatito es muy curioso."}, "eager": {"pos": "adj", "syn": "excited", "es": "entusiasmado", "esEx": "Estaba entusiasmada por el viaje."}, "credible": {"pos": "adj", "syn": "believable", "es": "creíble", "esEx": "Su historia es creíble."}, "credit": {"pos": "n", "syn": "recognition", "es": "el crédito", "esEx": "Ella merece el crédito por la idea."}, "incredible": {"pos": "adj", "syn": "amazing", "es": "increíble", "esEx": "¡La vista es increíble!"}, "anxious": {"pos": "adj", "syn": "worried", "es": "ansioso", "esEx": "Estaba ansiosa antes del examen."}, "nervous": {"pos": "adj", "syn": "uneasy", "es": "nervioso", "esEx": "Me puse nerviosa en el escenario."}, "confident": {"pos": "adj", "syn": "sure", "es": "seguro de sí mismo", "esEx": "Adelyn se siente segura de sí misma."}, "microphone": {"pos": "n", "syn": "mic", "es": "el micrófono", "esEx": "Canté con el micrófono."}, "symphony": {"pos": "n", "syn": "", "es": "la sinfonía", "esEx": "Escuchamos una sinfonía en el teatro."}, "phonics": {"pos": "n", "syn": "", "es": "la fonética", "esEx": "La fonética nos ayuda a leer."}, "cautious": {"pos": "adj", "syn": "careful", "es": "cauteloso", "esEx": "Sé cautelosa al cruzar la calle."}, "courageous": {"pos": "adj", "syn": "brave", "es": "valiente", "esEx": "El bombero fue muy valiente."}, "grateful": {"pos": "adj", "syn": "thankful", "es": "agradecido", "esEx": "Estoy agradecida por mi familia."}};          // word -> { pos, syn, es, esEx }
+const TOPS = {"sprinkles": {"name": "Rainbow Sprinkles", "size": 80, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><rect x=\"27.3\" y=\"60.2\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ff6b8b\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(94 34.3 62.7)\"></rect><rect x=\"68.0\" y=\"59.8\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffa94d\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(148 75.0 62.3)\"></rect><rect x=\"16.9\" y=\"39.9\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffd43b\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(120 23.9 42.4)\"></rect><rect x=\"28.6\" y=\"46.1\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#69db7c\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(120 35.6 48.6)\"></rect><rect x=\"45.5\" y=\"56.4\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#4dabf7\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(101 52.5 58.9)\"></rect><rect x=\"51.3\" y=\"40.6\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#b197fc\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(162 58.3 43.1)\"></rect><rect x=\"22.1\" y=\"78.5\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#f783ac\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(99 29.1 81.0)\"></rect><rect x=\"57.5\" y=\"65.4\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ff6b8b\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(16 64.5 67.9)\"></rect><rect x=\"22.6\" y=\"79.8\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffa94d\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(10 29.6 82.3)\"></rect><rect x=\"31.1\" y=\"36.4\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffd43b\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(68 38.1 38.9)\"></rect><rect x=\"41.4\" y=\"63.6\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#69db7c\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(99 48.4 66.1)\"></rect><rect x=\"55.8\" y=\"75.9\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#4dabf7\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(101 62.8 78.4)\"></rect><rect x=\"56.7\" y=\"61.0\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#b197fc\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(34 63.7 63.5)\"></rect><rect x=\"65.7\" y=\"42.6\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#f783ac\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(34 72.7 45.1)\"></rect><rect x=\"42.7\" y=\"42.9\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ff6b8b\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(172 49.7 45.4)\"></rect><rect x=\"39.2\" y=\"60.2\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffa94d\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(77 46.2 62.7)\"></rect><rect x=\"38.3\" y=\"69.6\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffd43b\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(146 45.3 72.1)\"></rect><rect x=\"34.1\" y=\"59.9\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#69db7c\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(149 41.1 62.4)\"></rect><rect x=\"26.9\" y=\"51.1\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#4dabf7\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(7 33.9 53.6)\"></rect><rect x=\"64.4\" y=\"81.5\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#b197fc\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(171 71.4 84.0)\"></rect><rect x=\"54.7\" y=\"65.8\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#f783ac\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(83 61.7 68.3)\"></rect><rect x=\"70.9\" y=\"79.7\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ff6b8b\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(145 77.9 82.2)\"></rect></svg>"}, "rose": {"name": "Sugar Rose", "size": 64, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><ellipse cx=\"28\" cy=\"74\" rx=\"16\" ry=\"7\" fill=\"#7bd88f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(-30 28 74)\"></ellipse><ellipse cx=\"72\" cy=\"74\" rx=\"16\" ry=\"7\" fill=\"#7bd88f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(30 72 74)\"></ellipse><circle cx=\"50.0\" cy=\"32.0\" r=\"17\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"67.1\" cy=\"44.4\" r=\"17\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"60.6\" cy=\"64.6\" r=\"17\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"39.4\" cy=\"64.6\" r=\"17\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"32.9\" cy=\"44.4\" r=\"17\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"50\" cy=\"50\" r=\"14\" fill=\"#ffb8dc\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M43 51 Q49 41 57 49 Q53 56 48 52\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path></svg>"}, "heart": {"name": "Candy Heart", "size": 56, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M50 88 C20 68 6 50 16 32 C26 14 46 18 50 34 C54 18 74 14 84 32 C94 50 80 68 50 88 Z\" fill=\"#ff5fa2\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><ellipse cx=\"30\" cy=\"36\" rx=\"7\" ry=\"4.5\" fill=\"#fff\" opacity=\"0.85\" transform=\"rotate(-35 30 36)\"></ellipse></svg>"}, "star": {"name": "Smiley Star", "size": 66, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><polygon points=\"50.0,10.0 61.8,37.8 91.8,40.4 69.0,60.2 75.9,89.6 50.0,74.0 24.1,89.6 31.0,60.2 8.2,40.4 38.2,37.8\" fill=\"#ffd84d\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></polygon><circle cx=\"43\" cy=\"56\" r=\"3\" fill=\"#5b3a6e\"></circle><circle cx=\"57\" cy=\"56\" r=\"3\" fill=\"#5b3a6e\"></circle><path d=\"M45 62 Q50 67 55 62\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"36\" cy=\"62\" r=\"4\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle><circle cx=\"64\" cy=\"62\" r=\"4\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle></svg>"}, "butterfly": {"name": "Butterfly", "size": 72, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><g><ellipse cx=\"32\" cy=\"40\" rx=\"19\" ry=\"17\" fill=\"#ff9ed2\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><ellipse cx=\"68\" cy=\"40\" rx=\"19\" ry=\"17\" fill=\"#ff9ed2\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><ellipse cx=\"36\" cy=\"66\" rx=\"14\" ry=\"13\" fill=\"#b99cff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><ellipse cx=\"64\" cy=\"66\" rx=\"14\" ry=\"13\" fill=\"#b99cff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><circle cx=\"28\" cy=\"38\" r=\"5\" fill=\"#fff\"></circle><circle cx=\"72\" cy=\"38\" r=\"5\" fill=\"#fff\"></circle><circle cx=\"37\" cy=\"68\" r=\"3.5\" fill=\"#fff\"></circle><circle cx=\"63\" cy=\"68\" r=\"3.5\" fill=\"#fff\"></circle></g><rect x=\"46.5\" y=\"30\" width=\"7\" height=\"46\" rx=\"3.5\" fill=\"#5b3a6e\"></rect><path d=\"M48 32 Q44 18 37 15\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.5\" stroke-linecap=\"round\"></path><path d=\"M52 32 Q56 18 63 15\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.5\" stroke-linecap=\"round\"></path><circle cx=\"37\" cy=\"15\" r=\"3\" fill=\"#5b3a6e\"></circle><circle cx=\"63\" cy=\"15\" r=\"3\" fill=\"#5b3a6e\"></circle></svg>"}, "cloud": {"name": "Cloud Friend", "size": 92, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M22 76 C6 76 6 54 22 52 C20 34 42 28 50 40 C56 24 80 28 80 46 C95 46 96 72 80 76 Z\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"42\" cy=\"58\" r=\"3\" fill=\"#5b3a6e\"></circle><circle cx=\"58\" cy=\"58\" r=\"3\" fill=\"#5b3a6e\"></circle><path d=\"M45 64 Q50 69 55 64\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"35\" cy=\"64\" r=\"4\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle><circle cx=\"65\" cy=\"64\" r=\"4\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle></svg>"}, "rainbow": {"name": "Rainbow Arch", "size": 120, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M6 72 A44 44 0 0 1 94 72\" stroke=\"#ff6b8b\" fill=\"none\" stroke-width=\"6.5\" stroke-linecap=\"round\"></path><path d=\"M12 72 A38 38 0 0 1 88 72\" stroke=\"#ffa94d\" fill=\"none\" stroke-width=\"6.5\" stroke-linecap=\"round\"></path><path d=\"M18 72 A32 32 0 0 1 82 72\" stroke=\"#ffe066\" fill=\"none\" stroke-width=\"6.5\" stroke-linecap=\"round\"></path><path d=\"M24 72 A26 26 0 0 1 76 72\" stroke=\"#7bd88f\" fill=\"none\" stroke-width=\"6.5\" stroke-linecap=\"round\"></path><path d=\"M30 72 A20 20 0 0 1 70 72\" stroke=\"#74c0fc\" fill=\"none\" stroke-width=\"6.5\" stroke-linecap=\"round\"></path><path d=\"M36 72 A14 14 0 0 1 64 72\" stroke=\"#b197fc\" fill=\"none\" stroke-width=\"6.5\" stroke-linecap=\"round\"></path><ellipse cx=\"14\" cy=\"73\" rx=\"14\" ry=\"8\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><ellipse cx=\"86\" cy=\"73\" rx=\"14\" ry=\"8\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse></svg>"}, "unicorn": {"name": "Unicorn Topper", "size": 110, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M36 68 Q30 88 34 98 L68 98 Q66 84 62 74 Z\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"31\" cy=\"40\" r=\"11\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"24\" cy=\"56\" r=\"11\" fill=\"#b99cff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"25\" cy=\"72\" r=\"11\" fill=\"#8fd3ff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"30\" cy=\"87\" r=\"10\" fill=\"#ffe27a\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"39\" cy=\"28\" r=\"9\" fill=\"#ffe27a\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M40 38 L40 15 L53 30 Z\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M42.5 31 L42.5 21 L49 29 Z\" fill=\"#ffc2dd\"></path><ellipse cx=\"54\" cy=\"54\" rx=\"24\" ry=\"22\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><ellipse cx=\"71\" cy=\"66\" rx=\"15\" ry=\"12\" fill=\"#ffe3f0\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><path d=\"M53 35 L69 3 L64 37 Z\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M56 28 L65 25 M59 20 L66 17 M62 12 L67 10\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"48\" cy=\"34\" r=\"8\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M51 52 Q56.5 58 62 52\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M52 54 L49 57 M56 56 L55 60\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"58\" cy=\"63\" r=\"4.5\" fill=\"#ffadd2\"></circle><ellipse cx=\"77\" cy=\"64\" rx=\"1.8\" ry=\"2.6\" fill=\"#5b3a6e\"></ellipse><path d=\"M67 72 Q71 75 75 72\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M86 11 Q87.26 16.74 93 18 Q87.26 19.26 86 25 Q84.74 19.26 79 18 Q84.74 16.74 86 11 Z\" fill=\"#ffd54f\"></path><path d=\"M14 7 Q14.9 11.1 19 12 Q14.9 12.9 14 17 Q13.1 12.9 9 12 Q13.1 11.1 14 7 Z\" fill=\"#ff8cc6\"></path></svg>"}, "candle": {"name": "Birthday Candle", "size": 70, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><rect x=\"40\" y=\"38\" width=\"20\" height=\"58\" rx=\"6\" fill=\"#a8dcff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></rect><path d=\"M41 52 L59 44 L59 51 L41 59 Z\" fill=\"#ff8cc6\"></path><path d=\"M41 70 L59 62 L59 69 L41 77 Z\" fill=\"#ff8cc6\"></path><path d=\"M41 88 L59 80 L59 87 L41 95 Z\" fill=\"#ff8cc6\"></path><rect x=\"40\" y=\"38\" width=\"20\" height=\"58\" rx=\"6\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></rect><path d=\"M50 38 L50 30\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.5\" stroke-linecap=\"round\"></path><g><circle cx=\"50\" cy=\"19\" r=\"14\" fill=\"#ffe27a\" opacity=\"0.4\"></circle><path d=\"M50 4 C59 14 60 23 50 30 C40 23 41 14 50 4 Z\" fill=\"#ffb020\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M50 14 C54 19 54 23 50 27 C46 23 46 19 50 14 Z\" fill=\"#fff3a0\"></path></g></svg>"}, "cherry": {"name": "Cherry on Top", "size": 58, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M50 42 Q52 20 72 8\" fill=\"none\" stroke=\"#4a7a3a\" stroke-width=\"4\" stroke-linecap=\"round\"></path><ellipse cx=\"68\" cy=\"16\" rx=\"11\" ry=\"5.5\" fill=\"#7bd88f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(-25 68 16)\"></ellipse><circle cx=\"50\" cy=\"64\" r=\"26\" fill=\"#ff4d6d\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><ellipse cx=\"39\" cy=\"53\" rx=\"7\" ry=\"5\" fill=\"#fff\" opacity=\"0.8\" transform=\"rotate(-30 39 53)\"></ellipse></svg>"}, "strawberry": {"name": "Strawberry", "size": 62, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M50 95 C24 82 12 58 20 44 C28 30 72 30 80 44 C88 58 76 82 50 95 Z\" fill=\"#ff5a6e\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><ellipse cx=\"34\" cy=\"52\" rx=\"1.8\" ry=\"3\" fill=\"#ffe27a\"></ellipse><ellipse cx=\"50\" cy=\"50\" rx=\"1.8\" ry=\"3\" fill=\"#ffe27a\"></ellipse><ellipse cx=\"66\" cy=\"52\" rx=\"1.8\" ry=\"3\" fill=\"#ffe27a\"></ellipse><ellipse cx=\"40\" cy=\"66\" rx=\"1.8\" ry=\"3\" fill=\"#ffe27a\"></ellipse><ellipse cx=\"58\" cy=\"66\" rx=\"1.8\" ry=\"3\" fill=\"#ffe27a\"></ellipse><ellipse cx=\"48\" cy=\"80\" rx=\"1.8\" ry=\"3\" fill=\"#ffe27a\"></ellipse><ellipse cx=\"30\" cy=\"64\" rx=\"1.8\" ry=\"3\" fill=\"#ffe27a\"></ellipse><ellipse cx=\"70\" cy=\"64\" rx=\"1.8\" ry=\"3\" fill=\"#ffe27a\"></ellipse><path d=\"M28 40 L42 32 L40 20 L50 29 L60 20 L58 32 L72 40 L57 41 L50 47 L43 41 Z\" fill=\"#6fcf7f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M50 29 L50 14\" fill=\"none\" stroke=\"#4a7a3a\" stroke-width=\"4\" stroke-linecap=\"round\"></path></svg>"}, "macaron": {"name": "Macaron", "size": 64, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><rect x=\"14\" y=\"54\" width=\"72\" height=\"24\" rx=\"12\" fill=\"#c7a6ff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></rect><rect x=\"14\" y=\"24\" width=\"72\" height=\"26\" rx=\"13\" fill=\"#c7a6ff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></rect><rect x=\"17\" y=\"46\" width=\"66\" height=\"11\" rx=\"5.5\" fill=\"#fff7fb\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></rect><ellipse cx=\"30\" cy=\"31\" rx=\"8\" ry=\"3\" fill=\"#fff\" opacity=\"0.7\"></ellipse><circle cx=\"43\" cy=\"36\" r=\"2.5\" fill=\"#5b3a6e\"></circle><circle cx=\"57\" cy=\"36\" r=\"2.5\" fill=\"#5b3a6e\"></circle><path d=\"M46 40 Q50 44 54 40\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path></svg>"}, "lollipop": {"name": "Swirl Lollipop", "size": 80, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><rect x=\"46.5\" y=\"52\" width=\"7\" height=\"44\" rx=\"3.5\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></rect><circle cx=\"50\" cy=\"36\" r=\"29\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M50 36 A4 4 0 0 1 58 36 A8 8 0 0 1 42 36 A12 12 0 0 1 66 36 A16 16 0 0 1 34 36 A20 20 0 0 1 74 36\" fill=\"none\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\"></path><path d=\"M50 66 L36 58 L38 74 Z\" fill=\"#b99cff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M50 66 L64 58 L62 74 Z\" fill=\"#b99cff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"50\" cy=\"66\" r=\"4\" fill=\"#b99cff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle></svg>"}, "gumdrop": {"name": "Gumdrop Buddy", "size": 60, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M20 86 Q18 30 50 24 Q82 30 80 86 Z\" fill=\"#7bd88f\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"32\" cy=\"44\" r=\"2.2\" fill=\"#fff\"></circle><circle cx=\"62\" cy=\"38\" r=\"2.2\" fill=\"#fff\"></circle><circle cx=\"44\" cy=\"32\" r=\"2.2\" fill=\"#fff\"></circle><circle cx=\"70\" cy=\"60\" r=\"2.2\" fill=\"#fff\"></circle><circle cx=\"28\" cy=\"70\" r=\"2.2\" fill=\"#fff\"></circle><circle cx=\"54\" cy=\"78\" r=\"2.2\" fill=\"#fff\"></circle><circle cx=\"74\" cy=\"78\" r=\"2.2\" fill=\"#fff\"></circle><circle cx=\"26\" cy=\"56\" r=\"2.2\" fill=\"#fff\"></circle><ellipse cx=\"36\" cy=\"40\" rx=\"6\" ry=\"9\" fill=\"#fff\" opacity=\"0.55\" transform=\"rotate(25 36 40)\"></ellipse><circle cx=\"42\" cy=\"60\" r=\"3\" fill=\"#5b3a6e\"></circle><circle cx=\"58\" cy=\"60\" r=\"3\" fill=\"#5b3a6e\"></circle><path d=\"M45 66 Q50 71 55 66\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"35\" cy=\"66\" r=\"4\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle><circle cx=\"65\" cy=\"66\" r=\"4\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle></svg>"}, "wrapped": {"name": "Wrapped Candy", "size": 70, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M28 50 L6 32 L10 50 L6 68 Z\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M72 50 L94 32 L90 50 L94 68 Z\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><ellipse cx=\"50\" cy=\"50\" rx=\"25\" ry=\"21\" fill=\"#ffd84d\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><path d=\"M36 34 L46 68 M50 30 L60 70 M64 34 L68 52\" fill=\"none\" stroke=\"#ff8cc6\" stroke-width=\"4\" stroke-linecap=\"round\"></path><ellipse cx=\"50\" cy=\"50\" rx=\"25\" ry=\"21\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse></svg>"}, "cookie": {"name": "Cookie", "size": 66, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><circle cx=\"50\" cy=\"52\" r=\"40\" fill=\"#e8b27a\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"50\" cy=\"52\" r=\"33\" fill=\"#f0c28e\"></circle><ellipse cx=\"34\" cy=\"38\" rx=\"5\" ry=\"4.2\" fill=\"#6b3e26\"></ellipse><ellipse cx=\"58\" cy=\"32\" rx=\"4.5\" ry=\"3.8\" fill=\"#6b3e26\"></ellipse><ellipse cx=\"68\" cy=\"54\" rx=\"5.5\" ry=\"4.7\" fill=\"#6b3e26\"></ellipse><ellipse cx=\"44\" cy=\"62\" rx=\"5\" ry=\"4.2\" fill=\"#6b3e26\"></ellipse><ellipse cx=\"30\" cy=\"60\" rx=\"4\" ry=\"3.4\" fill=\"#6b3e26\"></ellipse><ellipse cx=\"56\" cy=\"74\" rx=\"4.5\" ry=\"3.8\" fill=\"#6b3e26\"></ellipse><ellipse cx=\"70\" cy=\"36\" rx=\"3.5\" ry=\"3.0\" fill=\"#6b3e26\"></ellipse><ellipse cx=\"48\" cy=\"46\" rx=\"3.5\" ry=\"3.0\" fill=\"#6b3e26\"></ellipse></svg>"}, "shell": {"name": "Seashell", "size": 64, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M50 88 L16 48 Q14 30 30 22 Q50 8 70 22 Q86 30 84 48 Z\" fill=\"#ffb3c7\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M50 86 L24 40 M50 86 L37 22 M50 86 L50 16 M50 86 L63 22 M50 86 L76 40\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M38 94 L50 80 L62 94 Z\" fill=\"#ff8fb0\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><ellipse cx=\"34\" cy=\"34\" rx=\"5\" ry=\"3\" fill=\"#fff\" opacity=\"0.7\" transform=\"rotate(-40 34 34)\"></ellipse></svg>"}, "pearl": {"name": "Pearl", "size": 62, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><ellipse cx=\"50\" cy=\"80\" rx=\"38\" ry=\"10\" fill=\"#8fd3ff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><circle cx=\"50\" cy=\"54\" r=\"27\" fill=\"#fbf4ff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"56\" cy=\"60\" r=\"16\" fill=\"#eadcff\" opacity=\"0.8\"></circle><ellipse cx=\"40\" cy=\"44\" rx=\"8\" ry=\"5\" fill=\"#fff\" transform=\"rotate(-35 40 44)\"></ellipse><path d=\"M80 14 Q81.44 20.56 88 22 Q81.44 23.44 80 30 Q78.56 23.44 72 22 Q78.56 20.56 80 14 Z\" fill=\"#ffd54f\"></path><path d=\"M20 19 Q20.9 23.1 25 24 Q20.9 24.9 20 29 Q19.1 24.9 15 24 Q19.1 23.1 20 19 Z\" fill=\"#ff8cc6\"></path></svg>"}, "starfish": {"name": "Starfish", "size": 66, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><polygon points=\"50.0,10.0 62.9,36.2 91.8,40.4 70.9,60.8 75.9,89.6 50.0,76.0 24.1,89.6 29.1,60.8 8.2,40.4 37.1,36.2\" fill=\"#ffa36c\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></polygon><circle cx=\"50\" cy=\"22\" r=\"2\" fill=\"#ffd9b8\"></circle><circle cx=\"22\" cy=\"44\" r=\"2\" fill=\"#ffd9b8\"></circle><circle cx=\"78\" cy=\"44\" r=\"2\" fill=\"#ffd9b8\"></circle><circle cx=\"32\" cy=\"80\" r=\"2\" fill=\"#ffd9b8\"></circle><circle cx=\"68\" cy=\"80\" r=\"2\" fill=\"#ffd9b8\"></circle><circle cx=\"43\" cy=\"56\" r=\"3\" fill=\"#5b3a6e\"></circle><circle cx=\"57\" cy=\"56\" r=\"3\" fill=\"#5b3a6e\"></circle><path d=\"M45 62 Q50 67 55 62\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"36\" cy=\"62\" r=\"4\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle><circle cx=\"64\" cy=\"62\" r=\"4\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle></svg>"}, "tail": {"name": "Mermaid Tail", "size": 88, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M42 6 Q64 20 60 50 Q58 66 50 74 Q38 66 38 48 Q38 24 42 6 Z\" fill=\"#6fd8d0\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M44 20 Q50 24 56 20 M42 32 Q50 37 58 32 M41 44 Q50 49 59 44 M43 56 Q50 61 57 56\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M50 70 Q30 64 12 86 Q34 94 50 80 Q66 94 88 86 Q70 64 50 70 Z\" fill=\"#a58cff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M80 13 Q81.26 18.74 87 20 Q81.26 21.26 80 27 Q78.74 21.26 73 20 Q78.74 18.74 80 13 Z\" fill=\"#ffd54f\"></path></svg>"}, "coral": {"name": "Coral", "size": 76, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><ellipse cx=\"50\" cy=\"90\" rx=\"30\" ry=\"7\" fill=\"#c7a6ff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><path d=\"M50 88 L50 52 M50 72 L32 56 L30 34 M50 62 L68 46 L70 24 M32 56 L18 48 M68 46 L82 42 M50 52 L44 30\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"13\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M50 88 L50 52 M50 72 L32 56 L30 34 M50 62 L68 46 L70 24 M32 56 L18 48 M68 46 L82 42 M50 52 L44 30\" fill=\"none\" stroke=\"#ff7aa8\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><circle cx=\"30\" cy=\"32\" r=\"3\" fill=\"#fff\"></circle><circle cx=\"70\" cy=\"22\" r=\"3\" fill=\"#fff\"></circle></svg>"}, "fish": {"name": "Bubble Fish", "size": 70, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M70 52 L92 34 L90 52 L92 70 Z\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><ellipse cx=\"46\" cy=\"52\" rx=\"30\" ry=\"22\" fill=\"#ffa94d\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><path d=\"M44 30 Q50 20 60 32\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M52 36 Q58 52 52 68 M62 40 Q66 52 62 64\" fill=\"none\" stroke=\"#ffd84d\" stroke-width=\"4\" stroke-linecap=\"round\"></path><circle cx=\"32\" cy=\"48\" r=\"7\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"31\" cy=\"48\" r=\"3.5\" fill=\"#5b3a6e\"></circle><path d=\"M22 58 Q26 62 30 58\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"12\" cy=\"28\" r=\"5\" fill=\"#d8f3ff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"20\" cy=\"16\" r=\"3\" fill=\"#d8f3ff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle></svg>"}, "bubbles": {"name": "Bubbles", "size": 70, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><circle cx=\"40\" cy=\"60\" r=\"24\" fill=\"#d8f3ff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M26.8 56.4 A14.4 14.4 0 0 1 37.6 46.1\" fill=\"none\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\"></path><circle cx=\"70\" cy=\"34\" r=\"15\" fill=\"#d8f3ff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M61.8 31.8 A9.0 9.0 0 0 1 68.5 25.3\" fill=\"none\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\"></path><circle cx=\"72\" cy=\"74\" r=\"11\" fill=\"#d8f3ff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M66.0 72.3 A6.6 6.6 0 0 1 70.9 67.6\" fill=\"none\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\"></path><circle cx=\"26\" cy=\"26\" r=\"9\" fill=\"#d8f3ff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M21.1 24.6 A5.4 5.4 0 0 1 25.1 20.8\" fill=\"none\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\"></path></svg>"}, "jelly": {"name": "Jellyfish", "size": 78, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M30 54 Q24 66 30 76 Q36 86 30 94\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M30 54 Q24 66 30 76 Q36 86 30 94\" fill=\"none\" stroke=\"#e3ccff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M42 54 Q36 66 42 76 Q48 86 42 94\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M42 54 Q36 66 42 76 Q48 86 42 94\" fill=\"none\" stroke=\"#e3ccff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M58 54 Q52 66 58 76 Q64 86 58 94\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M58 54 Q52 66 58 76 Q64 86 58 94\" fill=\"none\" stroke=\"#e3ccff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M70 54 Q64 66 70 76 Q76 86 70 94\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M70 54 Q64 66 70 76 Q76 86 70 94\" fill=\"none\" stroke=\"#e3ccff\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M18 58 Q18 16 50 16 Q82 16 82 58 Q74 52 66 58 Q58 52 50 58 Q42 52 34 58 Q26 52 18 58 Z\" fill=\"#d7b8ff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><ellipse cx=\"34\" cy=\"30\" rx=\"7\" ry=\"4\" fill=\"#fff\" opacity=\"0.7\" transform=\"rotate(-30 34 30)\"></ellipse><circle cx=\"42\" cy=\"40\" r=\"3\" fill=\"#5b3a6e\"></circle><circle cx=\"58\" cy=\"40\" r=\"3\" fill=\"#5b3a6e\"></circle><path d=\"M45 46 Q50 51 55 46\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"35\" cy=\"46\" r=\"4\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle><circle cx=\"65\" cy=\"46\" r=\"4\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle></svg>"}, "planet": {"name": "Ringed Planet", "size": 88, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><g transform=\"rotate(-18 50 52)\"><path d=\"M8 52 A42 12 0 0 1 92 52\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M8 52 A42 12 0 0 1 92 52\" fill=\"none\" stroke=\"#ffd54f\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><circle cx=\"50\" cy=\"52\" r=\"27\" fill=\"#b197fc\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M28 44 Q50 38 72 44 M26 58 Q50 54 74 60\" fill=\"none\" stroke=\"#d6c8ff\" stroke-width=\"4\" stroke-linecap=\"round\"></path><path d=\"M8 52 A42 12 0 0 0 92 52\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M8 52 A42 12 0 0 0 92 52\" fill=\"none\" stroke=\"#ffd54f\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><path d=\"M84 8 Q85.08 12.92 90 14 Q85.08 15.08 84 20 Q82.92 15.08 78 14 Q82.92 12.92 84 8 Z\" fill=\"#ffd54f\"></path><path d=\"M14 79 Q14.9 83.1 19 84 Q14.9 84.9 14 89 Q13.1 84.9 9 84 Q13.1 83.1 14 79 Z\" fill=\"#ff8cc6\"></path></svg>"}, "moon": {"name": "Sleepy Moon", "size": 76, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M60 10 A40 40 0 1 0 90 70 A32 32 0 1 1 60 10 Z\" fill=\"#fff3b0\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M38 52 Q42 56 46 52\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"36\" cy=\"62\" r=\"4\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle><circle cx=\"34\" cy=\"32\" r=\"3\" fill=\"#f2e08a\"></circle><circle cx=\"46\" cy=\"78\" r=\"4\" fill=\"#f2e08a\"></circle><path d=\"M80 15 Q81.26 20.74 87 22 Q81.26 23.26 80 29 Q78.74 23.26 73 22 Q78.74 20.74 80 15 Z\" fill=\"#ffd54f\"></path></svg>"}, "shooting": {"name": "Shooting Star", "size": 80, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M53.5 31.0 L7.5 84.2\" fill=\"none\" stroke=\"#ff6b8b\" stroke-width=\"6\" stroke-linecap=\"round\" opacity=\"0.9\"></path><path d=\"M58.0 40.0 L12.0 86.0\" fill=\"none\" stroke=\"#ffe066\" stroke-width=\"6\" stroke-linecap=\"round\" opacity=\"0.9\"></path><path d=\"M62.5 49.0 L16.5 87.8\" fill=\"none\" stroke=\"#74c0fc\" stroke-width=\"6\" stroke-linecap=\"round\" opacity=\"0.9\"></path><polygon points=\"64.0,8.0 71.1,24.3 88.7,26.0 75.4,37.7 79.3,55.0 64.0,46.0 48.7,55.0 52.6,37.7 39.3,26.0 56.9,24.3\" fill=\"#ffd84d\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></polygon></svg>"}, "rocket": {"name": "Rocket", "size": 84, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M38 70 Q50 98 62 70 Z\" fill=\"#ffa94d\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M44 70 Q50 86 56 70 Z\" fill=\"#ffe066\"></path><path d=\"M34 50 L18 72 L36 68 Z\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M66 50 L82 72 L64 68 Z\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M50 6 Q72 26 66 70 L34 70 Q28 26 50 6 Z\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M50 6 Q60 14 64 24 L36 24 Q40 14 50 6 Z\" fill=\"#ff6b8b\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"50\" cy=\"42\" r=\"9\" fill=\"#74c0fc\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"47\" cy=\"39\" r=\"3\" fill=\"#fff\"></circle></svg>"}, "ufo": {"name": "Friendly UFO", "size": 84, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M34 62 L20 96 L80 96 L66 62 Z\" fill=\"#fff3a0\" opacity=\"0.7\"></path><path d=\"M32 50 Q32 20 50 20 Q68 20 68 50 Z\" fill=\"#c9efff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"50\" cy=\"38\" r=\"9\" fill=\"#9be38f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"47\" cy=\"37\" r=\"1.8\" fill=\"#5b3a6e\"></circle><circle cx=\"53\" cy=\"37\" r=\"1.8\" fill=\"#5b3a6e\"></circle><ellipse cx=\"50\" cy=\"56\" rx=\"42\" ry=\"13\" fill=\"#b99cff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><circle cx=\"24\" cy=\"58\" r=\"3.5\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"1.2\"></circle><circle cx=\"38\" cy=\"58\" r=\"3.5\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"1.2\"></circle><circle cx=\"50\" cy=\"58\" r=\"3.5\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"1.2\"></circle><circle cx=\"62\" cy=\"58\" r=\"3.5\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"1.2\"></circle><circle cx=\"76\" cy=\"58\" r=\"3.5\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"1.2\"></circle></svg>"}, "twinkle": {"name": "Twinkle Stars", "size": 70, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M40 18 Q44.68 39.32 66 44 Q44.68 48.68 40 70 Q35.32 48.68 14 44 Q35.32 39.32 40 18 Z\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M76 9 Q78.34 19.66 89 22 Q78.34 24.34 76 35 Q73.66 24.34 63 22 Q73.66 19.66 76 9 Z\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M74 61 Q76.7 73.3 89 76 Q76.7 78.7 74 91 Q71.3 78.7 59 76 Q71.3 73.3 74 61 Z\" fill=\"#8fd3ff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path></svg>"}, "galaxy": {"name": "Galaxy Swirl", "size": 76, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"#4b2f86\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M50 50 C50 38 66 36 70 48 C76 66 50 78 36 66 C20 52 30 24 54 22\" fill=\"none\" stroke=\"#ff8cc6\" stroke-width=\"6\" stroke-linecap=\"round\"></path><path d=\"M50 50 C50 62 34 64 30 52 C24 34 50 22 64 34 C80 48 70 76 46 78\" fill=\"none\" stroke=\"#b99cff\" stroke-width=\"5\" stroke-linecap=\"round\"></path><circle cx=\"50\" cy=\"50\" r=\"6\" fill=\"#fff3b0\"></circle><circle cx=\"24\" cy=\"36\" r=\"1.8\" fill=\"#fff\"></circle><circle cx=\"72\" cy=\"28\" r=\"1.8\" fill=\"#fff\"></circle><circle cx=\"78\" cy=\"64\" r=\"1.8\" fill=\"#fff\"></circle><circle cx=\"30\" cy=\"74\" r=\"1.8\" fill=\"#fff\"></circle><circle cx=\"60\" cy=\"84\" r=\"1.8\" fill=\"#fff\"></circle><circle cx=\"40\" cy=\"20\" r=\"1.8\" fill=\"#fff\"></circle></svg>"}, "gem": {"name": "Star Crystal", "size": 64, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><polygon points=\"50,94 14,38 30,16 70,16 86,38\" fill=\"#8fd3ff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></polygon><path d=\"M14 38 L86 38 M30 16 L40 38 L50 94 L60 38 L70 16 M50 16 L40 38 M50 16 L60 38\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><polygon points=\"30,16 40,38 14,38\" fill=\"#c9efff\"></polygon><path d=\"M14 38 L86 38\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M84 71 Q85.26 76.74 91 78 Q85.26 79.26 84 85 Q82.74 79.26 77 78 Q82.74 76.74 84 71 Z\" fill=\"#ffd54f\"></path></svg>"}, "mushroom": {"name": "Toadstool", "size": 70, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><rect x=\"36\" y=\"48\" width=\"28\" height=\"44\" rx=\"12\" fill=\"#fff4e0\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></rect><path d=\"M10 56 Q12 12 50 12 Q88 12 90 56 Z\" fill=\"#ff5a6e\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"32\" cy=\"34\" r=\"7\" fill=\"#fff\"></circle><circle cx=\"56\" cy=\"24\" r=\"6\" fill=\"#fff\"></circle><circle cx=\"72\" cy=\"42\" r=\"6\" fill=\"#fff\"></circle><circle cx=\"48\" cy=\"46\" r=\"4\" fill=\"#fff\"></circle><circle cx=\"45\" cy=\"68\" r=\"2.5\" fill=\"#5b3a6e\"></circle><circle cx=\"55\" cy=\"68\" r=\"2.5\" fill=\"#5b3a6e\"></circle><path d=\"M46 75 Q50 79 54 75\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path></svg>"}, "ladybug": {"name": "Ladybug", "size": 60, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M44 26 Q38 12 30 12 M56 26 Q62 12 70 12\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.5\" stroke-linecap=\"round\"></path><circle cx=\"30\" cy=\"12\" r=\"3\" fill=\"#5b3a6e\"></circle><circle cx=\"70\" cy=\"12\" r=\"3\" fill=\"#5b3a6e\"></circle><circle cx=\"50\" cy=\"32\" r=\"15\" fill=\"#5b3a6e\"></circle><circle cx=\"44\" cy=\"30\" r=\"3.5\" fill=\"#fff\"></circle><circle cx=\"56\" cy=\"30\" r=\"3.5\" fill=\"#fff\"></circle><circle cx=\"50\" cy=\"60\" r=\"32\" fill=\"#ff4d6d\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M50 30 L50 92\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"34\" cy=\"50\" r=\"6\" fill=\"#5b3a6e\"></circle><circle cx=\"66\" cy=\"50\" r=\"6\" fill=\"#5b3a6e\"></circle><circle cx=\"32\" cy=\"72\" r=\"5\" fill=\"#5b3a6e\"></circle><circle cx=\"68\" cy=\"72\" r=\"5\" fill=\"#5b3a6e\"></circle><circle cx=\"44\" cy=\"84\" r=\"4\" fill=\"#5b3a6e\"></circle><circle cx=\"56\" cy=\"84\" r=\"4\" fill=\"#5b3a6e\"></circle><ellipse cx=\"30\" cy=\"42\" rx=\"5\" ry=\"3\" fill=\"#fff\" opacity=\"0.7\" transform=\"rotate(-40 30 42)\"></ellipse></svg>"}, "tulip": {"name": "Tulip", "size": 72, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M50 60 L50 96\" fill=\"none\" stroke=\"#4a7a3a\" stroke-width=\"4\" stroke-linecap=\"round\"></path><ellipse cx=\"36\" cy=\"82\" rx=\"14\" ry=\"6\" fill=\"#7bd88f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(-35 36 82)\"></ellipse><ellipse cx=\"64\" cy=\"78\" rx=\"14\" ry=\"6\" fill=\"#7bd88f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(35 64 78)\"></ellipse><path d=\"M26 22 L38 38 L50 18 L62 38 L74 22 Q80 64 50 66 Q20 64 26 22 Z\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M40 44 Q42 56 50 60\" fill=\"none\" stroke=\"#ffc2dd\" stroke-width=\"4\" stroke-linecap=\"round\"></path></svg>"}, "wand": {"name": "Fairy Wand", "size": 84, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M26 92 L58 44\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M26 92 L58 44\" fill=\"none\" stroke=\"#c7a6ff\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><polygon points=\"64.0,6.0 71.1,22.3 88.7,24.0 75.4,35.7 79.3,53.0 64.0,44.0 48.7,53.0 52.6,35.7 39.3,24.0 56.9,22.3\" fill=\"#ffd84d\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></polygon><circle cx=\"64\" cy=\"34\" r=\"4\" fill=\"#fff\" opacity=\"0.8\"></circle><path d=\"M22 22 Q23.44 28.56 30 30 Q23.44 31.44 22 38 Q20.56 31.44 14 30 Q20.56 28.56 22 22 Z\" fill=\"#ff8cc6\"></path><path d=\"M90 64 Q91.08 68.92 96 70 Q91.08 71.08 90 76 Q88.92 71.08 84 70 Q88.92 68.92 90 64 Z\" fill=\"#8fd3ff\"></path><path d=\"M34 7 Q34.9 11.1 39 12 Q34.9 12.9 34 17 Q33.1 12.9 29 12 Q33.1 11.1 34 7 Z\" fill=\"#ffd54f\"></path></svg>"}, "bee": {"name": "Bumblebee", "size": 66, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><ellipse cx=\"40\" cy=\"30\" rx=\"14\" ry=\"18\" fill=\"#e6f6ff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(-20 40 30)\" opacity=\"0.95\"></ellipse><ellipse cx=\"62\" cy=\"30\" rx=\"14\" ry=\"18\" fill=\"#e6f6ff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(20 62 30)\" opacity=\"0.95\"></ellipse><path d=\"M86 58 L96 60 L86 64 Z\" fill=\"#5b3a6e\"></path><ellipse cx=\"54\" cy=\"60\" rx=\"32\" ry=\"22\" fill=\"#ffd84d\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><rect x=\"50\" y=\"40\" width=\"8\" height=\"40\" rx=\"4\" fill=\"#5b3a6e\"></rect><rect x=\"66\" y=\"43\" width=\"7\" height=\"34\" rx=\"3.5\" fill=\"#5b3a6e\"></rect><ellipse cx=\"54\" cy=\"60\" rx=\"32\" ry=\"22\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><circle cx=\"32\" cy=\"56\" r=\"3\" fill=\"#5b3a6e\"></circle><circle cx=\"42\" cy=\"56\" r=\"3\" fill=\"#5b3a6e\"></circle><path d=\"M33 64 Q37 68 41 64\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"28\" cy=\"64\" r=\"3.5\" fill=\"#ff9ec7\"></circle></svg>"}, "daisy": {"name": "Daisy", "size": 68, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><ellipse cx=\"50\" cy=\"24\" rx=\"9\" ry=\"20\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(0 50 50)\"></ellipse><ellipse cx=\"50\" cy=\"24\" rx=\"9\" ry=\"20\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(36 50 50)\"></ellipse><ellipse cx=\"50\" cy=\"24\" rx=\"9\" ry=\"20\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(72 50 50)\"></ellipse><ellipse cx=\"50\" cy=\"24\" rx=\"9\" ry=\"20\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(108 50 50)\"></ellipse><ellipse cx=\"50\" cy=\"24\" rx=\"9\" ry=\"20\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(144 50 50)\"></ellipse><ellipse cx=\"50\" cy=\"24\" rx=\"9\" ry=\"20\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(180 50 50)\"></ellipse><ellipse cx=\"50\" cy=\"24\" rx=\"9\" ry=\"20\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(216 50 50)\"></ellipse><ellipse cx=\"50\" cy=\"24\" rx=\"9\" ry=\"20\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(252 50 50)\"></ellipse><ellipse cx=\"50\" cy=\"24\" rx=\"9\" ry=\"20\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(288 50 50)\"></ellipse><ellipse cx=\"50\" cy=\"24\" rx=\"9\" ry=\"20\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\" transform=\"rotate(324 50 50)\"></ellipse><circle cx=\"50\" cy=\"50\" r=\"16\" fill=\"#ffd84d\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"45\" cy=\"50\" r=\"3\" fill=\"#5b3a6e\"></circle><circle cx=\"55\" cy=\"50\" r=\"3\" fill=\"#5b3a6e\"></circle><path d=\"M45 56 Q50 61 55 56\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"38\" cy=\"56\" r=\"2.5\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle><circle cx=\"62\" cy=\"56\" r=\"2.5\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle></svg>"}, "snail": {"name": "Snail", "size": 70, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M22 74 L18 50 M30 74 L32 50\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.5\" stroke-linecap=\"round\"></path><circle cx=\"18\" cy=\"48\" r=\"4\" fill=\"#5b3a6e\"></circle><circle cx=\"32\" cy=\"48\" r=\"4\" fill=\"#5b3a6e\"></circle><path d=\"M8 88 Q10 70 26 68 L84 70 Q96 80 88 88 Z\" fill=\"#ffe3a3\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"60\" cy=\"54\" r=\"28\" fill=\"#c7a6ff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M60 54 A4 4 0 0 1 68 54 A8 8 0 0 1 52 54 A12 12 0 0 1 76 54 A16 16 0 0 1 44 54 A20 20 0 0 1 84 54\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M20 80 Q24 84 28 80\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"16\" cy=\"80\" r=\"3\" fill=\"#ff9ec7\"></circle></svg>"}, "acorn": {"name": "Acorn", "size": 58, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M50 22 L54 10\" fill=\"none\" stroke=\"#4a7a3a\" stroke-width=\"4\" stroke-linecap=\"round\"></path><path d=\"M26 44 Q26 80 50 92 Q74 80 74 44 Z\" fill=\"#e8b27a\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M20 46 Q20 20 50 20 Q80 20 80 46 Z\" fill=\"#b07a4a\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M30 30 L40 44 M42 24 L52 42 M56 22 L64 40 M68 28 L74 38\" fill=\"none\" stroke=\"#8a5a34\" stroke-width=\"2.5\" stroke-linecap=\"round\"></path><circle cx=\"43\" cy=\"62\" r=\"3\" fill=\"#5b3a6e\"></circle><circle cx=\"57\" cy=\"62\" r=\"3\" fill=\"#5b3a6e\"></circle><path d=\"M45 68 Q50 73 55 68\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"36\" cy=\"68\" r=\"4\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle><circle cx=\"64\" cy=\"68\" r=\"4\" fill=\"#ff9ec7\" opacity=\"0.85\"></circle></svg>"}, "goldsprinkles": {"name": "Golden Sprinkles", "size": 84, "rare": true, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><rect x=\"27.3\" y=\"60.2\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(94 34.3 62.7)\"></rect><rect x=\"68.0\" y=\"59.8\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffc93c\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(148 75.0 62.3)\"></rect><rect x=\"16.9\" y=\"39.9\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#fff3a0\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(120 23.9 42.4)\"></rect><rect x=\"28.6\" y=\"46.1\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffdf70\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(120 35.6 48.6)\"></rect><rect x=\"45.5\" y=\"56.4\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffb81c\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(101 52.5 58.9)\"></rect><rect x=\"51.3\" y=\"40.6\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffe9a8\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(162 58.3 43.1)\"></rect><rect x=\"22.1\" y=\"78.5\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(99 29.1 81.0)\"></rect><rect x=\"57.5\" y=\"65.4\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(16 64.5 67.9)\"></rect><rect x=\"22.6\" y=\"79.8\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffc93c\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(10 29.6 82.3)\"></rect><rect x=\"31.1\" y=\"36.4\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#fff3a0\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(68 38.1 38.9)\"></rect><rect x=\"41.4\" y=\"63.6\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffdf70\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(99 48.4 66.1)\"></rect><rect x=\"55.8\" y=\"75.9\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffb81c\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(101 62.8 78.4)\"></rect><rect x=\"56.7\" y=\"61.0\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffe9a8\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(34 63.7 63.5)\"></rect><rect x=\"65.7\" y=\"42.6\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(34 72.7 45.1)\"></rect><rect x=\"42.7\" y=\"42.9\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(172 49.7 45.4)\"></rect><rect x=\"39.2\" y=\"60.2\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffc93c\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(77 46.2 62.7)\"></rect><rect x=\"38.3\" y=\"69.6\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#fff3a0\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(146 45.3 72.1)\"></rect><rect x=\"34.1\" y=\"59.9\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffdf70\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(149 41.1 62.4)\"></rect><rect x=\"26.9\" y=\"51.1\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffb81c\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(7 33.9 53.6)\"></rect><rect x=\"64.4\" y=\"81.5\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffe9a8\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(171 71.4 84.0)\"></rect><rect x=\"54.7\" y=\"65.8\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(83 61.7 68.3)\"></rect><rect x=\"70.9\" y=\"79.7\" width=\"14\" height=\"5\" rx=\"2.5\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"1.2\" transform=\"rotate(145 77.9 82.2)\"></rect><path d=\"M20 11 Q21.62 18.38 29 20 Q21.62 21.62 20 29 Q18.38 21.62 11 20 Q18.38 18.38 20 11 Z\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M84 19 Q85.26 24.74 91 26 Q85.26 27.26 84 33 Q82.74 27.26 77 26 Q82.74 24.74 84 19 Z\" fill=\"#fff3a0\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path></svg>"}, "sparkleunicorn": {"name": "Sparkle Unicorn", "size": 116, "rare": true, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M36 68 Q30 88 34 98 L68 98 Q66 84 62 74 Z\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"31\" cy=\"40\" r=\"11\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"24\" cy=\"56\" r=\"11\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"25\" cy=\"72\" r=\"11\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"30\" cy=\"87\" r=\"10\" fill=\"#b99cff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"39\" cy=\"28\" r=\"9\" fill=\"#b99cff\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M40 38 L40 15 L53 30 Z\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M42.5 31 L42.5 21 L49 29 Z\" fill=\"#ffc2dd\"></path><ellipse cx=\"54\" cy=\"54\" rx=\"24\" ry=\"22\" fill=\"#fff\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><ellipse cx=\"71\" cy=\"66\" rx=\"15\" ry=\"12\" fill=\"#ffe3f0\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></ellipse><path d=\"M53 35 L69 3 L64 37 Z\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M56 28 L65 25 M59 20 L66 17 M62 12 L67 10\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"48\" cy=\"34\" r=\"8\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M51 52 Q56.5 58 62 52\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M52 54 L49 57 M56 56 L55 60\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><circle cx=\"58\" cy=\"63\" r=\"4.5\" fill=\"#ffadd2\"></circle><ellipse cx=\"77\" cy=\"64\" rx=\"1.8\" ry=\"2.6\" fill=\"#5b3a6e\"></ellipse><path d=\"M67 72 Q71 75 75 72\" fill=\"none\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><path d=\"M86 11 Q87.26 16.74 93 18 Q87.26 19.26 86 25 Q84.74 19.26 79 18 Q84.74 16.74 86 11 Z\" fill=\"#ffd54f\"></path><path d=\"M14 7 Q14.9 11.1 19 12 Q14.9 12.9 14 17 Q13.1 12.9 9 12 Q13.1 11.1 14 7 Z\" fill=\"#ffd54f\"></path><path d=\"M86 43 Q87.26 48.74 93 50 Q87.26 51.26 86 57 Q84.74 51.26 79 50 Q84.74 48.74 86 43 Z\" fill=\"#ffd54f\"></path><path d=\"M12 84 Q13.08 88.92 18 90 Q13.08 91.08 12 96 Q10.92 91.08 6 90 Q10.92 88.92 12 84 Z\" fill=\"#ffd54f\"></path></svg>"}, "crown": {"name": "Rainbow Crown", "size": 80, "rare": true, "svg": "<svg viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M14 78 L16 30 L34 52 L50 20 L66 52 L84 30 L86 78 Z\" fill=\"#ffd54f\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></path><rect x=\"12\" y=\"70\" width=\"76\" height=\"14\" rx=\"5\" fill=\"#ffc93c\" stroke=\"#5b3a6e\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></rect><circle cx=\"22\" cy=\"77\" r=\"4.5\" fill=\"#ff6b8b\" stroke=\"#5b3a6e\" stroke-width=\"1.2\"></circle><circle cx=\"36\" cy=\"77\" r=\"4.5\" fill=\"#ffa94d\" stroke=\"#5b3a6e\" stroke-width=\"1.2\"></circle><circle cx=\"50\" cy=\"77\" r=\"4.5\" fill=\"#7bd88f\" stroke=\"#5b3a6e\" stroke-width=\"1.2\"></circle><circle cx=\"64\" cy=\"77\" r=\"4.5\" fill=\"#74c0fc\" stroke=\"#5b3a6e\" stroke-width=\"1.2\"></circle><circle cx=\"78\" cy=\"77\" r=\"4.5\" fill=\"#b197fc\" stroke=\"#5b3a6e\" stroke-width=\"1.2\"></circle><circle cx=\"16\" cy=\"28\" r=\"5\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"50\" cy=\"18\" r=\"5\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><circle cx=\"84\" cy=\"28\" r=\"5\" fill=\"#ff8cc6\" stroke=\"#5b3a6e\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"></circle><path d=\"M50 42 Q51.44 48.56 58 50 Q51.44 51.44 50 58 Q48.56 51.44 42 50 Q48.56 48.56 50 42 Z\" fill=\"#fff\"></path></svg>"}};            // topping id -> { name, size, svg, rare? }
+const PACKS = [{"id": "unicorn", "name": "Unicorn Land", "kinds": ["sprinkles", "rose", "heart", "star", "butterfly", "cloud", "rainbow", "unicorn"]}, {"id": "candy", "name": "Candy Castle", "kinds": ["candle", "cherry", "strawberry", "macaron", "lollipop", "gumdrop", "wrapped", "cookie"]}, {"id": "mermaid", "name": "Mermaid Lagoon", "kinds": ["shell", "pearl", "starfish", "tail", "coral", "fish", "bubbles", "jelly"]}, {"id": "galaxy", "name": "Galaxy Sparkle", "kinds": ["planet", "moon", "shooting", "rocket", "ufo", "twinkle", "galaxy", "gem"]}, {"id": "fairy", "name": "Fairy Garden", "kinds": ["mushroom", "ladybug", "tulip", "wand", "bee", "daisy", "snail", "acorn"]}];          // [{ id, name, kinds: [...] }]
+const RARES = ["goldsprinkles", "sparkleunicorn", "crown"];
+const TREAT_SVG = {"cake": "<svg class=\"treat-svg\" viewBox=\"0 0 520 520\" aria-hidden=\"true\"><ellipse cx=\"260\" cy=\"512\" rx=\"80\" ry=\"7\" fill=\"#d9e5f7\"></ellipse><path d=\"M232 494 L222 510 L298 510 L288 494 Z\" fill=\"#fff\" class=\"ol\"></path><ellipse cx=\"260\" cy=\"492\" rx=\"232\" ry=\"16\" fill=\"#fff\" class=\"ol\"></ellipse><ellipse cx=\"260\" cy=\"489\" rx=\"214\" ry=\"9\" fill=\"#f6ecfc\"></ellipse><rect x=\"60\" y=\"370\" width=\"400\" height=\"120\" rx=\"16\" fill=\"__BASE__\" class=\"ol\"></rect><rect x=\"61.5\" y=\"450\" width=\"397\" height=\"4\" fill=\"#ff6b8b\"></rect><rect x=\"61.5\" y=\"454\" width=\"397\" height=\"4\" fill=\"#ffa94d\"></rect><rect x=\"61.5\" y=\"458\" width=\"397\" height=\"4\" fill=\"#ffe066\"></rect><rect x=\"61.5\" y=\"462\" width=\"397\" height=\"4\" fill=\"#7bd88f\"></rect><rect x=\"61.5\" y=\"466\" width=\"397\" height=\"4\" fill=\"#74c0fc\"></rect><rect x=\"61.5\" y=\"470\" width=\"397\" height=\"4\" fill=\"#b197fc\"></rect><circle cx=\"70.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"89.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"108.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"127.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"146.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"165.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"184.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"203.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"222.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"241.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"260.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"279.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"298.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"317.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"336.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"355.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"374.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"393.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"412.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"431.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"450.0\" cy=\"486\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><path d=\"M55 384 V374 Q55 364 65 364 H455 Q465 364 465 374 V384 Q458.5 392 452.0 386 V411 A8 8 0 0 1 436.0 411 V386 Q425.6 392 415.2 386 V411 A8 8 0 0 1 399.2 411 V386 Q388.8 392 378.4 386 V420 A8 8 0 0 1 362.4 420 V386 Q352.0 392 341.6 386 V406 A8 8 0 0 1 325.6 406 V386 Q315.2 392 304.8 386 V410 A8 8 0 0 1 288.8 410 V386 Q278.4 392 268.0 386 V409 A8 8 0 0 1 252.0 409 V386 Q241.6 392 231.2 386 V417 A8 8 0 0 1 215.2 417 V386 Q204.8 392 194.4 386 V416 A8 8 0 0 1 178.4 416 V386 Q168.0 392 157.6 386 V412 A8 8 0 0 1 141.6 412 V386 Q131.2 392 120.8 386 V403 A8 8 0 0 1 104.8 403 V386 Q94.4 392 84.0 386 V404 A8 8 0 0 1 68.0 404 V386 Q61.5 392 55 384 Z\" fill=\"__DRIP__\" class=\"ol\"></path><ellipse cx=\"86\" cy=\"372\" rx=\"12\" ry=\"3.5\" fill=\"#fff\" opacity=\"0.6\"></ellipse><rect x=\"125\" y=\"265\" width=\"270\" height=\"105\" rx=\"16\" fill=\"__BASE__\" class=\"ol\"></rect><rect x=\"126.5\" y=\"330\" width=\"267\" height=\"4\" fill=\"#ff6b8b\"></rect><rect x=\"126.5\" y=\"334\" width=\"267\" height=\"4\" fill=\"#ffa94d\"></rect><rect x=\"126.5\" y=\"338\" width=\"267\" height=\"4\" fill=\"#ffe066\"></rect><rect x=\"126.5\" y=\"342\" width=\"267\" height=\"4\" fill=\"#7bd88f\"></rect><rect x=\"126.5\" y=\"346\" width=\"267\" height=\"4\" fill=\"#74c0fc\"></rect><rect x=\"126.5\" y=\"350\" width=\"267\" height=\"4\" fill=\"#b197fc\"></rect><circle cx=\"135.0\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"154.2\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"173.5\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"192.7\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"211.9\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"231.2\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"250.4\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"269.6\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"288.8\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"308.1\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"327.3\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"346.5\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"365.8\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"385.0\" cy=\"366\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><path d=\"M120 279 V269 Q120 259 130 259 H390 Q400 259 400 269 V279 Q393.5 287 387.0 281 V302 A8 8 0 0 1 371.0 302 V281 Q359.2 287 347.3 281 V302 A8 8 0 0 1 331.3 302 V281 Q319.5 287 307.7 281 V314 A8 8 0 0 1 291.7 314 V281 Q279.8 287 268.0 281 V304 A8 8 0 0 1 252.0 304 V281 Q240.2 287 228.3 281 V313 A8 8 0 0 1 212.3 313 V281 Q200.5 287 188.7 281 V300 A8 8 0 0 1 172.7 300 V281 Q160.8 287 149.0 281 V306 A8 8 0 0 1 133.0 306 V281 Q126.5 287 120 279 Z\" fill=\"__DRIP__\" class=\"ol\"></path><ellipse cx=\"151\" cy=\"267\" rx=\"12\" ry=\"3.5\" fill=\"#fff\" opacity=\"0.6\"></ellipse><rect x=\"185\" y=\"175\" width=\"150\" height=\"90\" rx=\"16\" fill=\"__BASE__\" class=\"ol\"></rect><rect x=\"186.5\" y=\"225\" width=\"147\" height=\"4\" fill=\"#ff6b8b\"></rect><rect x=\"186.5\" y=\"229\" width=\"147\" height=\"4\" fill=\"#ffa94d\"></rect><rect x=\"186.5\" y=\"233\" width=\"147\" height=\"4\" fill=\"#ffe066\"></rect><rect x=\"186.5\" y=\"237\" width=\"147\" height=\"4\" fill=\"#7bd88f\"></rect><rect x=\"186.5\" y=\"241\" width=\"147\" height=\"4\" fill=\"#74c0fc\"></rect><rect x=\"186.5\" y=\"245\" width=\"147\" height=\"4\" fill=\"#b197fc\"></rect><circle cx=\"195.0\" cy=\"261\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"213.6\" cy=\"261\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"232.1\" cy=\"261\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"250.7\" cy=\"261\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"269.3\" cy=\"261\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"287.9\" cy=\"261\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"306.4\" cy=\"261\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><circle cx=\"325.0\" cy=\"261\" r=\"4.5\" fill=\"#fff\" class=\"ol1\"></circle><path d=\"M180 189 V179 Q180 169 190 169 H330 Q340 169 340 179 V189 Q333.5 197 327.0 191 V204 A8 8 0 0 1 311.0 204 V191 Q299.3 197 287.7 191 V205 A8 8 0 0 1 271.7 205 V191 Q260.0 197 248.3 191 V205 A8 8 0 0 1 232.3 205 V191 Q220.7 197 209.0 191 V210 A8 8 0 0 1 193.0 210 V191 Q186.5 197 180 189 Z\" fill=\"__DRIP__\" class=\"ol\"></path><ellipse cx=\"211\" cy=\"177\" rx=\"12\" ry=\"3.5\" fill=\"#fff\" opacity=\"0.6\"></ellipse></svg>", "cupcake": "<svg class=\"treat-svg\" viewBox=\"0 0 520 520\" aria-hidden=\"true\"><ellipse cx=\"260\" cy=\"492\" rx=\"150\" ry=\"12\" fill=\"#d9e5f7\"></ellipse><path d=\"M140 300 L380 300 L352 486 L168 486 Z\" fill=\"#fff\" class=\"ol\"></path><path d=\"M140.0 300 L170.0 300 L191.0 486 L168.0 486 Z\" fill=\"#ffd0e6\"></path><path d=\"M200.0 300 L230.0 300 L237.0 486 L214.0 486 Z\" fill=\"#ffd0e6\"></path><path d=\"M260.0 300 L290.0 300 L283.0 486 L260.0 486 Z\" fill=\"#ffd0e6\"></path><path d=\"M320.0 300 L350.0 300 L329.0 486 L306.0 486 Z\" fill=\"#ffd0e6\"></path><path d=\"M140 300 L380 300 L352 486 L168 486 Z\" fill=\"none\" class=\"ol\"></path><path d=\"M170.0 300 L191.0 486\" fill=\"none\" class=\"ol1\"></path><path d=\"M200.0 300 L214.0 486\" fill=\"none\" class=\"ol1\"></path><path d=\"M230.0 300 L237.0 486\" fill=\"none\" class=\"ol1\"></path><path d=\"M260.0 300 L260.0 486\" fill=\"none\" class=\"ol1\"></path><path d=\"M290.0 300 L283.0 486\" fill=\"none\" class=\"ol1\"></path><path d=\"M320.0 300 L306.0 486\" fill=\"none\" class=\"ol1\"></path><path d=\"M350.0 300 L329.0 486\" fill=\"none\" class=\"ol1\"></path><rect x=\"108\" y=\"246\" width=\"304\" height=\"72\" rx=\"36\" fill=\"__DRIP__\" class=\"ol\"></rect><rect x=\"140\" y=\"186\" width=\"240\" height=\"72\" rx=\"36\" fill=\"__DRIP__\" class=\"ol\"></rect><rect x=\"178\" y=\"130\" width=\"164\" height=\"66\" rx=\"33\" fill=\"__DRIP__\" class=\"ol\"></rect><path d=\"M226 142 Q236 96 280 66 Q296 110 294 142 Z\" fill=\"__DRIP__\" class=\"ol\"></path><path d=\"M136 270 Q190 260 240 266\" fill=\"none\" stroke=\"__BASE__\" stroke-width=\"9\" stroke-linecap=\"round\"></path><path d=\"M168 208 Q214 200 256 206\" fill=\"none\" stroke=\"__BASE__\" stroke-width=\"9\" stroke-linecap=\"round\"></path><path d=\"M204 152 Q236 146 266 150\" fill=\"none\" stroke=\"__BASE__\" stroke-width=\"9\" stroke-linecap=\"round\"></path><path d=\"M248 120 Q262 100 278 88\" fill=\"none\" stroke=\"__BASE__\" stroke-width=\"9\" stroke-linecap=\"round\"></path></svg>", "donut": "<svg class=\"treat-svg\" viewBox=\"0 0 520 520\" aria-hidden=\"true\"><ellipse cx=\"260\" cy=\"478\" rx=\"226\" ry=\"24\" fill=\"#fff\" class=\"ol\"></ellipse><ellipse cx=\"260\" cy=\"474\" rx=\"206\" ry=\"13\" fill=\"#f6ecfc\"></ellipse><circle cx=\"260\" cy=\"272\" r=\"196\" fill=\"#f2c38b\" class=\"ol\"></circle><path d=\"M431.0 272.0 L436.0 281.2 L437.3 290.6 L435.1 299.7 L430.8 308.3 L426.0 316.5 L421.8 324.6 L418.3 332.8 L414.8 340.9 L410.2 348.5 L403.8 355.0 L395.5 360.0 L386.3 363.8 L377.8 367.4 L371.2 372.2 L367.2 379.2 L365.3 388.9 L364.1 400.5 L362.0 412.4 L357.7 422.5 L350.9 429.4 L341.8 432.6 L331.6 432.9 L321.3 431.8 L311.6 430.9 L302.6 431.1 L294.1 432.3 L285.6 433.6 L277.0 433.8 L268.4 432.3 L260.0 429.2 L251.9 425.9 L244.0 424.0 L235.8 424.7 L226.8 428.2 L216.7 433.6 L205.9 438.7 L195.0 441.2 L185.3 439.8 L177.4 434.0 L171.7 425.0 L167.4 414.6 L163.7 404.6 L159.4 396.3 L154.0 389.7 L147.7 384.3 L141.3 378.9 L135.6 372.7 L131.2 365.6 L127.6 358.0 L123.8 350.6 L118.7 344.0 L111.4 338.2 L102.2 332.6 L92.6 326.4 L84.6 319.0 L80.2 310.2 L80.4 300.5 L84.8 290.4 L91.8 280.8 L99.0 272.0 L104.5 263.8 L107.1 255.9 L107.2 247.8 L106.1 239.3 L105.3 230.6 L106.0 222.0 L108.4 213.8 L111.5 205.9 L114.4 197.8 L116.2 189.0 L117.0 179.1 L117.7 168.6 L119.8 158.4 L124.5 150.0 L132.5 144.5 L143.1 142.2 L155.2 142.5 L166.8 143.8 L176.9 144.0 L184.9 141.9 L191.1 136.8 L196.6 129.6 L202.4 121.9 L209.0 115.1 L216.7 110.4 L225.0 107.5 L233.7 105.7 L242.3 103.6 L251.0 100.7 L260.0 97.2 L269.3 94.4 L278.7 93.8 L287.8 96.8 L295.8 103.5 L302.6 112.9 L308.4 122.9 L314.0 131.3 L320.3 136.5 L328.2 138.2 L337.7 137.5 L348.2 136.1 L358.8 136.0 L368.3 138.3 L376.1 143.0 L382.5 149.5 L388.0 156.7 L393.7 163.8 L399.8 170.4 L406.0 177.2 L411.3 184.6 L414.5 193.3 L414.7 203.1 L412.1 213.6 L408.3 223.8 L405.2 233.1 L404.9 241.2 L408.3 248.5 L415.0 255.7 L423.4 263.4 L431.0 272.0 Z\" fill=\"__DRIP__\" class=\"ol\"></path><path d=\"M142 180 A150 150 0 0 1 250 124\" fill=\"none\" stroke=\"__BASE__\" stroke-width=\"12\" stroke-linecap=\"round\"></path><circle cx=\"260\" cy=\"272\" r=\"72\" fill=\"#f2c38b\" class=\"ol\"></circle><circle cx=\"260\" cy=\"272\" r=\"54\" fill=\"#e9f2ff\" class=\"ol\"></circle></svg>", "sundae": "<svg class=\"treat-svg\" viewBox=\"0 0 520 520\" aria-hidden=\"true\"><ellipse cx=\"260\" cy=\"482\" rx=\"96\" ry=\"18\" fill=\"#d8f3ff\" class=\"ol\"></ellipse><rect x=\"242\" y=\"384\" width=\"36\" height=\"96\" fill=\"#d8f3ff\" class=\"ol\"></rect><circle cx=\"182\" cy=\"250\" r=\"80\" fill=\"__BASE__\" class=\"ol\"></circle><circle cx=\"338\" cy=\"250\" r=\"80\" fill=\"#fff4dc\" class=\"ol\"></circle><circle cx=\"260\" cy=\"176\" r=\"84\" fill=\"__DRIP__\" class=\"ol\"></circle><path d=\"M204 150 A62 62 0 0 1 250 108\" fill=\"none\" stroke=\"__BASE__\" stroke-width=\"10\" stroke-linecap=\"round\"></path><circle cx=\"234\" cy=\"100\" r=\"28\" fill=\"#fff\" class=\"ol\"></circle><circle cx=\"286\" cy=\"100\" r=\"28\" fill=\"#fff\" class=\"ol\"></circle><circle cx=\"260\" cy=\"76\" r=\"30\" fill=\"#fff\" class=\"ol\"></circle><path d=\"M216 104 Q260 120 304 104\" fill=\"#fff\"></path><path d=\"M86 262 L434 262 Q424 404 260 404 Q96 404 86 262 Z\" fill=\"#e3f6ff\" class=\"ol\"></path><circle cx=\"150\" cy=\"300\" r=\"8\" fill=\"#ff6b8b\" class=\"ol1\"></circle><circle cx=\"194\" cy=\"300\" r=\"8\" fill=\"#ffa94d\" class=\"ol1\"></circle><circle cx=\"238\" cy=\"300\" r=\"8\" fill=\"#ffe066\" class=\"ol1\"></circle><circle cx=\"282\" cy=\"300\" r=\"8\" fill=\"#7bd88f\" class=\"ol1\"></circle><circle cx=\"326\" cy=\"300\" r=\"8\" fill=\"#74c0fc\" class=\"ol1\"></circle><circle cx=\"370\" cy=\"300\" r=\"8\" fill=\"#b197fc\" class=\"ol1\"></circle><path d=\"M118 290 Q126 350 176 376\" fill=\"none\" stroke=\"#fff\" stroke-width=\"9\" stroke-linecap=\"round\"></path></svg>"};   // treat id -> svg with __BASE__/__DRIP__
+const SPOTS = {"cake": [[260, 138], [155, 232], [365, 232], [92, 338], [428, 338], [190, 316], [330, 316], [130, 432], [260, 436], [390, 432]], "cupcake": [[262, 100], [165, 276], [355, 276], [260, 286], [200, 218], [320, 218], [260, 162], [110, 170], [410, 170], [260, 400]], "donut": [[260, 150], [332, 173], [376, 234], [376, 310], [332, 371], [260, 394], [188, 371], [144, 310], [144, 234], [188, 173]], "sundae": [[260, 92], [178, 222], [342, 222], [260, 170], [140, 272], [380, 272], [214, 242], [306, 242], [120, 150], [400, 150]]};
+const TREATS = [
+  { id: "cake", name: "Layer Cake" }, { id: "cupcake", name: "Giant Cupcake" },
+  { id: "donut", name: "Donut" }, { id: "sundae", name: "Sundae" }
+];
+const FROST = [
+  { name: "Strawberry", base: "#ffe0ee", drip: "#ff8fbf" },
+  { name: "Lavender", base: "#efe4ff", drip: "#b995f5" },
+  { name: "Mint", base: "#dcf7ec", drip: "#6fd3ad" },
+  { name: "Lemon", base: "#fff6cf", drip: "#ffd84d" },
+  { name: "Blueberry", base: "#e0efff", drip: "#7fb8f5" }
+];
+const GOAL = 10;
+const RARE_CHANCE = 0.12;
+const YAY = ["Yes, chef!", "Perfect batch!", "Order up, nailed it!", "Fresh out of the oven!", "Sweet! That's the one!", "Sprinkle-tastic!"];
+const GIFT_COLORS = [["#ff8cc6", "#ffd84d"], ["#b99cff", "#7bd88f"], ["#6fd3ad", "#ff6b8b"]];
+const SPEAKER_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="currentColor"/><path d="M16 9 Q18 12 16 15 M18.5 6.5 Q22 12 18.5 17.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+function ex(item) { return EXTRA[item.word] || {}; }
+
+// ---------- saved bakery state ----------
+function ensureBakery() {
+  const d = { treat: "cake", pack: "unicorn", unlocked: 1, frost: 0, placed: [], shelf: [], uid: 1, collected: {}, inProgress: false };
+  if (!state.bakery || typeof state.bakery !== "object") state.bakery = {};
+  state.bakery = Object.assign(d, state.bakery);
+  if (typeof state.autoRead !== "boolean") state.autoRead = false;
+  if (typeof state.wordsRight !== "number") state.wordsRight = 0;
+  if (typeof state.bestStreak !== "number") state.bestStreak = 0;
+}
+
+// ---------- speech ----------
+function speak(text, lang) {
+  try {
+    const ss = window.speechSynthesis; if (!ss || !text) return;
+    ss.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang; u.rate = 0.88;
+    const vs = ss.getVoices() || [];
+    const v = vs.find(x => x.lang && x.lang.toLowerCase() === lang.toLowerCase()) ||
+      vs.find(x => x.lang && x.lang.slice(0, 2) === lang.slice(0, 2));
+    if (v) u.voice = v;
+    ss.speak(u);
+  } catch (e) { }
+}
+function sayEn(t) { speak(t, "en-US"); }
+function sayEs(t) {
+  let lang = "es-MX";
+  try {
+    const vs = window.speechSynthesis.getVoices() || [];
+    if (!vs.some(v => v.lang === "es-MX")) lang = vs.some(v => v.lang === "es-US") ? "es-US" : "es-ES";
+  } catch (e) { }
+  speak(t, lang);
+}
+try { if (window.speechSynthesis) window.speechSynthesis.getVoices(); } catch (e) { }
+
+// ---------- question building ----------
+const TYPE_LABEL = {
+  def: "What does this word mean?", blank: "Fill in the blank", syn: "Pick the synonym", usage: "Is it used correctly?",
+  unscramble: "Unscramble the word", build: "Build the word", family: "Root family"
+};
+
+function swapWord(sentence, word, repl) {
+  const blanked = blankOutWord(sentence, word);
+  const i = blanked.indexOf("_____");
+  if (i < 0) return null;
+  const capital = i === 0 || /[.!?]\s*$/.test(blanked.slice(0, i));
+  const r = capital ? repl[0].toUpperCase() + repl.slice(1) : repl;
+  return blanked.slice(0, i) + r + blanked.slice(i + 5);
+}
+function famParts(label) {
+  const parts = String(label).split(" — ");
+  const key = parts[0].trim();
+  const meaning = (parts[1] || "").replace(/\s*\(.*\)\s*$/, "").trim();
+  const letters = key.split("/")[0].replace(/[^A-Za-z]/g, "").toLowerCase();
+  return { key, meaning, letters };
+}
+
+function makeQuestion(item, lastType) {
+  const taught = WORDS.filter(isTaught);
+  const pool = taught.length >= 6 ? taught : WORDS.filter(w => w.week <= Math.max(state.currentWeek, 2));
+  const others = shuffle(pool.filter(w => w.id !== item.id));
+  const e = ex(item);
+  const four = (list, field) => {
+    const seen = new Set([String(item[field]).toLowerCase()]);
+    const picked = [];
+    for (const w of list) {
+      const v = String(field === "syn" ? ex(w).syn : w[field]);
+      if (!v || seen.has(v.toLowerCase())) continue;
+      seen.add(v.toLowerCase()); picked.push(v);
+      if (picked.length === 3) break;
+    }
+    if (picked.length < 3) return null;
+    const right = field === "syn" ? e.syn : item[field];
+    return shuffle([right].concat(picked)).map(t => ({ text: t, ok: t === right }));
+  };
+  const gens = {
+    def() {
+      const opts = four(others, "definition"); if (!opts) return null;
+      return { lead: "What does this word mean?", big: item.word, opts, speak: item.word,
+        hint: item.rootNote ? "Root clue: " + item.rootNote : "Clue sentence: " + item.example,
+        answer: item.word + " means " + item.definition + ".", correctText: item.definition };
+    },
+    blank() {
+      const opts = four(others, "word"); if (!opts) return null;
+      const mid = blankOutWord(item.example, item.word);
+      return { lead: "Which word fills the blank?", mid, opts, speak: mid.replace("_____", "blank"),
+        hint: "The missing word means: " + item.definition + ".", answer: "The missing word is " + item.word + ".", correctText: item.word };
+    },
+    syn() {
+      if (!e.syn) return null;
+      const opts = four(others.filter(w => ex(w).syn && ex(w).pos !== e.pos && ex(w).syn.toLowerCase() !== item.word.toLowerCase()), "syn");
+      if (!opts) return null;
+      return { lead: "Which word means almost the same thing?", big: item.word, opts, speak: item.word,
+        hint: item.word + " means " + item.definition + ".", answer: item.word + " means about the same as “" + e.syn + ".”", correctText: e.syn };
+    },
+    usage() {
+      let fits = Math.random() < 0.5, sentence = item.example;
+      if (!fits) {
+        const nounVerb = e.pos === "n" || e.pos === "v";
+        const slot = others.find(w => { const p = ex(w).pos; return nounVerb ? (p === "adv" || p === "conj") : p === "n"; });
+        const swapped = slot ? swapWord(slot.example, slot.word, item.word) : null;
+        if (swapped) sentence = swapped; else fits = true;
+      }
+      return { lead: "Does “" + item.word + "” make sense in this sentence?", mid: sentence, speak: sentence,
+        opts: [{ text: "Yes, it makes sense", ok: fits }, { text: "No, it doesn't fit", ok: !fits }],
+        hint: "Remember: " + item.word + " means " + item.definition + ".",
+        answer: fits ? "Yes! It fits, because " + item.word + " means " + item.definition + "." : "That sentence needs a different word. " + item.word + " means " + item.definition + ".",
+        correctText: fits ? "Yes, it makes sense" : "No, it doesn't fit" };
+    },
+    unscramble() {
+      const w = item.word.toLowerCase();
+      if (!/^[a-z]+$/.test(w) || w.length < 4) return null;
+      let letters = w.split(""), tries = 0;
+      do { letters = shuffle(letters); tries++; } while (letters.join("") === w && tries < 12);
+      return { lead: "Unscramble the word that means:", mid: item.definition, tiles: letters, speak: item.definition,
+        hint: "It starts with “" + w[0].toUpperCase() + "” and has " + w.length + " letters.",
+        answer: "It's spelled " + w.toUpperCase().split("").join("-") + ".", correctText: item.word };
+    },
+    build() {
+      if (item.type !== "root" || !item.rootNote) return null;
+      const same = others.filter(w => w.rootFamily && w.rootFamily === item.rootFamily);
+      const rest = others.filter(w => w.rootFamily !== item.rootFamily);
+      const opts = four(same.concat(rest), "word"); if (!opts) return null;
+      return { lead: "Put the parts together. Which word do they make?", mid: item.rootNote, opts, speak: item.rootNote,
+        hint: "The word means: " + item.definition + ".", answer: item.rootNote + " makes " + item.word + ".", correctText: item.word };
+    },
+    family() {
+      if (item.type !== "root" || !item.rootFamily) return null;
+      const f = famParts(item.rootFamily);
+      const opts = four(others.filter(w => w.rootFamily !== item.rootFamily), "word"); if (!opts) return null;
+      return { lead: "Which word belongs to this root family?", big: f.key + " = " + f.meaning, opts,
+        speak: "Which word belongs to the " + f.letters + " family? It means " + f.meaning + ".",
+        hint: "Look for “" + f.letters + "” hiding inside the word.", answer: item.word + " is in the " + f.key + " family (" + f.meaning + ").", correctText: item.word };
+    }
+  };
+  let order = shuffle(Object.keys(gens));
+  order = order.filter(t => t !== lastType).concat(order.filter(t => t === lastType));
+  for (const t of order) {
+    const q = gens[t]();
+    if (q) return Object.assign({ type: t, item, big: "", mid: "", opts: [], tiles: null }, q);
+  }
+  return null;
+}
+
+// ---------- bake session (not saved; the bakery itself is) ----------
+const bake = { screen: "start", phase: "ask", q: null, pool: [], idx: 0, built: [], hint: false, gifts: [], reward: null, answer: "", yay: "", lastType: "", given: "" };
+
+function nextQuestion() {
+  let tries = 0;
+  while (tries++ < 400) {
+    if (bake.idx >= bake.pool.length) { bake.pool = buildRoundPool(3, 2); bake.idx = 0; saveState(); }
+    if (!bake.pool.length) bake.pool = shuffle(WORDS.filter(isTaught));
+    const item = bake.pool[bake.idx++];
+    const q = item ? makeQuestion(item, bake.lastType) : null;
+    if (q) {
+      bake.q = q; bake.lastType = q.type; bake.phase = "ask"; bake.built = []; bake.hint = false; bake.screen = "bake";
+      renderBakeCard();
+      if (state.autoRead) setTimeout(() => sayEn(q.speak), 350);
+      return;
+    }
+  }
+}
+
+function giveAnswer(ok, given) {
+  const q = bake.q;
+  recordAnswer(q.item.id, ok, {
+    subject: "vocabulary", word: q.item.word, question: TYPE_LABEL[q.type],
+    givenAnswer: given, correctAnswer: q.correctText, wasCorrect: ok
+  });
+  bake.answer = q.answer.charAt(0).toUpperCase() + q.answer.slice(1); bake.given = given;
+  if (ok) {
+    state.streak += 1; state.wordsRight += 1; state.lifetimePoints += 10;
+    state.bestStreak = Math.max(state.bestStreak, state.streak);
+    bake.yay = pick(YAY); bake.phase = "right";
+    const pack = PACKS.find(p => p.id === state.bakery.pack) || PACKS[0];
+    const fresh = pack.kinds.filter(k => !state.bakery.collected[k]);
+    const notOnTreat = pack.kinds.filter(k => !state.bakery.placed.some(p => p.kind === k));
+    const base = shuffle(fresh.length ? fresh : (notOnTreat.length ? notOnTreat : pack.kinds));
+    const filler = shuffle(pack.kinds);
+    let rareUsed = false;
+    bake.gifts = [0, 1, 2].map(i => {
+      if (!rareUsed && Math.random() < RARE_CHANCE) { rareUsed = true; return pick(RARES); }
+      return base[i] || filler[i % filler.length];
+    });
+    if (state.streak > 0 && state.streak % 5 === 0) celebrate(true); else playTone(true);
+  } else {
+    state.streak = 0; bake.phase = "wrong";
+    bake.pool.splice(Math.min(bake.pool.length, bake.idx + 3), 0, q.item);
+  }
+  saveState(); renderRankBar(); renderBakeCard();
+}
+
+function placeReward() {
+  const b = state.bakery;
+  const spots = SPOTS[b.treat];
+  const n = b.placed.length;
+  const sp = spots[n % spots.length];
+  const jitter = n >= spots.length ? 22 : 0;
+  b.placed.forEach(p => { p.fresh = false; });
+  b.placed.push({ uid: b.uid++, kind: bake.reward, x: sp[0] + (Math.random() - 0.5) * jitter, y: sp[1] + (Math.random() - 0.5) * jitter, fresh: true });
+  b.collected[bake.reward] = true;
+  saveState();
+  renderStage();
+  if (b.placed.length >= GOAL) {
+    const pk = PACKS.find(p => p.id === b.pack);
+    bake.name = pk.name.split(" ")[0] + " Dream " + TREATS.find(t => t.id === b.treat).name;
+    bake.screen = "done"; renderBakeCard(); renderStage(); celebrate();
+  } else {
+    nextQuestion();
+  }
+}
+
+function saveToShelf(name) {
+  const b = state.bakery;
+  const f = FROST[b.frost];
+  b.shelf.unshift({ treat: b.treat, base: f.base, drip: f.drip, name: (name || "My Treat").slice(0, 28), date: todayStr(),
+    placed: b.placed.map(p => ({ kind: p.kind, x: Math.round(p.x), y: Math.round(p.y) })) });
+  bake.unlockMsg = "";
+  if (b.unlocked < PACKS.length) { bake.unlockMsg = PACKS[b.unlocked].name; b.pack = PACKS[b.unlocked].id; b.unlocked += 1; }
+  const ti = TREATS.findIndex(t => t.id === b.treat);
+  b.treat = TREATS[(ti + 1) % TREATS.length].id;
+  b.frost = (b.frost + 1) % FROST.length;
+  b.placed = []; b.inProgress = false;
+  saveState();
+  bake.screen = "start";
+  renderBakeCard(); renderStage(); renderShelfStrip();
+  celebrate();
+}
+
+// ---------- rendering helpers ----------
+function treatSvg(treat, base, drip) {
+  return TREAT_SVG[treat].split("__BASE__").join(base).split("__DRIP__").join(drip);
+}
+function topHtml(p, cls) {
+  const t = TOPS[p.kind]; if (!t) return "";
+  const s = t.size / 5.2;
+  return `<div class="${cls}" data-uid="${p.uid || ""}" title="${esc(t.name)}" style="left:${((p.x - t.size / 2) / 5.2).toFixed(2)}%;top:${((p.y - t.size / 2) / 5.2).toFixed(2)}%;width:${s.toFixed(2)}%;height:${s.toFixed(2)}%">${t.svg}</div>`;
+}
+function miniHtml(entry) {
+  return `<div class="mini"><div class="treat-box">${treatSvg(entry.treat, entry.base, entry.drip)}${entry.placed.map(p => topHtml(p, "mtop")).join("")}</div></div>`;
+}
+function giftSvg(c1, c2) {
+  return `<svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true">
+    <rect x="16" y="50" width="88" height="62" rx="10" fill="${c1}" class="ol"/>
+    <rect x="10" y="36" width="100" height="22" rx="8" fill="${c1}" class="ol"/>
+    <rect x="52" y="36" width="16" height="76" fill="${c2}" class="ol2"/>
+    <path d="M60 36 C40 10 22 22 34 34 Z" fill="${c2}" class="ol2"/><path d="M60 36 C80 10 98 22 86 34 Z" fill="${c2}" class="ol2"/>
+    <circle cx="60" cy="36" r="7" fill="${c2}" class="ol2"/></svg>`;
+}
+
+// ---------- Bake! screen ----------
+function renderBakeMode() {
+  const main = document.getElementById("gameCard");
+  main.className = "bake-area";
+  main.innerHTML = `
+    <div class="bake-grid">
+      <section class="card qcard" id="qCard"></section>
+      <section class="stage-wrap">
+        <div class="stage">
+          <svg class="sky" viewBox="0 0 640 560" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+            <path d="M-40 580 A360 360 0 0 1 680 580" stroke="#ffe3ee"/><path d="M-14 580 A334 334 0 0 1 654 580" stroke="#fff3d6"/>
+            <path d="M12 580 A308 308 0 0 1 628 580" stroke="#e2f7e9"/><path d="M38 580 A282 282 0 0 1 602 580" stroke="#efe6ff"/>
+          </svg>
+          <div class="treat-box" id="treatBox"></div>
+          <div class="stage-top">
+            <div class="frost-row"><span>Frosting</span>${FROST.map((f, i) => `<button class="sw" data-frost="${i}" style="background:${f.drip}" aria-label="${f.name} frosting" title="${f.name} frosting"></button>`).join("")}</div>
+            <div class="pack-badge" id="packBadge"></div>
+          </div>
+          <div class="stage-hint">Drag your toppings anywhere you like</div>
+        </div>
+      </section>
+    </div>
+    <section class="shelf-strip">
+      <h2 class="disp">My display case</h2>
+      <div class="shelf" id="shelfStrip"></div>
+    </section>`;
+  main.querySelectorAll(".sw").forEach(b => b.addEventListener("click", () => {
+    state.bakery.frost = +b.dataset.frost; saveState(); renderStage();
+  }));
+  const b = state.bakery;
+  if (bake.screen === "start" && b.inProgress && b.placed.length > 0 && b.placed.length < GOAL) {
+    nextQuestion();
+  } else if (b.placed.length >= GOAL) {
+    bake.screen = "done"; bake.name = bake.name || "My Dream Treat"; renderBakeCard();
+  } else {
+    renderBakeCard();
+  }
+  renderStage(); renderShelfStrip();
+}
+
+function renderStage() {
+  const box = document.getElementById("treatBox"); if (!box) return;
+  const b = state.bakery, f = FROST[b.frost];
+  box.innerHTML = treatSvg(b.treat, f.base, f.drip) + b.placed.map(p => topHtml(p, "top" + (p.fresh ? " pop" : ""))).join("") +
+    (bake.screen === "done" ? '<svg class="done-spark" viewBox="0 0 520 520" aria-hidden="true">' + DONE_SPARKS + "</svg>" : "");
+  document.querySelectorAll(".sw").forEach(s => s.classList.toggle("on", +s.dataset.frost === b.frost));
+  const pb = document.getElementById("packBadge"); if (pb) pb.textContent = (PACKS.find(p => p.id === b.pack) || PACKS[0]).name;
+  box.querySelectorAll(".top").forEach(el => attachToppingDrag(el, box));
+}
+
+function attachToppingDrag(el, box) {
+  el.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    const uid = +el.dataset.uid;
+    const p = state.bakery.placed.find(x => x.uid === uid); if (!p) return;
+    const r = box.getBoundingClientRect();
+    const k = r.width / 520;
+    const size = TOPS[p.kind].size;
+    el.setPointerCapture(e.pointerId);
+    el.classList.remove("pop"); el.classList.add("dragging");
+    const move = (ev) => {
+      p.x = Math.max(10, Math.min(510, (ev.clientX - r.left) / k));
+      p.y = Math.max(10, Math.min(510, (ev.clientY - r.top) / k));
+      el.style.left = ((p.x - size / 2) / 5.2).toFixed(2) + "%";
+      el.style.top = ((p.y - size / 2) / 5.2).toFixed(2) + "%";
+    };
+    const up = () => {
+      el.classList.remove("dragging"); p.fresh = false;
+      el.removeEventListener("pointermove", move); el.removeEventListener("pointerup", up); el.removeEventListener("pointercancel", up);
+      saveState();
+    };
+    el.addEventListener("pointermove", move); el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
+  });
+}
+
+function renderShelfStrip() {
+  const el = document.getElementById("shelfStrip"); if (!el) return;
+  const shelf = state.bakery.shelf;
+  el.innerHTML = shelf.length
+    ? shelf.slice(0, 8).map(c => `<div class="shelf-item">${miniHtml(c)}<div class="shelf-name">${esc(c.name)}</div></div>`).join("")
+    : '<div class="shelf-empty">Finished treats will sit here. Your first masterpiece is waiting!</div>';
+}
+
+function progressHtml() {
+  const n = state.bakery.placed.length;
+  return `<div class="progress"><span>${n} of ${GOAL} toppings</span><div class="bar"><div style="width:${Math.round(n / GOAL * 100)}%"></div></div></div>`;
+}
+
+function renderBakeCard() {
+  const card = document.getElementById("qCard"); if (!card) return;
+  const b = state.bakery;
+  const s = bake.screen;
+  if (s === "start") {
+    const welcome = bake.welcome ? `<div class="note-good">Day streak: ${state.dayStreak} day${state.dayStreak === 1 ? "" : "s"} in a row. Welcome back to the bakery!</div>` : "";
+    card.innerHTML = `
+      <h2 class="disp title">What should we bake?</h2>
+      ${bake.unlockMsg ? `<div class="note-good">New topping pack unlocked: ${esc(bake.unlockMsg)}!</div>` : welcome}
+      <div class="treat-pick">${TREATS.map(t => `<button class="treatbtn ${t.id === b.treat ? "on" : ""}" data-treat="${t.id}">${miniHtml({ treat: t.id, base: "#ffe0ee", drip: "#ff8fbf", placed: [] })}<span>${t.name}</span></button>`).join("")}</div>
+      <div class="label">Pick a topping pack</div>
+      <div class="pack-pick">${PACKS.map((p, i) => {
+        const open = i < b.unlocked;
+        const got = p.kinds.filter(k => b.collected[k]).length;
+        return `<button class="packbtn ${!open ? "locked" : (p.id === b.pack ? "on" : "")}" data-pack="${p.id}" ${open ? "" : "disabled"}>
+          <span class="thumbs">${p.kinds.slice(0, 3).map(k => `<span class="thumb">${TOPS[k].svg}</span>`).join("")}</span>
+          <span class="pk"><b>${p.name}</b><small>${open ? got + " of 8 collected" : "Finish a treat to unlock"}</small></span></button>`;
+      }).join("")}</div>
+      <div class="card-foot"><span class="small">${GOAL} right answers finish a treat. Every gift is a surprise, and some are rare!</span>
+      <button class="btn" id="startBtn">Start baking!</button></div>`;
+    card.querySelectorAll(".treatbtn").forEach(x => x.onclick = () => { b.treat = x.dataset.treat; saveState(); renderBakeCard(); renderStage(); });
+    card.querySelectorAll(".packbtn").forEach(x => x.onclick = () => { if (x.disabled) return; b.pack = x.dataset.pack; saveState(); renderBakeCard(); renderStage(); });
+    card.querySelector("#startBtn").onclick = () => { b.placed = []; b.inProgress = true; bake.unlockMsg = ""; bake.welcome = false; saveState(); renderStage(); nextQuestion(); };
+    return;
+  }
+  if (s === "gift") {
+    card.innerHTML = `<div class="center">
+      <h2 class="disp title">Pick a gift box!</h2>
+      <p class="small">Each one hides a different topping. Some are rare!</p>
+      <div class="gifts">${bake.gifts.map((g, i) => `<button class="giftbtn" data-i="${i}" aria-label="Open gift ${i + 1}"><span class="wiggle" style="animation-delay:${i * 0.2}s">${giftSvg(GIFT_COLORS[i][0], GIFT_COLORS[i][1])}</span></button>`).join("")}</div></div>`;
+    card.querySelectorAll(".giftbtn").forEach(x => x.onclick = () => {
+      bake.reward = bake.gifts[+x.dataset.i]; bake.screen = "reveal"; renderBakeCard();
+      if (TOPS[bake.reward].rare) celebrate(); else playTone(true);
+    });
+    return;
+  }
+  if (s === "reveal") {
+    const t = TOPS[bake.reward];
+    const isNew = !b.collected[bake.reward];
+    card.innerHTML = `<div class="center">
+      ${t.rare ? '<div class="rare-badge">RARE TOPPING!</div>' : (isNew ? '<div class="new-badge">New for your collection!</div>' : "")}
+      <div class="reveal pop">${t.svg}</div>
+      <h2 class="disp title">You got: ${esc(t.name)}</h2>
+      <button class="btn" id="placeBtn">Put it on my treat!</button></div>`;
+    card.querySelector("#placeBtn").onclick = placeReward;
+    return;
+  }
+  if (s === "done") {
+    card.innerHTML = `<div class="center left">
+      <h2 class="disp title">Your treat is finished!</h2>
+      <p class="lead">Drag the toppings until it looks just right, then give it a name for your display case.</p>
+      <label class="label" for="nameIn">Name your creation</label>
+      <input class="namein" id="nameIn" type="text" maxlength="28" value="${esc(bake.name || "My Dream Treat")}">
+      <div class="card-foot"><span></span><button class="btn" id="saveBtn">Put it in my display case</button></div></div>`;
+    card.querySelector("#saveBtn").onclick = () => saveToShelf(card.querySelector("#nameIn").value.trim());
+    return;
+  }
+  // bake screen
+  const q = bake.q, item = q.item, e = ex(item);
+  const chip = "Week " + item.week + " · " + (item.type === "root" ? "Root word" : "Frequency word") + (isActive(item) ? "" : " · Review");
+  let body = "";
+  if (bake.phase === "ask") {
+    const choices = q.tiles ? `
+      <div class="slots">${q.tiles.map((_, i) => `<span class="slotch">${i < bake.built.length ? q.tiles[bake.built[i]].toUpperCase() : ""}</span>`).join("")}</div>
+      <div class="tiles">${q.tiles.map((ch, i) => `<button class="tile" data-i="${i}" ${bake.built.includes(i) ? "disabled" : ""}>${ch.toUpperCase()}</button>`).join("")}</div>
+      <div class="row-c"><button class="btn2" id="undoBtn">Undo</button><button class="btn2" id="clearBtn">Start over</button></div>`
+      : `<div class="opts ${q.opts.length === 2 ? "two" : ""}">${q.opts.map((o, i) => `<button class="ans a${i}" data-i="${i}"><span class="letter">${"ABCD"[i]}</span><span>${esc(o.text)}</span></button>`).join("")}</div>`;
+    body = `
+      <div class="qhead"><div class="lead">${esc(q.lead)}</div><button class="btn2" id="hearBtn" aria-label="Read the question out loud">${SPEAKER_SVG}<span>Hear it</span></button></div>
+      ${q.big ? `<div class="disp big">${esc(q.big)}</div>` : ""}
+      ${q.mid ? `<div class="disp mid">${esc(q.mid)}</div>` : ""}
+      ${choices}
+      <div class="grow"></div>
+      ${bake.hint ? `<div class="hintbox">${esc(q.hint)}</div>` : ""}
+      <div class="row-b"><button class="link" id="hintBtn">${bake.hint ? "Hide hint" : "Need a hint?"}</button><span class="pinkline">Right answer = a surprise gift</span></div>`;
+  } else if (bake.phase === "right") {
+    body = `
+      <div class="disp yay">${esc(bake.yay)}</div>
+      <div class="lead">${esc(bake.answer)}</div>
+      ${e.es ? `<div class="es-card" lang="es">
+        <div class="es-label">En español</div>
+        <div class="es-row"><div class="disp es-word">${esc(e.es)}</div><button class="btn2" id="esBtn" aria-label="Escuchar en español">${SPEAKER_SVG}<span>Escuchar</span></button></div>
+        <div class="es-ex">${esc(e.esEx)}</div></div>` : ""}
+      <div class="grow"></div>
+      <div class="card-foot"><button class="btn2" id="enBtn">${SPEAKER_SVG}<span>Hear it in English</span></button><button class="btn" id="giftBtn">Open a gift!</button></div>`;
+  } else {
+    body = `
+      <div class="disp oops">So close!</div>
+      <div class="lead big-lead">${esc(bake.answer)}</div>
+      <div class="small">This word will come back in a little bit so you can try again.</div>
+      <div class="grow"></div>
+      <div class="card-foot"><button class="btn2" id="enBtn">${SPEAKER_SVG}<span>Hear it</span></button><button class="btn" id="nextBtn2">Next word</button></div>`;
+  }
+  card.innerHTML = `<div class="qtop"><span class="chip">${esc(chip)}</span>${progressHtml()}</div>${body}`;
+  const on = (id, fn) => { const x = card.querySelector("#" + id); if (x) x.onclick = fn; };
+  on("hearBtn", () => sayEn(q.speak));
+  on("hintBtn", () => { bake.hint = !bake.hint; renderBakeCard(); });
+  on("undoBtn", () => { bake.built.pop(); renderBakeCard(); });
+  on("clearBtn", () => { bake.built = []; renderBakeCard(); });
+  on("esBtn", () => sayEs(e.es + ". " + e.esEx));
+  on("enBtn", () => sayEn(item.word + ". " + item.definition));
+  on("giftBtn", () => { bake.screen = "gift"; renderBakeCard(); });
+  on("nextBtn2", nextQuestion);
+  card.querySelectorAll(".ans").forEach(x => x.onclick = () => {
+    if (bake.phase !== "ask") return;
+    const o = q.opts[+x.dataset.i];
+    giveAnswer(o.ok, o.text);
+  });
+  card.querySelectorAll(".tile").forEach(x => x.onclick = () => {
+    const i = +x.dataset.i;
+    if (bake.phase !== "ask" || bake.built.includes(i)) return;
+    bake.built.push(i); renderBakeCard();
+    if (bake.built.length === q.tiles.length) {
+      const guess = bake.built.map(j => q.tiles[j]).join("");
+      setTimeout(() => giveAnswer(guess === item.word.toLowerCase(), guess), 350);
+    }
+  });
+}
+
+// ---------- My Bakery (display case + collection + parent settings) ----------
+function renderShop() {
+  const card = document.getElementById("gameCard");
+  card.className = "card";
+  const b = state.bakery;
+  const allKinds = PACKS.map(p => p).concat([{ id: "rare", name: "Rare toppings", kinds: RARES }]);
+  const collectedCount = Object.keys(b.collected).filter(k => TOPS[k]).length;
+  card.innerHTML = `
+    <h2 class="disp title">My Bakery</h2>
+    <div class="label">Display case (${b.shelf.length} treat${b.shelf.length === 1 ? "" : "s"})</div>
+    <div class="shelf big-shelf">${b.shelf.length ? b.shelf.map(c => `<div class="shelf-item">${miniHtml(c)}<div class="shelf-name">${esc(c.name)}</div></div>`).join("") : '<div class="shelf-empty">No finished treats yet. Head to Bake! to make your first one.</div>'}</div>
+    <div class="label">Topping collection (${collectedCount} of ${Object.keys(TOPS).length})</div>
+    ${allKinds.map((p, i) => {
+      const locked = p.id !== "rare" && i >= b.unlocked;
+      return `<div class="coll-row"><div class="coll-name">${esc(p.name)}${locked ? " · locked" : ""}</div><div class="coll">${p.kinds.map(k => `<div class="coll-item ${b.collected[k] ? "got" : ""}" title="${esc(b.collected[k] ? TOPS[k].name : "Not found yet")}">${TOPS[k].svg}<span>${b.collected[k] ? esc(TOPS[k].name) : "?"}</span></div>`).join("")}</div></div>`;
+    }).join("")}
+    <div class="stats-row"><span>Words right: <b>${state.wordsRight}</b></span><span>Best streak: <b>${state.bestStreak}</b></span><span>Day streak: <b>${state.dayStreak}</b></span></div>
+
+    <details class="parent-settings" id="parentSettingsDetails" ${parentSettingsOpen ? "open" : ""}>
+      <summary>Parent Settings</summary>
+      <div class="settings-body">
+        <label for="webAppUrlInput">ELA Pastry Kitchen Web App URL (auto-sync her current week):</label><br>
+        <input type="text" id="webAppUrlInput" placeholder="https://script.google.com/macros/s/.../exec"
+          value="${esc(state.webAppUrl)}" style="width:100%; max-width:340px;">
+        <button class="settings-save-btn" id="saveUrlBtn">Save &amp; Sync Now</button>
+        <p class="settings-note" id="syncStatusNote">${syncStatusLine()}</p>
+
+        <div class="box-section-title">Words to work on</div>
+        <div class="parent-report">${missedWordsReportHtml()}</div>
+
+        <div class="box-section-title">Recent answers</div>
+        <div class="parent-report">${recentAnswersHtml()}</div>
+
+        <label for="currentWeekInput">Or set her current week by hand:</label><br>
+        <input type="number" id="currentWeekInput" min="1" max="36" value="${state.currentWeek}">
+        <button class="settings-save-btn" id="saveWeekBtn">Save</button>
+        <span id="weekSavedNote" class="settings-note"></span>
+        <p class="settings-note">Words from any week after this number stay hidden either way. With a Web
+        App URL saved above, this number updates itself every time the game opens — set it by hand only
+        if you're not using auto-sync, or want to override it for now.</p>
+      </div>
+    </details>`;
+
+  const detailsEl = document.getElementById("parentSettingsDetails");
+  detailsEl.addEventListener("toggle", () => { parentSettingsOpen = detailsEl.open; });
+  document.getElementById("saveWeekBtn").addEventListener("click", () => {
+    const input = document.getElementById("currentWeekInput");
+    const week = Math.max(1, Math.min(36, parseInt(input.value, 10) || 1));
+    input.value = week; state.currentWeek = week; saveState();
+    document.getElementById("weekSavedNote").textContent = "✓ Saved — now on week " + week + ".";
+  });
+  document.getElementById("saveUrlBtn").addEventListener("click", async () => {
+    state.webAppUrl = document.getElementById("webAppUrlInput").value.trim();
+    saveState();
+    document.getElementById("syncStatusNote").textContent = "Syncing…";
+    await syncCurrentWeek();
+    renderShop();
+  });
+}
+
+// ---------- header stats (replaces the old sprinkles/rank bar) ----------
+function renderRankBar() {
+  const set = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+  set("streakStat", state.streak + " in a row");
+  set("rightStat", state.wordsRight + " words right");
+  set("dayStat", state.dayStreak + " day streak");
+  const rt = document.getElementById("readToggle");
+  if (rt) { rt.classList.toggle("on", state.autoRead); rt.querySelector("span").textContent = state.autoRead ? "Read to me: on" : "Read to me: off"; }
+}
+function comboTagHtml(streak) {
+  if (streak <= 1) return "";
+  return '<span class="combo-tag">Combo x' + streak + "</span>";
+}
+
+// ---------- Tabs + init ----------
 document.querySelectorAll(".tab").forEach(tab => {
   tab.addEventListener("click", () => {
     document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
     currentMode = tab.dataset.mode;
-    clearRushTimer();
-    if (currentMode === "quiz") startQuiz();
-    else if (currentMode === "match") startMatch();
+    try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) { }
+    if (currentMode === "quiz") renderBakeMode();
+    else if (currentMode === "match") { document.getElementById("gameCard").className = "card"; startMatch(); }
     else renderShop();
   });
 });
+document.getElementById("readToggle").addEventListener("click", () => {
+  state.autoRead = !state.autoRead; saveState(); renderRankBar();
+  if (state.autoRead && currentMode === "quiz" && bake.screen === "bake" && bake.phase === "ask" && bake.q) sayEn(bake.q.speak);
+});
 
-// ---------- Init ----------
 loadState();
+ensureBakery();
+bake.welcome = checkDailyVisit();
 renderRankBar();
-if (checkDailyVisit()) {
-  renderWelcomeBanner();
-} else {
-  startQuiz();
-}
-// Background week sync — never blocks the screen above; if a Web App URL
-// is saved, this quietly checks her real current_week and takes effect on
-// the next round or the next time My Bakery is opened.
+renderBakeMode();
 syncCurrentWeek();
+
 </script>
 </body>
 </html>
