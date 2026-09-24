@@ -328,3 +328,10 @@ body[data-view="parent"][data-child]{background:#F0EAE0;background-image:none;}
 .std-summary{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px;}
 .grade-sheet .grade-table td div.grade-dim{margin-top:2px;}
 .g-manual{background:#fff;color:var(--chalk-dim);border:1px dashed var(--chalk-dim);}
+.std-entries{margin-top:4px;}
+.std-entry{font-size:0.8rem;margin:2px 0;color:var(--chalk-text);}
+.std-x{border:none;background:none;color:var(--chalk-dim);cursor:pointer;font-size:1rem;line-height:1;padding:0 4px;}
+.std-log{margin-top:6px;border:1px dashed var(--tan);background:#fff;color:var(--tan-text);border-radius:6px;padding:4px 10px;font-size:0.76rem;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;}
+.std-form{display:flex;flex-direction:column;gap:5px;margin-top:6px;padding:8px;background:var(--tan-bg);border-radius:6px;}
+.std-form input,.std-form select{padding:5px 7px;border:1px solid var(--rail);border-radius:5px;font-size:0.82rem;font-family:'Nunito',sans-serif;}
+@media print{.std-log,.std-form,.std-x{display:none !important;}}

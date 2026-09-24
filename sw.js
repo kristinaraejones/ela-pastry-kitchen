@@ -9,7 +9,7 @@
 // the very first visit, forever. Network-first tries the real network on
 // every load (so a fix ships immediately) and only drops back to the
 // cached copy when that fetch actually fails (i.e. truly offline).
-const CACHE_NAME = "ela-pastry-kitchen-v4";
+const CACHE_NAME = "ela-pastry-kitchen-v5";
 const SHELL_ASSETS = ["./", "./index.html", "./app.js", "./styles.css", "./config.js", "./standards.js"];
 
 self.addEventListener("install", (event) => {

@@ -260,6 +260,7 @@ async function loadChild(student) {
   reviewPoolCache[student] = resp.reviewPool;
   answerLogCache[student] = resp.answerLog || [];
   projectsCache[student] = extractProjects(resp.submissions);
+  manualStandardsCache[student] = extractManualStandards(resp.submissions);
   markersCache[student] = resp.markers;
   burnLogCache[student] = resp.burnLog;
   banksCache[student] = resp.banks;
@@ -2359,8 +2360,50 @@ function fmtWeekList(weeks) {
   return parts.join(", ");
 }
 
+// ---------- Manual standards coverage (things taught outside the outline, e.g. Speaking & Listening) ----------
+// One Submissions row per child ("standards_manual") holds every entry, so no backend change is needed.
+const manualStandardsCache = {}; // { kenley: { "SL.7.4": [ {date, note, rating} ] } }
+let stdFormOpen = null;
+const RATING_CLASS = { "Strong": "g-strong", "Solid": "g-solid", "Developing": "g-dev", "Needs review": "g-review" };
+
+function extractManualStandards(submissions) {
+  const row = (submissions || []).find(s => s.task_id === "standards_manual");
+  return (row && row.answers && row.answers.entries) || {};
+}
+function manualEntries() { return manualStandardsCache[currentChild] || (manualStandardsCache[currentChild] = {}); }
+function persistManualStandards() {
+  apiPost("saveSubmission", { student: currentChild, task_id: "standards_manual", status: "manual", score: "", parent_comment: "", answers: { entries: manualEntries() } }).catch(() => {});
+}
+function refreshGradeSheet() {
+  const ov = document.getElementById("gradeOverlay");
+  const top = ov.scrollTop;
+  document.getElementById("gradeSheet").innerHTML = gradeSheetHTML();
+  ov.scrollTop = top;
+}
+function toggleStdForm(code) { stdFormOpen = stdFormOpen === code ? null : code; refreshGradeSheet(); }
+function saveStdEntry(code) {
+  const date = document.getElementById("std-date-" + code).value || new Date().toISOString().slice(0, 10);
+  const rating = document.getElementById("std-rating-" + code).value;
+  const note = document.getElementById("std-note-" + code).value.trim();
+  const all = manualEntries();
+  (all[code] = all[code] || []).push({ date, rating, note });
+  all[code].sort((x, y) => (x.date < y.date ? -1 : 1));
+  stdFormOpen = null;
+  persistManualStandards();
+  refreshGradeSheet();
+}
+function deleteStdEntry(code, idx) {
+  const all = manualEntries();
+  if (!all[code]) return;
+  all[code].splice(idx, 1);
+  if (!all[code].length) delete all[code];
+  persistManualStandards();
+  refreshGradeSheet();
+}
+
 // Standards coverage: every grade-level standard, where/when it is taught, and how it is landing.
 // Rating = lessons average, blended with the subject's quiz/test result (same TEST_WEIGHT split as the grades).
+// Work you record yourself (manual entries) counts as coverage too, and is the only coverage for Speaking & Listening.
 function standardsCoverageHTML(subjects, weekRows) {
   const e = escHtml;
   const grade = STANDARD_GRADE[currentChild];
@@ -2368,70 +2411,87 @@ function standardsCoverageHTML(subjects, weekRows) {
   if (!cat) return "";
   const wk = currentWeek();
   const child = STANDARD_MAP[currentChild] || {};
+  const manual = manualEntries();
   const nameOf = key => (DATA[key] && DATA[key].name) || ({ vocab: "Vocabulary", spelling: "Spelling", grammar: "Grammar", reading: "Reading", writing: "Writing" }[key] || key);
-  const weekPct = {}; // key|week -> pct of that week's graded work
+  const weekPct = {};
   weekRows.forEach(r => { if (r.pct != null) weekPct[r.key + "|" + r.w] = r.pct; });
   const testPctByKey = {};
   subjects.forEach(sj => { if (sj.testPct != null) testPctByKey[sj.key] = sj.testPct; });
-  // taught[code] = [{key, week}]
   const taught = {};
   Object.keys(child).forEach(key => Object.keys(child[key]).forEach(w => (child[key][w] || []).forEach(code => { (taught[code] = taught[code] || []).push({ key, week: Number(w) }); })));
+  const today = new Date().toISOString().slice(0, 10);
 
-  let nStrong = 0, nTaughtUngraded = 0, nUpcoming = 0, nNone = 0, nManual = 0, nAll = 0;
+  let nTaughtUngraded = 0, nUpcoming = 0, nNone = 0, nManualOpen = 0, nManualDone = 0, nAll = 0, nGraded = 0;
   const sections = cat.map(strand => {
     const rows = strand.codes.map(([code, desc]) => {
       nAll++;
       const t = taught[code] || [];
       const past = t.filter(x => x.week <= wk), future = t.filter(x => x.week > wk);
+      const man = manual[code] || [];
       const bySubject = list => {
         const m = {};
         list.forEach(x => { (m[x.key] = m[x.key] || []).push(x.week); });
         return Object.keys(m).map(k => e(nameOf(k)) + " Wk " + fmtWeekList(m[k])).join("; ");
       };
-      let status, where = "";
-      if (!t.length && strand.manual) {
-        nManual++;
-        status = '<span class="g-chip g-manual">Not in the outline — address manually</span>';
-        where = '<span class="grade-dim">Not a subject in the current outline.</span>';
-      } else if (!t.length) {
-        nNone++;
-        status = '<span class="g-chip g-review">Not in the plan yet</span>';
-        where = '<span class="grade-dim">No lesson is mapped to this standard.</span>';
-      } else {
-        if (past.length) where += "<div><b>Taught:</b> " + bySubject(past) + "</div>";
-        if (future.length) where += '<div class="grade-dim"><b>Coming up:</b> ' + bySubject(future) + "</div>";
-        if (!past.length) {
-          nUpcoming++;
-          status = '<span class="g-chip g-soon">Coming up · Wk ' + fmtWeekList(future.map(x => x.week)) + "</span>";
-        } else {
-          const pcts = past.map(x => weekPct[x.key + "|" + x.week]).filter(v => v != null);
-          const tests = [...new Set(past.map(x => x.key))].map(k => testPctByKey[k]).filter(v => v != null);
-          if (!pcts.length && !tests.length) {
-            nTaughtUngraded++;
-            status = '<span class="g-chip g-none">Taught — not graded yet</span>';
-          } else {
-            const lessonAvg = pcts.length ? pcts.reduce((n, v) => n + v, 0) / pcts.length : null;
-            const testAvg = tests.length ? tests.reduce((n, v) => n + v, 0) / tests.length : null;
-            const score = lessonAvg != null && testAvg != null ? lessonAvg * (1 - TEST_WEIGHT) + testAvg * TEST_WEIGHT : (testAvg != null ? testAvg : lessonAvg);
-            const g = graspFor(score);
-            if (score >= 90) nStrong++;
-            status = '<span class="g-chip ' + g.cls + '">' + g.text + " · " + Math.round(score) + "%</span>" + (future.length ? '<div class="grade-dim">also returns later</div>' : "");
-          }
+      // computed score from lessons/tests, if any
+      let computed = null;
+      if (past.length) {
+        const pcts = past.map(x => weekPct[x.key + "|" + x.week]).filter(v => v != null);
+        const tests = [...new Set(past.map(x => x.key))].map(k => testPctByKey[k]).filter(v => v != null);
+        if (pcts.length || tests.length) {
+          const lessonAvg = pcts.length ? pcts.reduce((n, v) => n + v, 0) / pcts.length : null;
+          const testAvg = tests.length ? tests.reduce((n, v) => n + v, 0) / tests.length : null;
+          computed = lessonAvg != null && testAvg != null ? lessonAvg * (1 - TEST_WEIGHT) + testAvg * TEST_WEIGHT : (testAvg != null ? testAvg : lessonAvg);
         }
       }
-      return "<tr><td><b>" + e(code) + "</b><div class=\"grade-dim\">" + e(desc) + "</div></td><td>" + where + "</td><td>" + status + "</td></tr>";
+      const lastMan = man.length ? man[man.length - 1] : null;
+      let status, where = "";
+      if (past.length) where += "<div><b>Taught:</b> " + bySubject(past) + "</div>";
+      if (future.length) where += '<div class="grade-dim"><b>Coming up:</b> ' + bySubject(future) + "</div>";
+      if (!t.length) where += '<span class="grade-dim">' + (strand.manual ? "Not a subject in the current outline." : "No lesson is mapped to this standard.") + "</span>";
+      if (computed != null) {
+        nGraded++;
+        const g = graspFor(computed);
+        status = '<span class="g-chip ' + g.cls + '">' + g.text + " · " + Math.round(computed) + "%</span>" + (future.length ? '<div class="grade-dim">also returns later</div>' : "");
+      } else if (lastMan) {
+        nManualDone++;
+        const cls = lastMan.rating ? RATING_CLASS[lastMan.rating] : "g-solid";
+        status = '<span class="g-chip ' + cls + '">' + (lastMan.rating ? e(lastMan.rating) + " · " : "") + "covered manually</span>";
+      } else if (past.length) {
+        nTaughtUngraded++;
+        status = '<span class="g-chip g-none">Taught — not graded yet</span>';
+      } else if (future.length) {
+        nUpcoming++;
+        status = '<span class="g-chip g-soon">Coming up · Wk ' + fmtWeekList(future.map(x => x.week)) + "</span>";
+      } else if (strand.manual) {
+        nManualOpen++;
+        status = '<span class="g-chip g-manual">Not in the outline — address manually</span>';
+      } else {
+        nNone++;
+        status = '<span class="g-chip g-review">Not in the plan yet</span>';
+      }
+      // manual log (entries + add form); the controls are hidden when printing
+      const entries = man.map((m, i) => '<div class="std-entry">✓ ' + e(m.date) + (m.rating ? ' · <span class="g-chip ' + RATING_CLASS[m.rating] + '">' + e(m.rating) + "</span>" : "") + (m.note ? " — " + e(m.note) : "") +
+        ' <button class="std-x no-print" title="Remove this entry" onclick="deleteStdEntry(\'' + code + "'," + i + ')">×</button></div>').join("");
+      const form = stdFormOpen === code ? '<div class="std-form no-print">' +
+        '<input type="date" id="std-date-' + code + '" value="' + today + '">' +
+        '<select id="std-rating-' + code + '"><option value="">No rating</option><option>Strong</option><option>Solid</option><option>Developing</option><option>Needs review</option></select>' +
+        '<input type="text" id="std-note-' + code + '" placeholder="What did you cover? e.g. 3-minute oral report on her book">' +
+        '<button class="btn primary" style="margin-top:0;" onclick="saveStdEntry(\'' + code + '\')">Save</button> <button class="btn" style="margin-top:0;" onclick="toggleStdForm(null)">Cancel</button></div>'
+        : '<button class="std-log no-print" onclick="toggleStdForm(\'' + code + '\')">＋ Log coverage</button>';
+      return "<tr><td><b>" + e(code) + '</b><div class="grade-dim">' + e(desc) + "</div></td><td>" + where + (entries ? '<div class="std-entries">' + entries + "</div>" : "") + "</td><td>" + status + form.replace(/^/, "<div>") + "</div></td></tr>";
     }).join("");
-    return "<h4>" + e(strand.name) + '</h4>' + (strand.note ? '<div class="grade-dim" style="margin-bottom:4px;">' + e(strand.note) + "</div>" : "") + '<table class="grade-table"><thead><tr><th>Standard</th><th>Where it is taught</th><th>Status</th></tr></thead><tbody>' + rows + "</tbody></table>";
+    return "<h4>" + e(strand.name) + '</h4>' + (strand.note ? '<div class="grade-dim" style="margin-bottom:4px;">' + e(strand.note) + "</div>" : "") + '<table class="grade-table"><thead><tr><th>Standard</th><th>Where it is taught / covered</th><th>Status</th></tr></thead><tbody>' + rows + "</tbody></table>";
   }).join("");
-  const graded = nAll - nNone - nManual - nUpcoming - nTaughtUngraded;
   return "<h3>Standards coverage — grade " + grade + " ELA</h3>" +
-    '<div class="std-summary"><span class="g-chip g-strong">' + graded + " taught &amp; graded</span> " +
+    '<div class="std-summary"><span class="g-chip g-strong">' + nGraded + " taught &amp; graded</span> " +
+    '<span class="g-chip g-solid">' + nManualDone + " covered manually</span> " +
     '<span class="g-chip g-none">' + nTaughtUngraded + " taught, not graded yet</span> " +
     '<span class="g-chip g-soon">' + nUpcoming + " coming up</span> " +
     '<span class="g-chip g-review">' + nNone + " not in the plan yet</span> " +
-    '<span class="g-chip g-manual">' + nManual + " speaking &amp; listening — manual</span></div>" +
+    '<span class="g-chip g-manual">' + nManualOpen + " speaking &amp; listening — still to cover manually</span></div>" +
     sections +
-    '<div class="grade-dim" style="margin-top:6px;">Common Core ELA, grade ' + grade + " (sub-parts roll up to their standard). How it landed: Strong 90%+, Solid 80–89%, Developing 70–79%, Needs review under 70% — the lessons average for the weeks it was taught, blended with the subject's quiz and test results. \"Not in the plan yet\" means no current lesson is mapped to that standard. Speaking &amp; Listening standards are listed for completeness but aren't a subject in the current outline, so they need to be covered manually or developed as lessons later.</div>";
+    '<div class="grade-dim" style="margin-top:6px;">Common Core ELA, grade ' + grade + " (sub-parts roll up to their standard). How it landed: Strong 90%+, Solid 80–89%, Developing 70–79%, Needs review under 70% — the lessons average for the weeks it was taught, blended with the subject's quiz and test results. \"Not in the plan yet\" means no current lesson is mapped to that standard. Use ＋ Log coverage to record anything you teach yourself (for example a Speaking &amp; Listening presentation) with a date, an optional rating, and a note. Speaking &amp; Listening isn't a subject in the current outline, so it's covered manually or developed as lessons later.</div>";
 }
 
 function gradeSheetHTML() {
