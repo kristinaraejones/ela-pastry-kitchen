@@ -327,3 +327,4 @@ body[data-view="parent"][data-child]{background:#F0EAE0;background-image:none;}
 .g-soon{background:#fff;color:var(--tan-text);border:1px dashed var(--tan);}
 .std-summary{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px;}
 .grade-sheet .grade-table td div.grade-dim{margin-top:2px;}
+.g-manual{background:#fff;color:var(--chalk-dim);border:1px dashed var(--chalk-dim);}

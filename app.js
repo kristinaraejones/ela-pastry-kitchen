@@ -2377,7 +2377,7 @@ function standardsCoverageHTML(subjects, weekRows) {
   const taught = {};
   Object.keys(child).forEach(key => Object.keys(child[key]).forEach(w => (child[key][w] || []).forEach(code => { (taught[code] = taught[code] || []).push({ key, week: Number(w) }); })));
 
-  let nStrong = 0, nTaughtUngraded = 0, nUpcoming = 0, nNone = 0, nAll = 0;
+  let nStrong = 0, nTaughtUngraded = 0, nUpcoming = 0, nNone = 0, nManual = 0, nAll = 0;
   const sections = cat.map(strand => {
     const rows = strand.codes.map(([code, desc]) => {
       nAll++;
@@ -2389,9 +2389,13 @@ function standardsCoverageHTML(subjects, weekRows) {
         return Object.keys(m).map(k => e(nameOf(k)) + " Wk " + fmtWeekList(m[k])).join("; ");
       };
       let status, where = "";
-      if (!t.length) {
+      if (!t.length && strand.manual) {
+        nManual++;
+        status = '<span class="g-chip g-manual">Not in the outline — address manually</span>';
+        where = '<span class="grade-dim">Not a subject in the current outline.</span>';
+      } else if (!t.length) {
         nNone++;
-        status = '<span class="g-chip g-none">Not in the plan yet</span>';
+        status = '<span class="g-chip g-review">Not in the plan yet</span>';
         where = '<span class="grade-dim">No lesson is mapped to this standard.</span>';
       } else {
         if (past.length) where += "<div><b>Taught:</b> " + bySubject(past) + "</div>";
@@ -2417,16 +2421,17 @@ function standardsCoverageHTML(subjects, weekRows) {
       }
       return "<tr><td><b>" + e(code) + "</b><div class=\"grade-dim\">" + e(desc) + "</div></td><td>" + where + "</td><td>" + status + "</td></tr>";
     }).join("");
-    return "<h4>" + e(strand.name) + '</h4><table class="grade-table"><thead><tr><th>Standard</th><th>Where it is taught</th><th>Status</th></tr></thead><tbody>' + rows + "</tbody></table>";
+    return "<h4>" + e(strand.name) + '</h4>' + (strand.note ? '<div class="grade-dim" style="margin-bottom:4px;">' + e(strand.note) + "</div>" : "") + '<table class="grade-table"><thead><tr><th>Standard</th><th>Where it is taught</th><th>Status</th></tr></thead><tbody>' + rows + "</tbody></table>";
   }).join("");
-  const graded = nAll - nNone - nUpcoming - nTaughtUngraded;
+  const graded = nAll - nNone - nManual - nUpcoming - nTaughtUngraded;
   return "<h3>Standards coverage — grade " + grade + " ELA</h3>" +
     '<div class="std-summary"><span class="g-chip g-strong">' + graded + " taught &amp; graded</span> " +
     '<span class="g-chip g-none">' + nTaughtUngraded + " taught, not graded yet</span> " +
     '<span class="g-chip g-soon">' + nUpcoming + " coming up</span> " +
-    '<span class="g-chip g-review">' + nNone + " not in the plan yet</span></div>" +
+    '<span class="g-chip g-review">' + nNone + " not in the plan yet</span> " +
+    '<span class="g-chip g-manual">' + nManual + " speaking &amp; listening — manual</span></div>" +
     sections +
-    '<div class="grade-dim" style="margin-top:6px;">Common Core ELA, grade ' + grade + " (sub-parts roll up to their standard). How it landed: Strong 90%+, Solid 80–89%, Developing 70–79%, Needs review under 70% — the lessons average for the weeks it was taught, blended with the subject's quiz and test results. \"Not in the plan yet\" means no current lesson is mapped to that standard. Speaking &amp; Listening isn't tracked.</div>";
+    '<div class="grade-dim" style="margin-top:6px;">Common Core ELA, grade ' + grade + " (sub-parts roll up to their standard). How it landed: Strong 90%+, Solid 80–89%, Developing 70–79%, Needs review under 70% — the lessons average for the weeks it was taught, blended with the subject's quiz and test results. \"Not in the plan yet\" means no current lesson is mapped to that standard. Speaking &amp; Listening standards are listed for completeness but aren't a subject in the current outline, so they need to be covered manually or developed as lessons later.</div>";
 }
 
 function gradeSheetHTML() {

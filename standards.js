@@ -1,6 +1,6 @@
 // Common Core ELA standards catalog and where each is taught.
 // Edit STANDARD_MAP to change which lessons teach which standard: map[child][subject key][week] = [codes].
-// Sub-parts (e.g. L.4.1a) roll up to their parent standard. Speaking & Listening isn't tracked (not part of this app's ELA subjects).
+// Sub-parts (e.g. L.4.1a) roll up to their parent standard. Speaking & Listening (SL) is listed but has no lessons mapped: it isn't a subject in the current outline.
 const STANDARD_GRADE = { kenley: 7, adelyn: 4 };
 const STANDARD_CATALOG = {
  "4": [
@@ -181,6 +181,38 @@ const STANDARD_CATALOG = {
      "Learn and use grade-level academic and subject-specific vocabulary"
     ]
    ]
+  },
+  {
+   "id": "SL",
+   "name": "Speaking & Listening",
+   "codes": [
+    [
+     "SL.4.1",
+     "Take part in collaborative discussions: prepare, follow rules, ask and answer questions, build on others’ ideas"
+    ],
+    [
+     "SL.4.2",
+     "Paraphrase a text read aloud or information presented in other media"
+    ],
+    [
+     "SL.4.3",
+     "Identify the reasons and evidence a speaker gives to support points"
+    ],
+    [
+     "SL.4.4",
+     "Report on a topic or tell a story with facts and details, speaking clearly at an understandable pace"
+    ],
+    [
+     "SL.4.5",
+     "Add audio and visual displays to presentations when they help"
+    ],
+    [
+     "SL.4.6",
+     "Tell when to use formal English and when informal speech is fine"
+    ]
+   ],
+   "manual": true,
+   "note": "Speaking & Listening is not a subject in the current outline, so these are not mapped to any lesson. Address them manually (discussions, presentations, read-alouds) or develop lessons for them later."
   }
  ],
  "7": [
@@ -347,6 +379,38 @@ const STANDARD_CATALOG = {
      "Learn and use grade-level academic and subject-specific vocabulary"
     ]
    ]
+  },
+  {
+   "id": "SL",
+   "name": "Speaking & Listening",
+   "codes": [
+    [
+     "SL.7.1",
+     "Take part in collaborative discussions: prepare, follow rules, pose questions, respond to new information"
+    ],
+    [
+     "SL.7.2",
+     "Analyze main ideas and supporting details in diverse media and explain how they clarify a topic"
+    ],
+    [
+     "SL.7.3",
+     "Outline a speaker’s argument and judge whether the reasoning and evidence are sound"
+    ],
+    [
+     "SL.7.4",
+     "Present claims and findings in a focused, coherent way with clear speaking (eye contact, volume, pronunciation)"
+    ],
+    [
+     "SL.7.5",
+     "Use multimedia and visual displays to clarify claims and findings"
+    ],
+    [
+     "SL.7.6",
+     "Adapt speech to different contexts and tasks, using formal English when appropriate"
+    ]
+   ],
+   "manual": true,
+   "note": "Speaking & Listening is not a subject in the current outline, so these are not mapped to any lesson. Address them manually (discussions, presentations, read-alouds) or develop lessons for them later."
   }
  ]
 };
