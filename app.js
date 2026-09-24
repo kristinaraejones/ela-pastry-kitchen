@@ -2044,6 +2044,9 @@ const stampSeeded = {}; // per child: false until the first render has recorded 
 // more than a single word. Each subject's grade is its total points; the overall
 // grade is the plain average of the subjects that have scores yet.
 
+// Lessons are the learning phase; the quizzes and tests (the monthly quizzes and term finals)
+// check what actually stuck, so they carry most of each subject's grade.
+const TEST_WEIGHT = 0.7; // quizzes & tests share of a subject's grade; lessons/practice get the rest
 const GRADE_SCALE = [[97, "A+"], [93, "A"], [90, "A-"], [87, "B+"], [83, "B"], [80, "B-"], [77, "C+"], [73, "C"], [70, "C-"], [67, "D+"], [63, "D"], [60, "D-"], [0, "F"]];
 function letterFor(pct) { return (GRADE_SCALE.find(([min]) => Math.round(pct) >= min) || [0, "F"])[1]; }
 function parseScore(score) {
@@ -2114,6 +2117,7 @@ function gradeSheetHTML() {
   SUBJECT_ORDER.forEach(key => {
     if (!DATA[key]) return;
     let got = 0, of = 0, scoredCount = 0, reflDone = 0, reflReviewed = 0;
+    let pg = 0, po = 0, tg = 0, to = 0; // pg/po = lessons & practice points; tg/to = quiz & test points
     const rows = [];
     DATA[key].tasks.forEach(t => {
       const s = state[key].tasks[t.id];
@@ -2130,13 +2134,20 @@ function gradeSheetHTML() {
         rows.push({ week, label: t.label, score: "—", pct: null, status: s.reviewed ? "Reviewed & approved" : s.sentBack && !s.done ? "Sent back — revising" : "Awaiting review", attempts: attempts > 1 ? attempts : null });
       } else if (sc && s.done) {
         const counts = kind !== "Review drill";
-        if (counts) { got += sc.got; of += sc.of; scoredCount++; }
-        rows.push({ week, label: t.label, score: (sc.got % 1 ? sc.got.toFixed(1) : sc.got) + "/" + sc.of, pct: (sc.got / sc.of) * 100, status: counts ? statusLabel(s) : "Practice — not counted in grade", attempts: attempts > 1 ? attempts : null });
+        if (counts) {
+          got += sc.got; of += sc.of; scoredCount++;
+          if (kind) { tg += sc.got; to += sc.of; } else { pg += sc.got; po += sc.of; }
+        }
+        rows.push({ week, isTest: !!kind && counts, label: t.label, score: (sc.got % 1 ? sc.got.toFixed(1) : sc.got) + "/" + sc.of, pct: (sc.got / sc.of) * 100, status: counts ? statusLabel(s) : "Practice — not counted in grade", attempts: attempts > 1 ? attempts : null });
       }
     });
     const order = w => (typeof w === "number" ? w : 900);
     rows.sort((x, y) => order(x.week) - order(y.week));
-    subjects.push({ key, name: DATA[key].name, got, of, pct: of > 0 ? (got / of) * 100 : null, scoredCount, reflDone, reflReviewed, rows });
+    const practicePct = po > 0 ? (pg / po) * 100 : null;
+    const testPct = to > 0 ? (tg / to) * 100 : null;
+    // Weighted: tests count for TEST_WEIGHT once there are any; until then the grade is lessons only.
+    const pct = practicePct != null && testPct != null ? practicePct * (1 - TEST_WEIGHT) + testPct * TEST_WEIGHT : (testPct != null ? testPct : practicePct);
+    subjects.push({ key, name: DATA[key].name, got, of, pct, practicePct, testPct, scoredCount, reflDone, reflReviewed, rows });
 
     // per-week concepts + how it landed
     for (let w = 1; w <= wk; w++) {
@@ -2163,7 +2174,8 @@ function gradeSheetHTML() {
 
   const summaryRows = subjects.map(sj => "<tr>" +
     "<td>" + e(sj.name) + "</td>" +
-    '<td class="num">' + (sj.pct == null ? "—" : (Math.round(sj.got * 10) / 10) + " / " + sj.of) + "</td>" +
+    '<td class="num">' + fmtPct(sj.practicePct) + "</td>" +
+    '<td class="num">' + (sj.testPct == null ? '<span class="grade-dim">none yet</span>' : fmtPct(sj.testPct)) + "</td>" +
     '<td class="num"><b>' + fmtPct(sj.pct) + "</b></td>" +
     '<td class="num"><b>' + (sj.pct == null ? "—" : letterFor(sj.pct)) + "</b></td>" +
     "<td>" + sj.scoredCount + " graded section" + (sj.scoredCount === 1 ? "" : "s") + (sj.reflDone ? " · " + sj.reflReviewed + "/" + sj.reflDone + " written answers reviewed" : "") + "</td></tr>").join("");
@@ -2178,7 +2190,7 @@ function gradeSheetHTML() {
   const detail = subjects.filter(sj => sj.rows.length).map(sj =>
     "<h3>" + e(sj.name) + ' <span class="grade-h3-pct">' + fmtPct(sj.pct) + (sj.pct == null ? "" : " · " + letterFor(sj.pct)) + "</span></h3>" +
     '<table class="grade-table"><thead><tr><th>Week</th><th>Section</th><th class="num">Score</th><th class="num">%</th><th>Status</th></tr></thead><tbody>' +
-    sj.rows.map(r => "<tr><td>" + (typeof r.week === "number" ? "Wk " + r.week : r.week) + "</td><td>" + e(r.label) + (r.attempts ? ' <span class="grade-dim">(attempt ' + r.attempts + ")</span>" : "") + "</td>" +
+    sj.rows.map(r => "<tr" + (r.isTest ? ' class="grade-test-row"' : "") + "><td>" + (typeof r.week === "number" ? "Wk " + r.week : r.week) + "</td><td>" + (r.isTest ? '<span class="g-chip g-test">counts ' + Math.round(TEST_WEIGHT * 100) + '% of subject</span> ' : "") + e(r.label) + (r.attempts ? ' <span class="grade-dim">(attempt ' + r.attempts + ")</span>" : "") + "</td>" +
       '<td class="num">' + r.score + '</td><td class="num">' + fmtPct(r.pct) + "</td><td>" + e(r.status) + "</td></tr>").join("") + "</tbody></table>").join("");
 
   // Areas to review
@@ -2190,6 +2202,8 @@ function gradeSheetHTML() {
   if (currentChild === "kenley") (answerLogCache[currentChild] || []).filter(r => /case files/i.test(r.game || "") && /vocab/i.test(r.subject || "") && !r.correct && !/^TEST/i.test(r.word || "")).forEach(r => { cfMiss[r.word] = (cfMiss[r.word] || 0) + 1; });
   const cfWords = Object.entries(cfMiss).sort((x, y) => y[1] - x[1]);
   const reviewBlocks = [];
+  const dips = subjects.filter(sj => sj.practicePct != null && sj.testPct != null && sj.testPct < sj.practicePct - 10);
+  if (dips.length) reviewBlocks.push("<h4>Didn't fully stick</h4><ul>" + dips.map(sj => "<li><b>" + e(sj.name) + "</b> — lessons " + fmtPct(sj.practicePct) + " but quizzes &amp; tests " + fmtPct(sj.testPct) + ". Worth reviewing this material.</li>").join("") + "</ul>");
   if (lowSections.length) reviewBlocks.push("<h4>Sections under 80%</h4><ul>" + lowSections.map(l => "<li><b>" + e(l.subject) + "</b> — " + e(l.label) + ": " + l.score + " (" + Math.round(l.pct) + "%)</li>").join("") + "</ul>");
   if (topics.length) reviewBlocks.push("<h4>Concepts to revisit</h4><ul>" + topics.slice(0, 12).map(tp => "<li><b>" + e(tp.group) + " · " + e(tp.topic) + "</b> — missed " + tp.count + "×" + (tp.ex.length ? " (e.g. " + tp.ex.map(x => "“" + e(x) + "”").join(", ") + ")" : "") + "</li>").join("") + "</ul>");
   if (questions.length) reviewBlocks.push("<h4>Questions to go over</h4><ul>" + questions.slice(0, 10).map(q => "<li><b>" + e(q.group) + "</b> — " + e(q.q) + ' <span class="grade-dim">Answer: ' + e(q.answer) + "</span></li>").join("") + "</ul>");
@@ -2200,13 +2214,13 @@ function gradeSheetHTML() {
     "<h2>" + e(child.name) + " — ELA Grade Sheet</h2>" +
     '<div class="grade-meta">' + e(child.subtitle) + " · Through Week " + wk + " · Printed " + today + "</div>" +
     '<div class="grade-overall"><div class="grade-overall-num">' + (overall == null ? "—" : Math.round(overall) + "%") + '</div><div class="grade-overall-letter">' + (overall == null ? "" : letterFor(overall)) + '</div><div class="grade-overall-label">Overall ELA grade to date</div></div>' +
-    '<table class="grade-table grade-summary"><thead><tr><th>Subject</th><th class="num">Points</th><th class="num">%</th><th class="num">Grade</th><th>Notes</th></tr></thead><tbody>' + summaryRows + "</tbody></table>" +
+    '<table class="grade-table grade-summary"><thead><tr><th>Subject</th><th class="num">Lessons &amp; practice</th><th class="num">Quizzes &amp; tests</th><th class="num">Subject %</th><th class="num">Grade</th><th>Notes</th></tr></thead><tbody>' + summaryRows + "</tbody></table>" +
     (conceptRows ? "<h3>Concepts covered &amp; how they landed</h3>" +
       '<table class="grade-table"><thead><tr><th>Week</th><th>Subject</th><th>Lesson focus</th><th class="num">Score</th><th>How it landed</th></tr></thead><tbody>' + conceptRows + "</tbody></table>" +
       '<div class="grade-dim" style="margin-top:6px;">Strong 90%+ · Solid 80–89% · Developing 70–79% · Needs review under 70%. Based on that week\'s graded work in the subject.</div>' : "") +
     "<h3>Areas to review</h3>" + (reviewBlocks.length ? reviewBlocks.join("") : '<p class="grade-dim">Nothing flagged right now. 🎉</p>') +
     (detail ? "<h3>Section-by-section scores</h3>" + detail : '<p class="grade-dim">No graded work yet.</p>') +
-    '<div class="grade-foot">Scores show the most recent attempt on each section. Sections redone after a send-back or to improve keep their earlier attempts on file. Written answers are reviewed by a parent and aren\'t given a percentage. Review drills are practice and aren\'t counted. Scale: A+ 97, A 93, A- 90, B+ 87, B 83, B- 80, C+ 77, C 73, C- 70, D+ 67, D 63, D- 60. Overall is the average of the subjects with scores.</div>';
+    '<div class="grade-foot">Scores show the most recent attempt on each section. Sections redone after a send-back or to improve keep their earlier attempts on file. Written answers are reviewed by a parent and aren\'t given a percentage. Review drills are practice and aren\'t counted. Scale: A+ 97, A 93, A- 90, B+ 87, B 83, B- 80, C+ 77, C 73, C- 70, D+ 67, D 63, D- 60. Quizzes and tests (the monthly quizzes and term finals) count for ' + Math.round(TEST_WEIGHT * 100) + '% of a subject\'s grade and lessons &amp; practice for ' + Math.round((1 - TEST_WEIGHT) * 100) + '%, since lessons are where the learning happens and the tests check what was retained; until a subject has a quiz or test, its grade is lessons only. Overall is the average of the subjects with scores.</div>';
 }
 function openGradeSheet() {
   document.getElementById("gradeSheet").innerHTML = gradeSheetHTML();

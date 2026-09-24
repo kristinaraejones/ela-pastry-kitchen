@@ -311,3 +311,5 @@ body[data-view="parent"][data-child]{background:#F0EAE0;background-image:none;}
 .g-dev{background:var(--tan-bg);color:var(--tan-text);}
 .g-review{background:#FBE0D0;color:#B4502C;}
 .g-none{background:var(--rail);color:var(--chalk-dim);}
+.g-test{background:var(--tan-bg);color:var(--tan-text);font-size:0.68rem;}
+.grade-test-row td{background:#FBF6EC;font-weight:600;}
