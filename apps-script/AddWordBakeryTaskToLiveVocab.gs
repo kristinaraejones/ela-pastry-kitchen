@@ -6,7 +6,7 @@
  *
  * Run once from the Apps Script editor (addWordBakeryTaskToLiveVocab > Run).
  * Safe to re-run: weeks that already have an avwb row are skipped.
- * Each new row is a copy of that week's av1 row with the task fields swapped.
+ * Each new row is a copy of that week's study-words row (av1, av2, ...) with the task fields swapped.
  */
 function addWordBakeryTaskToLiveVocab() {
   var sh = getSheet_('Schedule');
@@ -30,7 +30,7 @@ function addWordBakeryTaskToLiveVocab() {
   var newRows = [];
   for (var k = 1; k < values.length; k++) {
     var t = values[k];
-    if (t[studentCol] !== 'adelyn' || t[subjectCol] !== 'vocab' || t[taskCol] !== 'av1') continue;
+    if (t[studentCol] !== 'adelyn' || t[subjectCol] !== 'vocab' || !/^avd+$/.test(t[taskCol])) continue;
     if (hasTask[t[weekCol]]) continue;
     var copy = t.slice();
     copy[taskCol] = 'avwb';
