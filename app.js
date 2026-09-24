@@ -259,6 +259,7 @@ async function loadChild(student) {
   childrenCache[student] = built;
   reviewPoolCache[student] = resp.reviewPool;
   answerLogCache[student] = resp.answerLog || [];
+  projectsCache[student] = extractProjects(resp.submissions);
   markersCache[student] = resp.markers;
   burnLogCache[student] = resp.burnLog;
   banksCache[student] = resp.banks;
@@ -2075,6 +2076,177 @@ function exportWeeksPdf() {
 const stampedStations = new Set();
 const stampSeeded = {}; // per child: false until the first render has recorded already-served plates
 
+// ---------- Projects (monthly writing summaries, book completion) ----------
+// Parent-created, graded 0-100, count a bit more than a regular assignment on the grade sheet.
+// Each project is stored as its own Submissions row (task_id "proj_...") so no backend change
+// is needed and a long typed answer never runs into a single-cell size limit.
+
+const PROJECT_WEIGHT = 1.5; // how much a project counts vs. a standard assignment
+const PROJECT_KINDS = {
+  "writing-summary": { label: "Monthly writing summary", subject: "writing", subjectName: "Writing" },
+  "book": { label: "Book completion project", subject: "reading", subjectName: "Reading" }
+};
+const projectsCache = {}; // { kenley: [ project, ... ], adelyn: [...] }
+let projectFormOpen = false;
+let openProjectKid = null;
+
+function extractProjects(submissions) {
+  return (submissions || [])
+    .filter(s => String(s.task_id || "").indexOf("proj_") === 0 && s.answers && s.answers.project)
+    .map(s => Object.assign({}, s.answers.project, { id: s.task_id }));
+}
+function childProjects() { return projectsCache[currentChild] || (projectsCache[currentChild] = []); }
+function findProject(id) { return childProjects().find(p => p.id === id); }
+function persistProject(p) {
+  apiPost("saveSubmission", {
+    student: currentChild, task_id: p.id, status: p.status, score: p.score || "",
+    parent_comment: p.feedback || "", answers: { project: p }
+  }).catch(() => {});
+}
+function projectSnapshot(p, by) {
+  p.history = p.history || [];
+  if (!p.text && !p.score) return;
+  p.history.push({ at: new Date().toISOString(), by, text: p.text || "", score: p.score || "", feedback: p.feedback || "" });
+}
+function projectStatusText(p) {
+  return { assigned: "Assigned", submitted: "Submitted — awaiting your review", reviewed: "Reviewed", sent_back: "Sent back — revising", archived: "Archived" }[p.status] || p.status;
+}
+
+// ----- parent actions -----
+function toggleProjectForm() { projectFormOpen = !projectFormOpen; render(); }
+function addProject() {
+  const title = document.getElementById("proj-title").value.trim();
+  if (!title) { alert("Give the project a title first."); return; }
+  const kind = document.getElementById("proj-kind").value;
+  const p = {
+    id: "proj_" + Date.now().toString(36), title, kind,
+    subject: PROJECT_KINDS[kind].subject,
+    month: document.getElementById("proj-month").value.trim(),
+    prompt: document.getElementById("proj-prompt").value.trim(),
+    status: "assigned", text: "", score: "", feedback: "", history: [], createdAt: new Date().toISOString()
+  };
+  childProjects().unshift(p);
+  projectFormOpen = false;
+  persistProject(p);
+  render();
+}
+function projectGradeFromInput(p) {
+  const input = document.getElementById("pgrade-" + p.id);
+  if (!input) return;
+  const raw = input.value.trim();
+  if (raw === "") { p.score = ""; return; }
+  const v = Math.max(0, Math.min(100, Math.round(Number(raw))));
+  if (!Number.isNaN(v)) p.score = v + "/100";
+}
+function saveProjectGrade(id) {
+  const p = findProject(id); if (!p) return;
+  projectGradeFromInput(p);
+  const box = document.getElementById("pcomment-" + id);
+  if (box && box.value.trim()) p.feedback = box.value.trim();
+  if (p.status === "assigned" && p.score) p.status = "reviewed"; // graded from paper work
+  persistProject(p); render();
+}
+function approveProject(id) {
+  const p = findProject(id); if (!p) return;
+  projectGradeFromInput(p);
+  const box = document.getElementById("pcomment-" + id);
+  if (box) p.feedback = box.value.trim() || p.feedback || "";
+  p.status = "reviewed";
+  persistProject(p); render();
+}
+function sendBackProject(id) {
+  const p = findProject(id); if (!p) return;
+  projectGradeFromInput(p);
+  const box = document.getElementById("pcomment-" + id);
+  p.feedback = (box && box.value.trim()) || "Please take another look and resubmit.";
+  projectSnapshot(p, "parent");
+  p.score = "";
+  p.status = "sent_back";
+  persistProject(p); render();
+}
+function archiveProject(id) {
+  const p = findProject(id); if (!p) return;
+  if (!confirm("Remove this project from the list? Its grade will no longer count.")) return;
+  p.status = "archived";
+  persistProject(p); render();
+}
+
+// ----- student actions -----
+function toggleProjectKid(id) { openProjectKid = openProjectKid === id ? null : id; render(); }
+function submitProject(id) {
+  const p = findProject(id); if (!p) return;
+  const ta = document.getElementById("ptext-" + id);
+  const text = ta ? ta.value.trim() : "";
+  if (!text) return;
+  p.text = text;
+  p.status = "submitted";
+  persistProject(p); render();
+}
+
+// ----- rendering -----
+function projectHistoryHTML(p, forStudent) {
+  const hist = p.history || [];
+  if (!hist.length) return "";
+  const rows = hist.map((h, i) => '<div class="attempt"><div class="attempt-head"><b>Attempt ' + (i + 1) + '</b> <span class="attempt-dim">· ' + new Date(h.at).toLocaleDateString() + (!forStudent && h.score ? " · scored " + escHtml(h.score) : "") + '</span></div>' +
+    (h.text ? '<div class="attempt-text">' + escHtml(h.text) + "</div>" : "") +
+    (h.feedback ? '<div class="parent-feedback">📝 ' + (forStudent ? "Feedback you got: " : "Your note: ") + escHtml(h.feedback) + "</div>" : "") + "</div>").join("");
+  return '<details class="attempt-history"' + (forStudent ? "" : " open") + "><summary>" + (forStudent ? "📜 My earlier drafts (" : "📜 Previous attempts (") + hist.length + ")</summary>" + rows + "</details>";
+}
+function projectCardParentHTML(p) {
+  const kind = PROJECT_KINDS[p.kind] || { label: "Project", subjectName: "" };
+  const awaiting = p.status === "submitted";
+  const pct = (parseScore(p.score) ? Math.round(parseScore(p.score).got / parseScore(p.score).of * 100) : null);
+  return '<div class="review-item project-card' + (awaiting ? " needs-attention" : "") + '">' +
+    "<strong>" + escHtml(p.title) + "</strong> " +
+    '<span class="g-chip g-test">' + escHtml(kind.label) + " · counts " + PROJECT_WEIGHT + "×</span>" +
+    '<div class="meta">' + escHtml(kind.subjectName) + (p.month ? " · " + escHtml(p.month) : "") + " · " + projectStatusText(p) + "</div>" +
+    (p.prompt ? '<div class="lesson-text"><p>' + escHtml(p.prompt) + "</p></div>" : "") +
+    projectHistoryHTML(p, false) +
+    (p.text ? (p.history && p.history.length ? '<div class="attempt-current-label">Latest attempt</div>' : "") + '<div class="submitted-text student-answer">' + escHtml(p.text) + "</div>" : '<div class="grade-dim">Nothing typed in the app yet — you can grade paper work directly.</div>') +
+    '<textarea id="pcomment-' + p.id + '" placeholder="Feedback (she sees it if you send it back or approve)" style="min-height:44px;margin-top:6px;"></textarea>' +
+    '<div class="grade-entry"><label for="pgrade-' + p.id + '"><b>Grade</b></label>' +
+    '<input type="number" min="0" max="100" step="1" id="pgrade-' + p.id + '" value="' + (pct == null ? "" : pct) + '" placeholder="0–100">' +
+    '<span class="grade-entry-letter">' + (pct == null ? "not graded" : "= " + letterFor(pct)) + "</span>" +
+    '<div class="grade-entry-note">Change it any time, for example after revised work.</div></div>' +
+    '<div class="review-actions"><button onclick="saveProjectGrade(\'' + p.id + '\')">Save grade</button>' +
+    (p.text ? '<button onclick="sendBackProject(\'' + p.id + '\')">Refire (send back)</button><button class="approve" onclick="approveProject(\'' + p.id + '\')">Approve</button>' : "") +
+    '<button onclick="archiveProject(\'' + p.id + '\')">Remove</button></div></div>';
+}
+function projectCardKidHTML(p) {
+  const kind = PROJECT_KINDS[p.kind] || { label: "Project" };
+  const open = openProjectKid === p.id;
+  const canWrite = p.status === "assigned" || p.status === "sent_back";
+  let body = "";
+  if (open) {
+    body = (p.prompt ? '<div class="lesson-text"><p>' + escHtml(p.prompt) + "</p></div>" : "") +
+      (p.status === "sent_back" && p.feedback ? '<div class="parent-feedback">📝 Please revise: ' + escHtml(p.feedback) + "</div>" : "") +
+      (p.status === "reviewed" && p.feedback ? '<div class="parent-feedback">📝 Feedback from parent: ' + escHtml(p.feedback) + "</div>" : "") +
+      '<textarea id="ptext-' + p.id + '" placeholder="Type your project here… (or hand it in on paper)" ' + (canWrite ? "" : "disabled") + ">" + escHtml(p.text || "") + "</textarea>" +
+      (canWrite ? '<button class="btn primary" onclick="submitProject(\'' + p.id + '\')">' + (p.status === "sent_back" ? "Refire" : "Submit") + "</button>" : '<div class="graded-note">' + (p.status === "submitted" ? "Submitted — waiting on parent review." : "Reviewed.") + "</div>") +
+      projectHistoryHTML(p, true);
+  }
+  return '<div class="project-kid"><div class="task-head' + (p.status === "sent_back" ? " review" : "") + '" onclick="toggleProjectKid(\'' + p.id + '\')"><div class="dot"></div><span class="label">' + escHtml(p.title) + '</span><span class="status-text">' + escHtml(kind.label) + " · " + (p.status === "sent_back" ? "🔥 Try again" : projectStatusText(p).replace(" — awaiting your review", " — waiting on Mom")) + "</span></div>" + (open ? '<div class="task-body open">' + body + "</div>" : "") + "</div>";
+}
+function renderProjectsPanel() {
+  const panel = document.getElementById("projectsPanel");
+  if (!panel) return;
+  const list = childProjects().filter(p => p.status !== "archived");
+  if (currentView !== "parent") {
+    panel.innerHTML = list.length ? '<div class="projects-box"><h3>📚 Projects</h3>' + list.map(projectCardKidHTML).join("") + "</div>" : "";
+    return;
+  }
+  const form = projectFormOpen ? '<div class="project-form">' +
+    '<label>Title<input type="text" id="proj-title" placeholder="e.g. September writing summary"></label>' +
+    '<label>Type<select id="proj-kind"><option value="writing-summary">Monthly writing summary (Writing)</option><option value="book">Book completion project (Reading)</option></select></label>' +
+    '<label>Month / due<input type="text" id="proj-month" placeholder="e.g. September"></label>' +
+    '<label>Instructions (optional)<textarea id="proj-prompt" style="min-height:50px;" placeholder="What should ' + escHtml(CHILD_META[currentChild].name) + ' do?"></textarea></label>' +
+    '<div class="review-actions"><button class="approve" onclick="addProject()">Add project</button><button onclick="toggleProjectForm()">Cancel</button></div></div>' : "";
+  panel.innerHTML = '<div class="projects-box"><h3>📚 Projects — ' + escHtml(CHILD_META[currentChild].name) + '</h3>' +
+    '<div class="lesson-text" style="font-size:0.82rem;">Monthly writing summaries and book completion projects. Each counts ' + PROJECT_WEIGHT + '× a regular assignment in her lessons grade. ' + escHtml(CHILD_META[currentChild].name) + ' can type hers here, or you can grade paper work directly.</div>' +
+    (projectFormOpen ? "" : '<button class="btn primary" style="margin-top:0;" onclick="toggleProjectForm()">＋ Add a project</button>') + form +
+    (list.length ? list.map(projectCardParentHTML).join("") : '<div class="empty-note">No projects yet.</div>') + "</div>";
+}
+
 // ---------- Grade sheet (report card) ----------
 // Score = points earned / points possible, so a 10-point dictation sentence counts
 // more than a single word. Each subject's grade is its total points; the overall
@@ -2226,7 +2398,7 @@ function gradeSheetHTML() {
     const testPct = to > 0 ? (tg / to) * 100 : null;
     // Weighted: tests count for TEST_WEIGHT once there are any; until then the grade is lessons only.
     const pct = practicePct != null && testPct != null ? practicePct * (1 - TEST_WEIGHT) + testPct * TEST_WEIGHT : (testPct != null ? testPct : practicePct);
-    subjects.push({ key, name: DATA[key].name, got, of, pct, practicePct, testPct, scoredCount, reflDone, reflReviewed, rows });
+    subjects.push({ key, name: DATA[key].name, got, of, pct, practicePct, testPct, scoredCount, reflDone, reflReviewed, rows, pg, po, tg, to });
 
     // per-week concepts + how it landed
     for (let w = 1; w <= wk; w++) {
@@ -2247,6 +2419,22 @@ function gradeSheetHTML() {
       const lesson = reads.length ? shortTopic(reads[0].label) : shortTopic(tasks[0].label);
       weekRows.push({ w, subject: DATA[key].name, lesson, tag: DATA[key].tagsByWeek && DATA[key].tagsByWeek[w], stds, pct, refl, reflOk });
     }
+  });
+  // Projects: graded 0-100 by the parent, counted PROJECT_WEIGHT x a standard assignment in lessons & practice.
+  childProjects().filter(p => p.status !== "archived").forEach(p => {
+    const sc = parseScore(p.score);
+    if (!sc) return;
+    const kindInfo = PROJECT_KINDS[p.kind] || { subject: "writing", subjectName: "Writing" };
+    let sj = subjects.find(x => x.key === kindInfo.subject);
+    if (!sj) {
+      sj = { key: kindInfo.subject, name: kindInfo.subjectName, got: 0, of: 0, pct: null, practicePct: null, testPct: null, scoredCount: 0, reflDone: 0, reflReviewed: 0, rows: [], pg: 0, po: 0, tg: 0, to: 0 };
+      subjects.push(sj);
+    }
+    sj.pg += sc.got * PROJECT_WEIGHT; sj.po += sc.of * PROJECT_WEIGHT; sj.scoredCount++;
+    sj.practicePct = sj.po > 0 ? (sj.pg / sj.po) * 100 : null;
+    sj.testPct = sj.to > 0 ? (sj.tg / sj.to) * 100 : null;
+    sj.pct = sj.practicePct != null && sj.testPct != null ? sj.practicePct * (1 - TEST_WEIGHT) + sj.testPct * TEST_WEIGHT : (sj.testPct != null ? sj.testPct : sj.practicePct);
+    sj.rows.push({ week: "Project", isProject: true, label: p.title + (p.month ? " (" + p.month + ")" : ""), score: sc.got + "/" + sc.of, pct: (sc.got / sc.of) * 100, status: projectStatusText(p), attempts: (p.history || []).length ? (p.history.length + 1) : null });
   });
   const graded = subjects.filter(sj => sj.pct != null);
   const overall = graded.length ? graded.reduce((n, sj) => n + sj.pct, 0) / graded.length : null;
@@ -2269,7 +2457,7 @@ function gradeSheetHTML() {
   const detail = subjects.filter(sj => sj.rows.length).map(sj =>
     "<h3>" + e(sj.name) + ' <span class="grade-h3-pct">' + fmtPct(sj.pct) + (sj.pct == null ? "" : " · " + letterFor(sj.pct)) + "</span></h3>" +
     '<table class="grade-table"><thead><tr><th>Week</th><th>Section</th><th class="num">Score</th><th class="num">%</th><th>Status</th></tr></thead><tbody>' +
-    sj.rows.map(r => "<tr" + (r.isTest ? ' class="grade-test-row"' : "") + "><td>" + (typeof r.week === "number" ? "Wk " + r.week : r.week) + "</td><td>" + (r.isTest ? '<span class="g-chip g-test">counts ' + Math.round(TEST_WEIGHT * 100) + '% of subject</span> ' : "") + e(r.label) + (r.attempts ? ' <span class="grade-dim">(attempt ' + r.attempts + ")</span>" : "") + "</td>" +
+    sj.rows.map(r => "<tr" + (r.isTest ? ' class="grade-test-row"' : "") + "><td>" + (typeof r.week === "number" ? "Wk " + r.week : r.week) + "</td><td>" + (r.isTest ? '<span class="g-chip g-test">counts ' + Math.round(TEST_WEIGHT * 100) + '% of subject</span> ' : "") + (r.isProject ? '<span class="g-chip g-test">project · counts ' + PROJECT_WEIGHT + '×</span> ' : "") + e(r.label) + (r.attempts ? ' <span class="grade-dim">(attempt ' + r.attempts + ")</span>" : "") + "</td>" +
       '<td class="num">' + r.score + '</td><td class="num">' + fmtPct(r.pct) + "</td><td>" + e(r.status) + "</td></tr>").join("") + "</tbody></table>").join("");
 
   // Areas to review
@@ -2314,7 +2502,7 @@ function gradeSheetHTML() {
       '<div class="grade-dim" style="margin-top:6px;">Strong 90%+ · Solid 80–89% · Developing 70–79% · Needs review under 70%. Based on that week\'s graded work in the subject.</div>' : "") +
     "<h3>Areas to review</h3>" + (reviewBlocks.length ? reviewBlocks.join("") : '<p class="grade-dim">Nothing flagged right now. 🎉</p>') +
     (detail ? "<h3>Section-by-section scores</h3>" + detail : '<p class="grade-dim">No graded work yet.</p>') +
-    '<div class="grade-foot">Scores show the most recent attempt on each section. Sections redone after a send-back or to improve keep their earlier attempts on file. Written answers count once a parent has entered a grade for them. Review drills are practice and aren\'t counted. Scale: A+ 97, A 93, A- 90, B+ 87, B 83, B- 80, C+ 77, C 73, C- 70, D+ 67, D 63, D- 60. Quizzes and tests (the monthly quizzes and term finals) count for ' + Math.round(TEST_WEIGHT * 100) + '% of a subject\'s grade and lessons &amp; practice for ' + Math.round((1 - TEST_WEIGHT) * 100) + '%, since lessons are where the learning happens and the tests check what was retained; until a subject has a quiz or test, its grade is lessons only. Overall is the average of the subjects with scores.</div>';
+    '<div class="grade-foot">Scores show the most recent attempt on each section. Sections redone after a send-back or to improve keep their earlier attempts on file. Written answers count once a parent has entered a grade for them. Projects (monthly writing summaries, book completion) count ' + PROJECT_WEIGHT + '× a standard assignment within lessons &amp; practice. Review drills are practice and aren\'t counted. Scale: A+ 97, A 93, A- 90, B+ 87, B 83, B- 80, C+ 77, C 73, C- 70, D+ 67, D 63, D- 60. Quizzes and tests (the monthly quizzes and term finals) count for ' + Math.round(TEST_WEIGHT * 100) + '% of a subject\'s grade and lessons &amp; practice for ' + Math.round((1 - TEST_WEIGHT) * 100) + '%, since lessons are where the learning happens and the tests check what was retained; until a subject has a quiz or test, its grade is lessons only. Overall is the average of the subjects with scores.</div>';
 }
 function openGradeSheet() {
   document.getElementById("gradeSheet").innerHTML = gradeSheetHTML();
@@ -2329,6 +2517,7 @@ function closeGradeSheet() {
 
 function render() {
   regradeLegacyDictation();
+  renderProjectsPanel();
   const gsc = document.getElementById("gradeSheetControl");
   gsc.style.display = currentView === "parent" ? "flex" : "none";
   document.getElementById("gradeSheetLabel").textContent = `${CHILD_META[currentChild].name}'s grade sheet`;
