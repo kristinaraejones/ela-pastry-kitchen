@@ -2039,8 +2039,101 @@ function exportWeeksPdf() {
 const stampedStations = new Set();
 const stampSeeded = {}; // per child: false until the first render has recorded already-served plates
 
+// ---------- Grade sheet (report card) ----------
+// Score = points earned / points possible, so a 10-point dictation sentence counts
+// more than a single word. Each subject's grade is its total points; the overall
+// grade is the plain average of the subjects that have scores yet.
+
+const GRADE_SCALE = [[90, "A"], [80, "B"], [70, "C"], [60, "D"], [0, "F"]];
+function letterFor(pct) { return (GRADE_SCALE.find(([min]) => pct >= min) || [0, "F"])[1]; }
+function parseScore(score) {
+  const m = /^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/.exec(score || "");
+  return m && Number(m[2]) > 0 ? { got: Number(m[1]), of: Number(m[2]) } : null;
+}
+function fmtPct(p) { return p == null ? "—" : `${Math.round(p)}%`; }
+
+function gradeSheetHTML() {
+  const child = CHILD_META[currentChild];
+  const wk = currentWeek();
+  const today = new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+  const subjects = [];
+  SUBJECT_ORDER.forEach(key => {
+    if (!DATA[key]) return;
+    let got = 0, of = 0, scoredCount = 0, reflDone = 0, reflReviewed = 0, reflPending = 0;
+    const rows = [];
+    DATA[key].tasks.forEach(t => {
+      const s = state[key].tasks[t.id];
+      if (!s) return;
+      const isTest = !!(t.monthlyTest || t.termFinal || t.dynamic);
+      const week = isTest ? "Tests" : t.week_number;
+      if (!isTest && t.week_number > wk) return;
+      const sc = parseScore(s.score);
+      const attempts = (s.history || []).length + 1;
+      if (t.type === "reflection") {
+        if (!(s.answers && s.answers.text)) return;
+        reflDone++;
+        const status = s.reviewed ? "Reviewed & approved" : s.sentBack && !s.done ? "Sent back — revising" : "Awaiting review";
+        if (s.reviewed) reflReviewed++; else reflPending++;
+        rows.push({ week, label: t.label, score: "—", pct: null, status, attempts: attempts > 1 ? attempts : null });
+      } else if (sc && s.done) {
+        got += sc.got; of += sc.of; scoredCount++;
+        rows.push({ week, label: t.label, score: `${sc.got % 1 ? sc.got.toFixed(1) : sc.got}/${sc.of}`, pct: (sc.got / sc.of) * 100, status: statusLabel(s), attempts: attempts > 1 ? attempts : null });
+      }
+    });
+    rows.sort((x, y) => (x.week === "Tests" ? 999 : x.week) - (y.week === "Tests" ? 999 : y.week));
+    subjects.push({ key, name: DATA[key].name, got, of, pct: of > 0 ? (got / of) * 100 : null, scoredCount, reflDone, reflReviewed, reflPending, rows });
+  });
+  const graded = subjects.filter(sj => sj.pct != null);
+  const overall = graded.length ? graded.reduce((n, sj) => n + sj.pct, 0) / graded.length : null;
+
+  const summaryRows = subjects.map(sj => `<tr>
+      <td>${escHtml(sj.name)}</td>
+      <td class="num">${sj.pct == null ? "—" : `${Math.round(sj.got * 10) / 10} / ${sj.of}`}</td>
+      <td class="num"><b>${fmtPct(sj.pct)}</b></td>
+      <td class="num"><b>${sj.pct == null ? "—" : letterFor(sj.pct)}</b></td>
+      <td>${sj.scoredCount} graded section${sj.scoredCount === 1 ? "" : "s"}${sj.reflDone ? ` · ${sj.reflReviewed}/${sj.reflDone} written answers reviewed` : ""}</td>
+    </tr>`).join("");
+  const detail = subjects.filter(sj => sj.rows.length).map(sj => `
+    <h3>${escHtml(sj.name)} <span class="grade-h3-pct">${fmtPct(sj.pct)}${sj.pct == null ? "" : " · " + letterFor(sj.pct)}</span></h3>
+    <table class="grade-table">
+      <thead><tr><th>Week</th><th>Section</th><th class="num">Score</th><th class="num">%</th><th>Status</th></tr></thead>
+      <tbody>${sj.rows.map(r => `<tr>
+        <td>${r.week === "Tests" ? "Test" : "Wk " + r.week}</td>
+        <td>${escHtml(r.label)}${r.attempts ? ` <span class="grade-dim">(attempt ${r.attempts})</span>` : ""}</td>
+        <td class="num">${r.score}</td>
+        <td class="num">${fmtPct(r.pct)}</td>
+        <td>${escHtml(r.status)}</td>
+      </tr>`).join("")}</tbody>
+    </table>`).join("");
+
+  return `
+    <div class="grade-title">The ELA Pastry Kitchen</div>
+    <h2>${escHtml(child.name)} — ELA Grade Sheet</h2>
+    <div class="grade-meta">${escHtml(child.subtitle)} · Through Week ${wk} · Printed ${today}</div>
+    <div class="grade-overall"><div class="grade-overall-num">${overall == null ? "—" : Math.round(overall) + "%"}</div><div class="grade-overall-letter">${overall == null ? "" : letterFor(overall)}</div><div class="grade-overall-label">Overall ELA grade to date</div></div>
+    <table class="grade-table grade-summary">
+      <thead><tr><th>Subject</th><th class="num">Points</th><th class="num">%</th><th class="num">Grade</th><th>Notes</th></tr></thead>
+      <tbody>${summaryRows}</tbody>
+    </table>
+    ${detail || '<p class="grade-dim">No graded work yet.</p>'}
+    <div class="grade-foot">Scores show the most recent attempt on each section. Sections redone after a send-back or to improve keep their earlier attempts on file. Written answers are reviewed by a parent and aren't given a percentage. Scale: A 90+, B 80+, C 70+, D 60+. Overall is the average of the subjects with scores.</div>`;
+}
+function openGradeSheet() {
+  document.getElementById("gradeSheet").innerHTML = gradeSheetHTML();
+  document.getElementById("gradeOverlay").style.display = "block";
+  document.body.classList.add("grade-open");
+  window.scrollTo(0, 0);
+}
+function closeGradeSheet() {
+  document.getElementById("gradeOverlay").style.display = "none";
+  document.body.classList.remove("grade-open");
+}
+
 function render() {
   regradeLegacyDictation();
+  const gsc = document.getElementById("gradeSheetControl");
+  gsc.style.display = currentView === "parent" ? "flex" : "none";
+  document.getElementById("gradeSheetLabel").textContent = `${CHILD_META[currentChild].name}'s grade sheet`;
   document.getElementById("childSwitcher").innerHTML = Object.keys(CHILD_META).map(id =>
     `<button class="child-pill kid-${id} ${currentChild === id ? "active" : ""}" onclick="switchChild('${id}')">${currentChild === id ? "✓ " : ""}${CHILD_META[id].name}</button>`
   ).join("");

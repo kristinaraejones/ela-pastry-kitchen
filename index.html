@@ -51,6 +51,10 @@
     <input type="number" id="exportToWeek" min="1" style="width:48px;flex:none;">
     <button class="btn primary" style="margin-top:0;" onclick="exportWeeksPdf()">Export PDF</button>
   </div>
+  <div class="due-control" id="gradeSheetControl" style="display:none;">
+    <span id="gradeSheetLabel">Grade sheet</span>
+    <button class="btn primary" style="margin-top:0;" onclick="openGradeSheet()">📊 Open grade sheet</button>
+  </div>
   <div class="due-control" id="termFinalControl" style="display:none;">
     <span>Term Finals:</span>
     <button class="btn" style="margin-top:0;" onclick="toggleTermFinals()" id="termFinalBtn"></button>
@@ -88,6 +92,13 @@
   </div>
 </div>
 
+<div class="grade-overlay" id="gradeOverlay" style="display:none;">
+  <div class="grade-toolbar no-print">
+    <button class="btn primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    <button class="btn" onclick="closeGradeSheet()">✕ Close</button>
+  </div>
+  <div class="grade-sheet" id="gradeSheet"></div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
