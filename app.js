@@ -2300,7 +2300,7 @@ function reviewTopics() {
   let curCtx = null; // lesson focus + standards for the week the current task belongs to
   const ctxFor = (key, week) => {
     const reads = weekScopedTasks(key, week).filter(x => x.type === "read");
-    return { focus: reads.length ? shortTopic(reads[0].label) : "", stds: [...new Set(reads.map(standardsFromTask).filter(Boolean))].join("; ") };
+    return { focus: reads.length ? shortTopic(reads[0].label) : "", stds: mapStandards(key, week).join(", ") || [...new Set(reads.map(standardsFromTask).filter(Boolean))].join("; ") };
   };
   const add = (group, topic, example) => {
     const k = group + " · " + topic;
@@ -2341,28 +2341,92 @@ function reviewTopics() {
   return { topics: Object.values(topics).sort((x, y) => y.count - x.count), questions, spell };
 }
 
-// Grade-level standards, only where a lesson lists them: how each landed across the weeks it was taught.
-function standardsCheckHTML(weekRows) {
+// Codes from the standards map for this child's subject/week (falls back to what the lesson text itself lists).
+function mapStandards(key, week) {
+  const child = STANDARD_MAP[currentChild];
+  const codes = child && child[key] && child[key][week];
+  return codes ? codes.slice() : [];
+}
+function fmtWeekList(weeks) {
+  const ws = [...new Set(weeks)].sort((x, y) => x - y);
+  const parts = [];
+  for (let i = 0; i < ws.length; i++) {
+    let j = i;
+    while (j + 1 < ws.length && ws[j + 1] === ws[j] + 1) j++;
+    parts.push(j > i + 1 ? ws[i] + "–" + ws[j] : ws.slice(i, j + 1).join(", "));
+    i = j;
+  }
+  return parts.join(", ");
+}
+
+// Standards coverage: every grade-level standard, where/when it is taught, and how it is landing.
+// Rating = lessons average, blended with the subject's quiz/test result (same TEST_WEIGHT split as the grades).
+function standardsCoverageHTML(subjects, weekRows) {
   const e = escHtml;
-  const map = {};
-  weekRows.forEach(r => {
-    if (!r.stds) return;
-    (r.stds.match(/\b[A-Z]{1,3}\.\d{1,2}\.\d{1,2}[a-z]?\b/g) || []).forEach(code => {
-      const m = map[code] || (map[code] = { code, weeks: [], pcts: [], notes: r.stds });
-      m.weeks.push(r.subject + " Wk " + r.w);
-      if (r.pct != null) m.pcts.push(r.pct);
-    });
-  });
-  const list = Object.values(map).sort((x, y) => x.code.localeCompare(y.code));
-  if (!list.length) return "";
-  const rows = list.map(m => {
-    const avg = m.pcts.length ? m.pcts.reduce((n, v) => n + v, 0) / m.pcts.length : null;
-    const g = graspFor(avg);
-    return "<tr><td><b>" + e(m.code) + "</b></td><td>" + e(m.weeks.join(", ")) + '</td><td class="num">' + fmtPct(avg) + '</td><td><span class="g-chip ' + g.cls + '">' + e(g.text) + "</span></td></tr>";
+  const grade = STANDARD_GRADE[currentChild];
+  const cat = STANDARD_CATALOG[grade];
+  if (!cat) return "";
+  const wk = currentWeek();
+  const child = STANDARD_MAP[currentChild] || {};
+  const nameOf = key => (DATA[key] && DATA[key].name) || ({ vocab: "Vocabulary", spelling: "Spelling", grammar: "Grammar", reading: "Reading", writing: "Writing" }[key] || key);
+  const weekPct = {}; // key|week -> pct of that week's graded work
+  weekRows.forEach(r => { if (r.pct != null) weekPct[r.key + "|" + r.w] = r.pct; });
+  const testPctByKey = {};
+  subjects.forEach(sj => { if (sj.testPct != null) testPctByKey[sj.key] = sj.testPct; });
+  // taught[code] = [{key, week}]
+  const taught = {};
+  Object.keys(child).forEach(key => Object.keys(child[key]).forEach(w => (child[key][w] || []).forEach(code => { (taught[code] = taught[code] || []).push({ key, week: Number(w) }); })));
+
+  let nStrong = 0, nTaughtUngraded = 0, nUpcoming = 0, nNone = 0, nAll = 0;
+  const sections = cat.map(strand => {
+    const rows = strand.codes.map(([code, desc]) => {
+      nAll++;
+      const t = taught[code] || [];
+      const past = t.filter(x => x.week <= wk), future = t.filter(x => x.week > wk);
+      const bySubject = list => {
+        const m = {};
+        list.forEach(x => { (m[x.key] = m[x.key] || []).push(x.week); });
+        return Object.keys(m).map(k => e(nameOf(k)) + " Wk " + fmtWeekList(m[k])).join("; ");
+      };
+      let status, where = "";
+      if (!t.length) {
+        nNone++;
+        status = '<span class="g-chip g-none">Not in the plan yet</span>';
+        where = '<span class="grade-dim">No lesson is mapped to this standard.</span>';
+      } else {
+        if (past.length) where += "<div><b>Taught:</b> " + bySubject(past) + "</div>";
+        if (future.length) where += '<div class="grade-dim"><b>Coming up:</b> ' + bySubject(future) + "</div>";
+        if (!past.length) {
+          nUpcoming++;
+          status = '<span class="g-chip g-soon">Coming up · Wk ' + fmtWeekList(future.map(x => x.week)) + "</span>";
+        } else {
+          const pcts = past.map(x => weekPct[x.key + "|" + x.week]).filter(v => v != null);
+          const tests = [...new Set(past.map(x => x.key))].map(k => testPctByKey[k]).filter(v => v != null);
+          if (!pcts.length && !tests.length) {
+            nTaughtUngraded++;
+            status = '<span class="g-chip g-none">Taught — not graded yet</span>';
+          } else {
+            const lessonAvg = pcts.length ? pcts.reduce((n, v) => n + v, 0) / pcts.length : null;
+            const testAvg = tests.length ? tests.reduce((n, v) => n + v, 0) / tests.length : null;
+            const score = lessonAvg != null && testAvg != null ? lessonAvg * (1 - TEST_WEIGHT) + testAvg * TEST_WEIGHT : (testAvg != null ? testAvg : lessonAvg);
+            const g = graspFor(score);
+            if (score >= 90) nStrong++;
+            status = '<span class="g-chip ' + g.cls + '">' + g.text + " · " + Math.round(score) + "%</span>" + (future.length ? '<div class="grade-dim">also returns later</div>' : "");
+          }
+        }
+      }
+      return "<tr><td><b>" + e(code) + "</b><div class=\"grade-dim\">" + e(desc) + "</div></td><td>" + where + "</td><td>" + status + "</td></tr>";
+    }).join("");
+    return "<h4>" + e(strand.name) + '</h4><table class="grade-table"><thead><tr><th>Standard</th><th>Where it is taught</th><th>Status</th></tr></thead><tbody>' + rows + "</tbody></table>";
   }).join("");
-  return "<h3>Grade-level standards check</h3>" +
-    '<table class="grade-table"><thead><tr><th>Standard</th><th>Taught in</th><th class="num">Score</th><th>How it landed</th></tr></thead><tbody>' + rows + "</tbody></table>" +
-    '<div class="grade-dim" style="margin-top:6px;">Shown only for lessons that list their standards. Score is the average of that week\'s graded work in the subject.</div>';
+  const graded = nAll - nNone - nUpcoming - nTaughtUngraded;
+  return "<h3>Standards coverage — grade " + grade + " ELA</h3>" +
+    '<div class="std-summary"><span class="g-chip g-strong">' + graded + " taught &amp; graded</span> " +
+    '<span class="g-chip g-none">' + nTaughtUngraded + " taught, not graded yet</span> " +
+    '<span class="g-chip g-soon">' + nUpcoming + " coming up</span> " +
+    '<span class="g-chip g-review">' + nNone + " not in the plan yet</span></div>" +
+    sections +
+    '<div class="grade-dim" style="margin-top:6px;">Common Core ELA, grade ' + grade + " (sub-parts roll up to their standard). How it landed: Strong 90%+, Solid 80–89%, Developing 70–79%, Needs review under 70% — the lessons average for the weeks it was taught, blended with the subject's quiz and test results. \"Not in the plan yet\" means no current lesson is mapped to that standard. Speaking &amp; Listening isn't tracked.</div>";
 }
 
 function gradeSheetHTML() {
@@ -2416,7 +2480,7 @@ function gradeSheetHTML() {
       const tasks = weekScopedTasks(key, w);
       if (!tasks.length) continue;
       const reads = tasks.filter(t => t.type === "read");
-      const stds = [...new Set(reads.map(standardsFromTask).filter(Boolean))].join("; ");
+      const stds = mapStandards(key, w).join(", ") || [...new Set(reads.map(standardsFromTask).filter(Boolean))].join("; ");
       let wg = 0, wo = 0, refl = 0, reflOk = 0;
       tasks.forEach(t => {
         const s = state[key].tasks[t.id]; if (!s) return;
@@ -2428,7 +2492,7 @@ function gradeSheetHTML() {
       if (!started) continue;
       const pct = wo > 0 ? (wg / wo) * 100 : null;
       const lesson = reads.length ? shortTopic(reads[0].label) : shortTopic(tasks[0].label);
-      weekRows.push({ w, subject: DATA[key].name, lesson, tag: DATA[key].tagsByWeek && DATA[key].tagsByWeek[w], stds, pct, refl, reflOk });
+      weekRows.push({ w, key, subject: DATA[key].name, lesson, tag: DATA[key].tagsByWeek && DATA[key].tagsByWeek[w], stds, pct, refl, reflOk });
     }
   });
   // Projects: graded 0-100 by the parent, counted PROJECT_WEIGHT x a standard assignment in lessons & practice.
@@ -2507,12 +2571,12 @@ function gradeSheetHTML() {
     '<div class="grade-meta">' + e(child.subtitle) + " · Through Week " + wk + " · Printed " + today + "</div>" +
     '<div class="grade-overall"><div class="grade-overall-num">' + (overall == null ? "—" : Math.round(overall) + "%") + '</div><div class="grade-overall-letter">' + (overall == null ? "" : letterFor(overall)) + '</div><div class="grade-overall-label">Overall ELA grade to date</div></div>' +
     '<table class="grade-table grade-summary"><thead><tr><th>Subject</th><th class="num">Lessons &amp; practice</th><th class="num">Quizzes &amp; tests</th><th class="num">Subject %</th><th class="num">Grade</th><th>Notes</th></tr></thead><tbody>' + summaryRows + "</tbody></table>" +
-    standardsCheckHTML(weekRows) +
     (conceptRows ? "<h3>Concepts covered &amp; how they landed</h3>" +
       '<table class="grade-table"><thead><tr><th>Week</th><th>Subject</th><th>Lesson focus</th><th class="num">Score</th><th>How it landed</th></tr></thead><tbody>' + conceptRows + "</tbody></table>" +
       '<div class="grade-dim" style="margin-top:6px;">Strong 90%+ · Solid 80–89% · Developing 70–79% · Needs review under 70%. Based on that week\'s graded work in the subject.</div>' : "") +
     "<h3>Areas to review</h3>" + (reviewBlocks.length ? reviewBlocks.join("") : '<p class="grade-dim">Nothing flagged right now. 🎉</p>') +
     (detail ? "<h3>Section-by-section scores</h3>" + detail : '<p class="grade-dim">No graded work yet.</p>') +
+    standardsCoverageHTML(subjects, weekRows) +
     '<div class="grade-foot">Scores show the most recent attempt on each section. Sections redone after a send-back or to improve keep their earlier attempts on file. Written answers count once a parent has entered a grade for them. Projects (monthly writing summaries, book completion) count ' + PROJECT_WEIGHT + '× a standard assignment within lessons &amp; practice. Review drills are practice and aren\'t counted. Scale: A+ 97, A 93, A- 90, B+ 87, B 83, B- 80, C+ 77, C 73, C- 70, D+ 67, D 63, D- 60. Quizzes and tests (the monthly quizzes and term finals) count for ' + Math.round(TEST_WEIGHT * 100) + '% of a subject\'s grade and lessons &amp; practice for ' + Math.round((1 - TEST_WEIGHT) * 100) + '%, since lessons are where the learning happens and the tests check what was retained; until a subject has a quiz or test, its grade is lessons only. Overall is the average of the subjects with scores.</div>';
 }
 function openGradeSheet() {
