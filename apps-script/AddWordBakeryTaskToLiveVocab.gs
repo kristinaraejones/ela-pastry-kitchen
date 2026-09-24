@@ -30,7 +30,7 @@ function addWordBakeryTaskToLiveVocab() {
   var newRows = [];
   for (var k = 1; k < values.length; k++) {
     var t = values[k];
-    if (t[studentCol] !== 'adelyn' || t[subjectCol] !== 'vocab' || !/^avd+$/.test(t[taskCol])) continue;
+    if (t[studentCol] !== 'adelyn' || t[subjectCol] !== 'vocab' || !/^av\d+$/.test(t[taskCol])) continue;
     if (hasTask[t[weekCol]]) continue;
     var copy = t.slice();
     copy[taskCol] = 'avwb';
