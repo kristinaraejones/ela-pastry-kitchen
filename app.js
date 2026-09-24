@@ -2044,79 +2044,169 @@ const stampSeeded = {}; // per child: false until the first render has recorded 
 // more than a single word. Each subject's grade is its total points; the overall
 // grade is the plain average of the subjects that have scores yet.
 
-const GRADE_SCALE = [[90, "A"], [80, "B"], [70, "C"], [60, "D"], [0, "F"]];
-function letterFor(pct) { return (GRADE_SCALE.find(([min]) => pct >= min) || [0, "F"])[1]; }
+const GRADE_SCALE = [[97, "A+"], [93, "A"], [90, "A-"], [87, "B+"], [83, "B"], [80, "B-"], [77, "C+"], [73, "C"], [70, "C-"], [67, "D+"], [63, "D"], [60, "D-"], [0, "F"]];
+function letterFor(pct) { return (GRADE_SCALE.find(([min]) => Math.round(pct) >= min) || [0, "F"])[1]; }
 function parseScore(score) {
   const m = /^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/.exec(score || "");
   return m && Number(m[2]) > 0 ? { got: Number(m[1]), of: Number(m[2]) } : null;
 }
-function fmtPct(p) { return p == null ? "—" : `${Math.round(p)}%`; }
+function fmtPct(p) { return p == null ? "—" : Math.round(p) + "%"; }
+function kindOfTask(t) {
+  if (t.termFinal) return "Term final";
+  if (t.monthlyTest) return "Monthly test";
+  if (t.dynamic) return "Review drill"; // practice on missed words: listed, but not counted in the grade
+  return null;
+}
+// How well the concept seems to have landed, from the score on that week's graded work.
+function graspFor(pct) {
+  if (pct == null) return { text: "Not graded yet", cls: "g-none" };
+  if (pct >= 90) return { text: "Strong", cls: "g-strong" };
+  if (pct >= 80) return { text: "Solid", cls: "g-solid" };
+  if (pct >= 70) return { text: "Developing", cls: "g-dev" };
+  return { text: "Needs review", cls: "g-review" };
+}
+function standardsFromTask(t) {
+  const html = typeof t.content === "string" ? t.content : "";
+  const m = /Standards?:\s*([^<]+)/i.exec(html);
+  return m ? m[1].trim().replace(/\s+/g, " ") : "";
+}
+function shortTopic(label) { return String(label || "").replace(/^Week\s*\d+\s*(Lesson|Reading & Discussion Lesson)?:?\s*/i, "").trim() || label; }
+
+// Concepts and questions she got wrong, pulled from her latest attempts.
+function reviewTopics() {
+  const topics = {}; // "Grammar · Adjective" -> { count, ex:Set }
+  const add = (group, topic, example) => {
+    const k = group + " · " + topic;
+    const e = topics[k] || (topics[k] = { group, topic, count: 0, ex: [] });
+    e.count++;
+    if (example && !e.ex.includes(example) && e.ex.length < 5) e.ex.push(example);
+  };
+  const questions = [];
+  SUBJECT_ORDER.forEach(key => {
+    if (!DATA[key]) return;
+    DATA[key].tasks.forEach(t => {
+      const s = state[key].tasks[t.id];
+      if (!s || !s.done) return;
+      const g = DATA[key].name;
+      if (t.type === "pos-tagger" && s.labels) {
+        t.sentence.forEach((w, i) => { if (s.labels[i] !== t.answers[i]) add(g, t.answers[i] + "s", w.replace(/[.,;:!?]+$/, "")); });
+      } else if (t.type === "concept-check" && s.labels) {
+        t.targets.forEach(tg => { const exp = conceptAnswerText(tg, t.options); if (s.labels[tg.index] !== exp) exp.split(" + ").forEach(part => add(g, part, t.sentence[tg.index].replace(/[.,;:!?]+$/, ""))); });
+      } else if (t.type === "phrase-tagger" && s.selections && t.phrases) {
+        const seen = new Set();
+        t.phrases.forEach(p => { if (!s.selections.some(sel => phraseHit(p, sel))) add(g, p.type, t.sentence.slice(p.start, p.end + 1).join(" ").replace(/[.,;:!?]+$/, "")); });
+        s.selections.forEach(sel => { if (!t.phrases.some(p => spanHit(p, sel))) add(g, "Marked a chunk that isn't a " + sel.type.toLowerCase(), t.sentence.slice(sel.start, sel.end + 1).join(" ").replace(/[.,;:!?]+$/, "")); });
+      } else if (t.type === "graded-mc" && t.questions && s.answers && s.answers.mc) {
+        t.questions.forEach((q, qi) => { const pick = s.answers.mc[qi]; if (pick != null && pick !== q.correct) questions.push({ group: g, q: q.q, answer: q.options[q.correct], label: t.label }); });
+      }
+    });
+  });
+  return { topics: Object.values(topics).sort((x, y) => y.count - x.count), questions };
+}
 
 function gradeSheetHTML() {
   const child = CHILD_META[currentChild];
   const wk = currentWeek();
   const today = new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+  const e = escHtml;
   const subjects = [];
+  const weekRows = []; // standards / concepts by week
   SUBJECT_ORDER.forEach(key => {
     if (!DATA[key]) return;
-    let got = 0, of = 0, scoredCount = 0, reflDone = 0, reflReviewed = 0, reflPending = 0;
+    let got = 0, of = 0, scoredCount = 0, reflDone = 0, reflReviewed = 0;
     const rows = [];
     DATA[key].tasks.forEach(t => {
       const s = state[key].tasks[t.id];
       if (!s) return;
-      const isTest = !!(t.monthlyTest || t.termFinal || t.dynamic);
-      const week = isTest ? "Tests" : t.week_number;
-      if (!isTest && t.week_number > wk) return;
+      const kind = kindOfTask(t);
+      const week = kind || t.week_number;
+      if (!kind && t.week_number > wk) return;
       const sc = parseScore(s.score);
       const attempts = (s.history || []).length + 1;
       if (t.type === "reflection") {
         if (!(s.answers && s.answers.text)) return;
         reflDone++;
-        const status = s.reviewed ? "Reviewed & approved" : s.sentBack && !s.done ? "Sent back — revising" : "Awaiting review";
-        if (s.reviewed) reflReviewed++; else reflPending++;
-        rows.push({ week, label: t.label, score: "—", pct: null, status, attempts: attempts > 1 ? attempts : null });
+        if (s.reviewed) reflReviewed++;
+        rows.push({ week, label: t.label, score: "—", pct: null, status: s.reviewed ? "Reviewed & approved" : s.sentBack && !s.done ? "Sent back — revising" : "Awaiting review", attempts: attempts > 1 ? attempts : null });
       } else if (sc && s.done) {
-        got += sc.got; of += sc.of; scoredCount++;
-        rows.push({ week, label: t.label, score: `${sc.got % 1 ? sc.got.toFixed(1) : sc.got}/${sc.of}`, pct: (sc.got / sc.of) * 100, status: statusLabel(s), attempts: attempts > 1 ? attempts : null });
+        const counts = kind !== "Review drill";
+        if (counts) { got += sc.got; of += sc.of; scoredCount++; }
+        rows.push({ week, label: t.label, score: (sc.got % 1 ? sc.got.toFixed(1) : sc.got) + "/" + sc.of, pct: (sc.got / sc.of) * 100, status: counts ? statusLabel(s) : "Practice — not counted in grade", attempts: attempts > 1 ? attempts : null });
       }
     });
-    rows.sort((x, y) => (x.week === "Tests" ? 999 : x.week) - (y.week === "Tests" ? 999 : y.week));
-    subjects.push({ key, name: DATA[key].name, got, of, pct: of > 0 ? (got / of) * 100 : null, scoredCount, reflDone, reflReviewed, reflPending, rows });
+    const order = w => (typeof w === "number" ? w : 900);
+    rows.sort((x, y) => order(x.week) - order(y.week));
+    subjects.push({ key, name: DATA[key].name, got, of, pct: of > 0 ? (got / of) * 100 : null, scoredCount, reflDone, reflReviewed, rows });
+
+    // per-week concepts + how it landed
+    for (let w = 1; w <= wk; w++) {
+      const tasks = weekScopedTasks(key, w);
+      if (!tasks.length) continue;
+      const reads = tasks.filter(t => t.type === "read");
+      const stds = [...new Set(reads.map(standardsFromTask).filter(Boolean))].join("; ");
+      let wg = 0, wo = 0, refl = 0, reflOk = 0;
+      tasks.forEach(t => {
+        const s = state[key].tasks[t.id]; if (!s) return;
+        const sc = parseScore(s.score);
+        if (t.type === "reflection" && s.answers && s.answers.text) { refl++; if (s.reviewed) reflOk++; }
+        else if (sc && s.done) { wg += sc.got; wo += sc.of; }
+      });
+      const started = tasks.some(t => { const s = state[key].tasks[t.id]; return s && (s.done || (s.answers && s.answers.text)); });
+      if (!started) continue;
+      const pct = wo > 0 ? (wg / wo) * 100 : null;
+      const lesson = reads.length ? shortTopic(reads[0].label) : shortTopic(tasks[0].label);
+      weekRows.push({ w, subject: DATA[key].name, lesson, tag: DATA[key].tagsByWeek && DATA[key].tagsByWeek[w], stds, pct, refl, reflOk });
+    }
   });
   const graded = subjects.filter(sj => sj.pct != null);
   const overall = graded.length ? graded.reduce((n, sj) => n + sj.pct, 0) / graded.length : null;
 
-  const summaryRows = subjects.map(sj => `<tr>
-      <td>${escHtml(sj.name)}</td>
-      <td class="num">${sj.pct == null ? "—" : `${Math.round(sj.got * 10) / 10} / ${sj.of}`}</td>
-      <td class="num"><b>${fmtPct(sj.pct)}</b></td>
-      <td class="num"><b>${sj.pct == null ? "—" : letterFor(sj.pct)}</b></td>
-      <td>${sj.scoredCount} graded section${sj.scoredCount === 1 ? "" : "s"}${sj.reflDone ? ` · ${sj.reflReviewed}/${sj.reflDone} written answers reviewed` : ""}</td>
-    </tr>`).join("");
-  const detail = subjects.filter(sj => sj.rows.length).map(sj => `
-    <h3>${escHtml(sj.name)} <span class="grade-h3-pct">${fmtPct(sj.pct)}${sj.pct == null ? "" : " · " + letterFor(sj.pct)}</span></h3>
-    <table class="grade-table">
-      <thead><tr><th>Week</th><th>Section</th><th class="num">Score</th><th class="num">%</th><th>Status</th></tr></thead>
-      <tbody>${sj.rows.map(r => `<tr>
-        <td>${r.week === "Tests" ? "Test" : "Wk " + r.week}</td>
-        <td>${escHtml(r.label)}${r.attempts ? ` <span class="grade-dim">(attempt ${r.attempts})</span>` : ""}</td>
-        <td class="num">${r.score}</td>
-        <td class="num">${fmtPct(r.pct)}</td>
-        <td>${escHtml(r.status)}</td>
-      </tr>`).join("")}</tbody>
-    </table>`).join("");
+  const summaryRows = subjects.map(sj => "<tr>" +
+    "<td>" + e(sj.name) + "</td>" +
+    '<td class="num">' + (sj.pct == null ? "—" : (Math.round(sj.got * 10) / 10) + " / " + sj.of) + "</td>" +
+    '<td class="num"><b>' + fmtPct(sj.pct) + "</b></td>" +
+    '<td class="num"><b>' + (sj.pct == null ? "—" : letterFor(sj.pct)) + "</b></td>" +
+    "<td>" + sj.scoredCount + " graded section" + (sj.scoredCount === 1 ? "" : "s") + (sj.reflDone ? " · " + sj.reflReviewed + "/" + sj.reflDone + " written answers reviewed" : "") + "</td></tr>").join("");
 
-  return `
-    <div class="grade-title">The ELA Pastry Kitchen</div>
-    <h2>${escHtml(child.name)} — ELA Grade Sheet</h2>
-    <div class="grade-meta">${escHtml(child.subtitle)} · Through Week ${wk} · Printed ${today}</div>
-    <div class="grade-overall"><div class="grade-overall-num">${overall == null ? "—" : Math.round(overall) + "%"}</div><div class="grade-overall-letter">${overall == null ? "" : letterFor(overall)}</div><div class="grade-overall-label">Overall ELA grade to date</div></div>
-    <table class="grade-table grade-summary">
-      <thead><tr><th>Subject</th><th class="num">Points</th><th class="num">%</th><th class="num">Grade</th><th>Notes</th></tr></thead>
-      <tbody>${summaryRows}</tbody>
-    </table>
-    ${detail || '<p class="grade-dim">No graded work yet.</p>'}
-    <div class="grade-foot">Scores show the most recent attempt on each section. Sections redone after a send-back or to improve keep their earlier attempts on file. Written answers are reviewed by a parent and aren't given a percentage. Scale: A 90+, B 80+, C 70+, D 60+. Overall is the average of the subjects with scores.</div>`;
+  weekRows.sort((x, y) => x.w - y.w || SUBJECT_ORDER.findIndex(k => DATA[k] && DATA[k].name === x.subject) - SUBJECT_ORDER.findIndex(k => DATA[k] && DATA[k].name === y.subject));
+  const conceptRows = weekRows.map(r => {
+    const g = r.pct == null ? (r.refl ? { text: r.reflOk + "/" + r.refl + " written answers reviewed", cls: r.reflOk === r.refl ? "g-solid" : "g-none" } : graspFor(null)) : graspFor(r.pct);
+    return "<tr><td>Wk " + r.w + "</td><td>" + e(r.subject) + "</td><td>" + e(r.lesson) + (r.stds ? '<div class="grade-dim">Standards: ' + e(r.stds) + "</div>" : "") + "</td>" +
+      '<td class="num">' + fmtPct(r.pct) + '</td><td><span class="g-chip ' + g.cls + '">' + e(g.text) + "</span></td></tr>";
+  }).join("");
+
+  const detail = subjects.filter(sj => sj.rows.length).map(sj =>
+    "<h3>" + e(sj.name) + ' <span class="grade-h3-pct">' + fmtPct(sj.pct) + (sj.pct == null ? "" : " · " + letterFor(sj.pct)) + "</span></h3>" +
+    '<table class="grade-table"><thead><tr><th>Week</th><th>Section</th><th class="num">Score</th><th class="num">%</th><th>Status</th></tr></thead><tbody>' +
+    sj.rows.map(r => "<tr><td>" + (typeof r.week === "number" ? "Wk " + r.week : r.week) + "</td><td>" + e(r.label) + (r.attempts ? ' <span class="grade-dim">(attempt ' + r.attempts + ")</span>" : "") + "</td>" +
+      '<td class="num">' + r.score + '</td><td class="num">' + fmtPct(r.pct) + "</td><td>" + e(r.status) + "</td></tr>").join("") + "</tbody></table>").join("");
+
+  // Areas to review
+  const { topics, questions } = reviewTopics();
+  const lowSections = [];
+  subjects.forEach(sj => sj.rows.forEach(r => { if (r.pct != null && r.pct < 80 && r.status !== "Practice — not counted in grade") lowSections.push({ subject: sj.name, label: r.label, score: r.score, pct: r.pct }); }));
+  const pool = loadPool().filter(p => p.status === "active").sort((x, y) => (y.timesMissed || 0) - (x.timesMissed || 0));
+  const cfMiss = {};
+  if (currentChild === "kenley") (answerLogCache[currentChild] || []).filter(r => /case files/i.test(r.game || "") && /vocab/i.test(r.subject || "") && !r.correct && !/^TEST/i.test(r.word || "")).forEach(r => { cfMiss[r.word] = (cfMiss[r.word] || 0) + 1; });
+  const cfWords = Object.entries(cfMiss).sort((x, y) => y[1] - x[1]);
+  const reviewBlocks = [];
+  if (lowSections.length) reviewBlocks.push("<h4>Sections under 80%</h4><ul>" + lowSections.map(l => "<li><b>" + e(l.subject) + "</b> — " + e(l.label) + ": " + l.score + " (" + Math.round(l.pct) + "%)</li>").join("") + "</ul>");
+  if (topics.length) reviewBlocks.push("<h4>Concepts to revisit</h4><ul>" + topics.slice(0, 12).map(tp => "<li><b>" + e(tp.group) + " · " + e(tp.topic) + "</b> — missed " + tp.count + "×" + (tp.ex.length ? " (e.g. " + tp.ex.map(x => "“" + e(x) + "”").join(", ") + ")" : "") + "</li>").join("") + "</ul>");
+  if (questions.length) reviewBlocks.push("<h4>Questions to go over</h4><ul>" + questions.slice(0, 10).map(q => "<li><b>" + e(q.group) + "</b> — " + e(q.q) + ' <span class="grade-dim">Answer: ' + e(q.answer) + "</span></li>").join("") + "</ul>");
+  if (pool.length) reviewBlocks.push("<h4>Spelling words to practice</h4><p>" + pool.map(p => "<b>" + e(p.word) + "</b>" + (p.timesMissed > 1 ? " (missed " + p.timesMissed + "×)" : "")).join(", ") + "</p>");
+  if (cfWords.length) reviewBlocks.push("<h4>Vocabulary words missed in Case Files</h4><p>" + cfWords.map(([w, n]) => "<b>" + e(w) + "</b>" + (n > 1 ? " (" + n + "×)" : "")).join(", ") + "</p>");
+
+  return '<div class="grade-title">The ELA Pastry Kitchen</div>' +
+    "<h2>" + e(child.name) + " — ELA Grade Sheet</h2>" +
+    '<div class="grade-meta">' + e(child.subtitle) + " · Through Week " + wk + " · Printed " + today + "</div>" +
+    '<div class="grade-overall"><div class="grade-overall-num">' + (overall == null ? "—" : Math.round(overall) + "%") + '</div><div class="grade-overall-letter">' + (overall == null ? "" : letterFor(overall)) + '</div><div class="grade-overall-label">Overall ELA grade to date</div></div>' +
+    '<table class="grade-table grade-summary"><thead><tr><th>Subject</th><th class="num">Points</th><th class="num">%</th><th class="num">Grade</th><th>Notes</th></tr></thead><tbody>' + summaryRows + "</tbody></table>" +
+    (conceptRows ? "<h3>Concepts covered &amp; how they landed</h3>" +
+      '<table class="grade-table"><thead><tr><th>Week</th><th>Subject</th><th>Lesson focus</th><th class="num">Score</th><th>How it landed</th></tr></thead><tbody>' + conceptRows + "</tbody></table>" +
+      '<div class="grade-dim" style="margin-top:6px;">Strong 90%+ · Solid 80–89% · Developing 70–79% · Needs review under 70%. Based on that week\'s graded work in the subject.</div>' : "") +
+    "<h3>Areas to review</h3>" + (reviewBlocks.length ? reviewBlocks.join("") : '<p class="grade-dim">Nothing flagged right now. 🎉</p>') +
+    (detail ? "<h3>Section-by-section scores</h3>" + detail : '<p class="grade-dim">No graded work yet.</p>') +
+    '<div class="grade-foot">Scores show the most recent attempt on each section. Sections redone after a send-back or to improve keep their earlier attempts on file. Written answers are reviewed by a parent and aren\'t given a percentage. Review drills are practice and aren\'t counted. Scale: A+ 97, A 93, A- 90, B+ 87, B 83, B- 80, C+ 77, C 73, C- 70, D+ 67, D 63, D- 60. Overall is the average of the subjects with scores.</div>';
 }
 function openGradeSheet() {
   document.getElementById("gradeSheet").innerHTML = gradeSheetHTML();

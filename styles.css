@@ -302,3 +302,12 @@ body[data-view="parent"][data-child]{background:#F0EAE0;background-image:none;}
   .grade-sheet{border:none;padding:0;max-width:none;}
   .grade-table tr{page-break-inside:avoid;}
 }
+.grade-sheet h4{margin:12px 0 4px;font-size:0.86rem;font-weight:800;color:var(--tan-text);}
+.grade-sheet ul{margin:0 0 6px;padding-left:20px;line-height:1.5;}
+.grade-sheet p{margin:4px 0;line-height:1.5;}
+.g-chip{display:inline-block;padding:2px 9px;border-radius:10px;font-size:0.76rem;font-weight:700;white-space:nowrap;}
+.g-strong{background:#DDF0D9;color:#3E7A38;}
+.g-solid{background:#EAF3D9;color:#5B7A2E;}
+.g-dev{background:var(--tan-bg);color:var(--tan-text);}
+.g-review{background:#FBE0D0;color:#B4502C;}
+.g-none{background:var(--rail);color:var(--chalk-dim);}
