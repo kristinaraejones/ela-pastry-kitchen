@@ -2214,18 +2214,6 @@ function render() {
         <b>Mastered (${mastered.length}):</b> ${mastered.map(p => p.word).join(", ") || "none"}
       </div>`;
 
-    const answerLog = (answerLogCache[currentChild] || []).slice(0, 40);
-    const answerLogList = document.getElementById("answerLogList");
-    answerLogList.innerHTML = answerLog.length === 0
-      ? `<div class="empty-note">No graded answers logged yet.</div>`
-      : answerLog.map(a => `
-        <div class="review-item answer-log-item ${a.correct ? "answer-log-correct" : "answer-log-wrong"}">
-          <strong>${a.correct ? "✅" : "❌"} ${a.word}</strong>
-          <div class="meta">${a.game || ""}${a.subject ? " · " + a.subject : ""} · ${a.timestamp ? new Date(a.timestamp).toLocaleString() : ""}</div>
-          ${a.question ? `<div class="submitted-text">${a.question}</div>` : ""}
-          ${!a.correct ? `<div class="submitted-text">Answered: "${a.givenAnswer}" — Correct answer: "${a.correctAnswer}"</div>` : ""}
-        </div>`).join("");
-
     const burnLog = burnLogCache[currentChild] || [];
     const burnList = document.getElementById("burnLogList");
     burnList.innerHTML = burnLog.length === 0
