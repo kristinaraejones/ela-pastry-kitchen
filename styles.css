@@ -264,3 +264,6 @@ body[data-view="parent"][data-child]{background:#F0EAE0;background-image:none;}
 .cf-miss-title{margin-top:8px;font-weight:700;}
 .cf-miss{margin:3px 0;}
 .cf-empty,.cf-note{color:var(--chalk-dim);font-size:0.76rem;margin-top:6px;}
+.why-note{margin-top:6px;border-radius:4px;padding:8px 10px;font-size:0.82rem;line-height:1.45;}
+.why-note.why-right{background:#E7F3E3;border-left:3px solid var(--herb);}
+.why-note.why-miss{background:var(--tan-bg);border-left:3px solid var(--tan);}

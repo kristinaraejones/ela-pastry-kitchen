@@ -1703,7 +1703,11 @@ function taskBodyHTML(key, t) {
         inner += `<div class="mc-option ${cls}" onclick="selectMC('${key}','${t.id}',${qi},${oi})">${opt}</div>`;
       });
       inner += `</div></div>${trimReadAloud ? "" : readAloudButton(qId, "Read this question and choices to me")}`;
-      if (s.done && q.explanation) inner += `<div class="tag-review-item" style="margin-top:6px;">${q.explanation}</div>`;
+      if (s.done && q.explanation) {
+        // Green when she got it right, tan when she missed it — never red, since the explanation is teaching, not scolding.
+        const gotIt = s.answers.mc && s.answers.mc[qi] === q.correct;
+        inner += `<div class="why-note ${gotIt ? "why-right" : "why-miss"}"><b>💡 Why:</b> ${q.explanation}</div>`;
+      }
     });
     if (s.done) {
       const parts = s.score.split("/");
