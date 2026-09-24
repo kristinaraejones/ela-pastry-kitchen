@@ -995,6 +995,17 @@ function regradeLegacyDictation() {
         if (ps.score !== fresh) { ps.score = fresh; persistTask(key, t.id); }
         return;
       }
+      if (t.type === "pos-tagger" || t.type === "concept-check") {
+        // Re-score finished tagging / noun-check tasks against the CURRENT answer key (keys get corrected after kids have already finished).
+        const ts = state[key].tasks[t.id];
+        if (!ts || !ts.done || !ts.labels) return;
+        let ok = 0, total = 0;
+        if (t.type === "pos-tagger") { total = t.answers.length; t.answers.forEach((ans, i) => { if (ts.labels[i] === ans) ok++; }); }
+        else { total = t.targets.length; t.targets.forEach(tg => { if (ts.labels[tg.index] === conceptAnswerText(tg, t.options)) ok++; }); }
+        const freshScore = ok + "/" + total;
+        if (ts.score !== freshScore) { ts.score = freshScore; persistTask(key, t.id); }
+        return;
+      }
       if (t.type !== "graded-dictation") return;
       const st = state[key].tasks[t.id];
       if (!st || !st.done || !st.results) return;
