@@ -312,7 +312,8 @@ function buildChildFromBootstrap(resp) {
         answers: a.answers || {},
         score: (sub && sub.score) || null,
         parentComment: (sub && sub.parent_comment) || null,
-        results: a.results || null
+        results: a.results || null,
+        history: a.history || []
       };
       if (t.type === "pos-tagger") base.labels = a.labels || new Array(t.sentence.length).fill(null);
       if (t.type === "phrase-tagger") base.selections = a.selections || [];
@@ -325,7 +326,7 @@ function buildChildFromBootstrap(resp) {
 
 // A blank, not-started state for one task (right shape for its type).
 function freshTaskState(t) {
-  const base = { open: false, done: false, needsReview: false, reviewed: false, sentBack: false, answers: {}, score: null, parentComment: null, results: null };
+  const base = { open: false, done: false, needsReview: false, reviewed: false, sentBack: false, answers: {}, score: null, parentComment: null, results: null, history: [] };
   if (t.type === "pos-tagger") base.labels = new Array(t.sentence.length).fill(null);
   if (t.type === "phrase-tagger") base.selections = [];
   if (t.type === "concept-check") base.labels = {};
@@ -357,7 +358,7 @@ function persistTask(key, id) {
     status: deriveStatus(s),
     score: s.score || "",
     parent_comment: s.parentComment || "",
-    answers: { answers: s.answers, labels: s.labels, selections: s.selections, results: s.results }
+    answers: { answers: s.answers, labels: s.labels, selections: s.selections, results: s.results, history: s.history || [] }
   }).catch(() => {});
 }
 
@@ -532,7 +533,10 @@ function redoStation(key) {
   (burnLogCache[currentChild] = burnLogCache[currentChild] || []).unshift(record);
   apiPost("addBurnLog", { student: currentChild, ...record }).catch(() => {});
   activeTasks(key).forEach(t => {
+    snapshotAttempt(key, t.id, "parent", "Whole section redone (scored below 70%)");
+    const keep = state[key].tasks[t.id].history;
     state[key].tasks[t.id] = freshTaskState(t);
+    state[key].tasks[t.id].history = keep;
     persistTask(key, t.id);
   });
   render();
@@ -540,11 +544,81 @@ function redoStation(key) {
 
 // ---------- Reset / send back ONE section (task), not the whole subject ----------
 
+// ---------- Attempt history ----------
+// Every send-back / redo saves the attempt being replaced (her answers, score, and the
+// feedback given) so earlier drafts can be compared with later ones. Stored inside the
+// submission's answers JSON, so no Sheet changes are needed.
+
+function compactResults(results) {
+  return (results || []).map(r => r.kind === "sentence"
+    ? { kind: "sentence", typed: r.typed, answer: r.answer, points: (r.grade && typeof r.grade.points === "number") ? r.grade.points : null }
+    : { kind: "word", typed: r.typed, answer: r.answer, correct: !!r.correct });
+}
+function snapshotAttempt(key, id, by, feedback) {
+  const s = state[key].tasks[id];
+  const hasWork = s.done || (s.answers && s.answers.text);
+  if (!hasWork) return;
+  s.history = s.history || [];
+  s.history.push({
+    at: new Date().toISOString(), by, feedback: feedback || "",
+    score: s.score || "", status: statusLabel(s),
+    // Deep copies: the live answer objects keep being edited after this point.
+    answers: JSON.parse(JSON.stringify(s.answers || {})),
+    labels: s.labels ? JSON.parse(JSON.stringify(s.labels)) : null,
+    selections: s.selections ? JSON.parse(JSON.stringify(s.selections)) : null,
+    results: compactResults(s.results)
+  });
+}
+function attemptSummaryHTML(t, h) {
+  const e = escHtml;
+  if (t.type === "reflection") return h.answers && h.answers.text ? `<div class="attempt-text">${e(h.answers.text)}</div>` : "";
+  if (t.type === "graded-dictation" && h.results && h.results.length) {
+    return h.results.map(r => r.kind === "sentence"
+      ? `<div class="attempt-line">"${e(r.typed || "(blank)")}" <span class="attempt-dim">— answer: ${e(r.answer)}${r.points != null ? ` · ${r.points}/10` : ""}</span></div>`
+      : `<div class="attempt-line">${r.correct ? "✓" : "✗"} ${e(r.typed || "(blank)")}${r.correct ? "" : ` <span class="attempt-dim">— answer: ${e(r.answer)}</span>`}</div>`).join("");
+  }
+  if (t.type === "graded-mc" && t.questions && h.answers && h.answers.mc) {
+    return t.questions.map((q, qi) => {
+      const pick = h.answers.mc[qi];
+      if (pick == null) return "";
+      return `<div class="attempt-line">${pick === q.correct ? "✓" : "✗"} ${e(q.q)} <span class="attempt-dim">— chose "${e(q.options[pick])}"</span></div>`;
+    }).join("");
+  }
+  if (t.type === "pos-tagger" && h.labels) {
+    return `<div class="attempt-line">${t.sentence.map((w, i) => `${e(w)} <span class="attempt-dim">(${e(h.labels[i] || "—")}${h.labels[i] === t.answers[i] ? "" : " ✗"})</span>`).join(" ")}</div>`;
+  }
+  if (t.type === "phrase-tagger" && h.selections) {
+    return h.selections.map(sel => `<div class="attempt-line">"${e(t.sentence.slice(sel.start, sel.end + 1).join(" "))}" <span class="attempt-dim">→ ${e(sel.type)}</span></div>`).join("");
+  }
+  if (t.type === "concept-check" && h.labels) {
+    return Object.keys(h.labels).map(i => `<div class="attempt-line">${e(t.sentence[i])} <span class="attempt-dim">→ ${e(h.labels[i])}</span></div>`).join("");
+  }
+  return "";
+}
+// Earlier attempts, oldest first. `forStudent` shows only her drafts and the feedback she got.
+function attemptHistoryHTML(t, s, opts) {
+  const hist = s.history || [];
+  if (!hist.length) return "";
+  const forStudent = opts && opts.forStudent;
+  const rows = hist.map((h, i) => {
+    const when = new Date(h.at).toLocaleDateString();
+    const who = h.by === "parent" ? "sent back" : "redone by her";
+    return `<div class="attempt">
+      <div class="attempt-head"><b>Attempt ${i + 1}</b> <span class="attempt-dim">· ${when}${forStudent ? "" : " · " + who}${h.score && !forStudent ? " · scored " + escHtml(h.score) : ""}</span></div>
+      ${attemptSummaryHTML(t, h)}
+      ${h.feedback ? `<div class="parent-feedback">📝 ${forStudent ? "Feedback you got:" : "Your note:"} ${escHtml(h.feedback)}</div>` : ""}
+    </div>`;
+  }).join("");
+  const label = forStudent ? `📜 My earlier drafts (${hist.length})` : `📜 Previous attempts (${hist.length})`;
+  return `<details class="attempt-history"${opts && opts.open ? " open" : ""}><summary>${label}</summary>${rows}</details>`;
+}
+
 // Reflections keep the written text so it can be edited rather than retyped.
 function resetOneTask(key, id, by, comment) {
   const t = DATA[key].tasks.find(x => x.id === id);
   const old = state[key].tasks[id];
   const was = old.score ? `scored ${old.score}` : old.needsReview ? "submitted, awaiting review" : old.done ? "completed" : "not finished";
+  snapshotAttempt(key, id, by, comment);
   const record = {
     station: DATA[key].name, tag: subjectTag(key), date: new Date().toLocaleDateString(),
     reason: by === "parent" ? "Section sent back by parent" : "Section redone by student to improve it",
@@ -554,6 +628,7 @@ function resetOneTask(key, id, by, comment) {
   apiPost("addBurnLog", { student: currentChild, ...record }).catch(() => {});
   const fresh = freshTaskState(t);
   if (t.type === "reflection" && old.answers) fresh.answers = old.answers;
+  fresh.history = old.history || [];
   fresh.open = by !== "parent";
   if (by === "parent") { fresh.sentBack = true; fresh.parentComment = comment || "Please take another look at this part and resubmit."; }
   state[key].tasks[id] = fresh;
@@ -1392,6 +1467,7 @@ function approveReflection(key, id) {
 function sendBackReflection(key, id) {
   const comment = document.getElementById(`comment-${key}-${id}`).value.trim();
   const s = state[key].tasks[id];
+  snapshotAttempt(key, id, "parent", comment);
   s.parentComment = comment || "Please take another look and resubmit.";
   s.done = false;
   s.needsReview = false;
@@ -1449,12 +1525,14 @@ function taskBodyHTML(key, t) {
       </label>`;
   } else if (t.type === "reflection") {
     const promptId = `refl-prompt-${key}-${t.id}`;
-    const feedbackNote = s.parentComment ? `<div class="parent-feedback">📝 ${s.reviewed ? "Feedback from parent:" : "Refired — please revise:"} ${s.parentComment}</div>` : "";
+    // Once she has resubmitted (and it's not yet approved), the old note belongs to the earlier draft, which the drafts panel below shows.
+    const feedbackNote = (s.parentComment && !(s.done && !s.reviewed)) ? `<div class="parent-feedback">📝 ${s.reviewed ? "Feedback from parent:" : "Refired — please revise:"} ${s.parentComment}</div>` : "";
     inner = `${trimReadAloud && key === "reading" ? "" : readAloudButton(promptId, "Read the question to me")}
       <div class="lesson-text" id="${promptId}"><p>${t.prompt}</p></div>
       ${feedbackNote}
       <textarea id="ta-${key}-${t.id}" placeholder="Type your answer here..." ${s.done ? "disabled" : ""}>${s.answers.text || ""}</textarea>
-      ${s.done ? `<div class="graded-note">Submitted — waiting on parent review.</div>` : `<button class="btn primary" onclick="submitReflection('${key}','${t.id}')">${s.sentBack ? "Refire" : "Submit"}</button>`}`;
+      ${s.done ? `<div class="graded-note">Submitted — waiting on parent review.</div>` : `<button class="btn primary" onclick="submitReflection('${key}','${t.id}')">${s.sentBack ? "Refire" : "Submit"}</button>`}
+      ${attemptHistoryHTML(t, s, { forStudent: true })}`;
   } else if (t.type === "graded-dictation") {
     let words = t.words;
     const banks = banksCache[currentChild] || {};
@@ -1851,9 +1929,13 @@ function renderPastTaskReport(key, t, s) {
     : renderTaskContent(t);
   if (isCaseFilesTask(t) && currentChild === "kenley") extra += caseFilesVocabReportHTML();
   const awaiting = t.type === "reflection" && s.needsReview && !s.reviewed;
+  const histHtml = attemptHistoryHTML(t, s, { open: t.type === "reflection" });
+  if (histHtml && t.type !== "reflection") extra += histHtml;
+  if (t.type === "reflection" && histHtml) extra += histHtml + `<div class="attempt-current-label">Latest attempt</div>`;
   if (t.type === "reflection" && s.answers && s.answers.text) {
     extra += `<div class="submitted-text student-answer">${s.answers.text}</div>`;
-    if (s.parentComment) extra += `<div class="parent-feedback">📝 ${s.parentComment}</div>`;
+    const lastFb = (s.history || []).length ? (s.history[s.history.length - 1].feedback || "Please take another look and resubmit.") : null;
+    if (s.parentComment && !(lastFb !== null && lastFb === s.parentComment && !s.reviewed)) extra += `<div class="parent-feedback">📝 ${s.parentComment}</div>`;
   }
   if (awaiting) {
     // Review happens right here, next to the prompt and sample answer it responds to.

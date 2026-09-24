@@ -267,3 +267,11 @@ body[data-view="parent"][data-child]{background:#F0EAE0;background-image:none;}
 .why-note{margin-top:6px;border-radius:4px;padding:8px 10px;font-size:0.82rem;line-height:1.45;}
 .why-note.why-right{background:#E7F3E3;border-left:3px solid var(--herb);}
 .why-note.why-miss{background:var(--tan-bg);border-left:3px solid var(--tan);}
+.attempt-history{margin:8px 0;font-size:0.84rem;}
+.attempt-history summary{cursor:pointer;font-weight:700;color:var(--tan-text);padding:4px 0;}
+.attempt{background:var(--tan-bg);border-left:3px solid var(--tan);border-radius:4px;padding:8px 10px;margin:6px 0;}
+.attempt-head{margin-bottom:4px;}
+.attempt-dim{color:var(--chalk-dim);font-size:0.78rem;}
+.attempt-text{white-space:pre-wrap;line-height:1.5;margin:4px 0;}
+.attempt-line{margin:2px 0;line-height:1.45;}
+.attempt-current-label{font-family:'JetBrains Mono',monospace;font-size:0.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--sky);margin:8px 0 2px;}
