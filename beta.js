@@ -1095,7 +1095,18 @@ const BK_WORD_CARDS = {
   incredulous: { prefix: ["in-", "not"], root: ["cred", "believe"], suffix: ["-ulous", "full of / tending to"], origin: "Latin", meaning: "not willing or able to believe something; showing disbelief", example: "She gave an incredulous look when her brother said he'd cleaned his whole room in five minutes.", tip: "Same root as \"credit\" and \"credible\" — all about believing." },
   deduction: { prefix: ["de-", "down / from"], root: ["duct", "lead"], suffix: ["-ion", "act of"], origin: "Latin", meaning: "a conclusion reached by reasoning from general facts to a specific one", example: "From the muddy footprints, the detective made a deduction about which door the thief had used.", tip: "\"Lead down\" from facts to a conclusion — like Sherlock Holmes." },
   meticulous: { prefix: null, root: ["metus", "fear"], suffix: ["-ulous", "full of / tending to"], origin: "Latin", meaning: "showing great attention to detail; very careful and precise", example: "Adelyn was meticulous about lining up every sticker perfectly in her passport.", tip: "Comes from a word for \"fearful\" — being so careful you're almost afraid to make a mistake." },
-  resilient: { prefix: ["re-", "back"], root: ["sili", "jump / leap"], suffix: ["-ent", "state of"], origin: "Latin", meaning: "able to recover quickly from difficulties; springing back into shape", example: "After a rough first attempt, Kenley was resilient and tried the recipe again the next day.", tip: "Think of a rubber band \"jumping back\" into shape." }
+  resilient: { prefix: ["re-", "back"], root: ["sili", "jump / leap"], suffix: ["-ent", "state of"], origin: "Latin", meaning: "able to recover quickly from difficulties; springing back into shape", example: "After a rough first attempt, Kenley was resilient and tried the recipe again the next day.", tip: "Think of a rubber band \"jumping back\" into shape." },
+  // Adelyn's 4th-grade set — matches her current TELE- (far) root unit.
+  telephone: { prefix: ["tele-", "far"], root: ["phone", "sound"], suffix: null, origin: "Greek", meaning: "a device that carries sound so people who are far apart can talk", example: "Adelyn called her grandma on the telephone to tell her about her spelling test.", tip: "Same \"tele-\" as television and telescope — it always means far away." },
+  television: { prefix: ["tele-", "far"], root: ["vis", "see"], suffix: ["-ion", "act of"], origin: "Greek/Latin", meaning: "a device that lets you see pictures sent from far away", example: "They watched a baking show on television after dinner.", tip: "\"Far\" + \"see\" — seeing something that's happening far away." },
+  unbelievable: { prefix: ["un-", "not"], root: null, suffix: ["-able", "able to be"], origin: "Old English / Latin", meaning: "impossible or hard to believe", example: "It was unbelievable how fast Adelyn finished her word cards.", tip: "Start with the whole word \"believe,\" then add un- and -able on each end." },
+  disagree: { prefix: ["dis-", "not / apart"], root: null, suffix: null, origin: "Latin", meaning: "to have a different opinion than someone else", example: "The sisters disagreed about which pastry to bake first.", tip: "\"Dis-\" flips a word to its opposite — agree becomes disagree." }
+};
+// Which curated words show by default when the recipe box opens, per child —
+// Kenley's are drawn from her Set A vocab; Adelyn's from her current root unit.
+const BK_FEATURED_WORDS = {
+  kenley: ["incredulous", "deduction", "meticulous", "resilient"],
+  adelyn: ["telephone", "television", "unbelievable", "disagree"]
 };
 // Falls back to a generic morpheme breakdown for any word not in the curated list.
 function bkAnalyzeWord(word) {
@@ -1156,14 +1167,14 @@ function bkWordCardHTML(word) {
 // ---------- Word Recipe Box (browse words she's practiced + curated set) ----------
 let bkRecipeBoxOpen = false;
 let bkRecipeBoxWord = null;
-function bkOpenRecipeBox() { bkRecipeBoxOpen = true; bkRecipeBoxWord = Object.keys(BK_WORD_CARDS)[0] || null; render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+function bkOpenRecipeBox() { bkRecipeBoxOpen = true; bkRecipeBoxWord = (BK_FEATURED_WORDS[currentChild] || [])[0] || null; render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
 function bkCloseRecipeBox() { bkRecipeBoxOpen = false; render(); window.scrollTo({ top: 0 }); }
 function bkPickRecipeWord(w) { bkRecipeBoxWord = w; render(); }
 function bkRecipeBoxWordList() {
   const practiced = (reviewPoolCache[currentChild] || []).map(r => r.word).filter(Boolean);
-  const curated = Object.keys(BK_WORD_CARDS);
+  const featured = BK_FEATURED_WORDS[currentChild] || [];
   const seen = {}, out = [];
-  curated.concat(practiced).forEach(w => { const key = String(w).toLowerCase(); if (!seen[key]) { seen[key] = true; out.push(w); } });
+  featured.concat(practiced).forEach(w => { const key = String(w).toLowerCase(); if (!seen[key]) { seen[key] = true; out.push(w); } });
   return out;
 }
 function bkRecipeBoxHTML() {
