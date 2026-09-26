@@ -94,6 +94,8 @@ const BK_NUM_WORDS = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Sev
 function bkNumWord(n) { return BK_NUM_WORDS[n] || String(n); }
 function bkPlural(n, one, many) { return n === 1 ? one : many; }
 function bkSentBackTasks(key) { return activeTasks(key).filter(t => state[key].tasks[t.id].sentBack && !state[key].tasks[t.id].done); }
+// Header rule: every word capitalized ("Read Chapters 1–8"). Only raises first letters; never lowercases (keeps AAS, MCT).
+function bkTitle(str) { return String(str == null ? "" : str).replace(/(^|[\s(“"\/\-])([a-z])/g, (m, a, b) => a + b.toUpperCase()); }
 function bkAttr(str) { return String(str == null ? "" : str).replace(/'/g, "\\'"); }
 
 function bkPill(kind, text, icon) {
@@ -118,7 +120,7 @@ function bkUnlockHint(t) {
 function bkLockChips(locked) {
   if (!locked.length) return "";
   return `<div class="bk-st-locks">${locked.map(t =>
-    `<span class="bk-lock-chip">${bkIcon("lock", 14)}${t.label} <span class="bk-lock-when">· ${bkUnlockHint(t)}</span></span>`).join("")}</div>`;
+    `<span class="bk-lock-chip">${bkIcon("lock", 14)}${bkTitle(t.label)} <span class="bk-lock-when">· ${bkUnlockHint(t)}</span></span>`).join("")}</div>`;
 }
 
 // ---------- Kid hero ----------
@@ -221,9 +223,9 @@ function bkQueueHTML() {
   const name = CHILD_META[currentChild].name;
   const needs = bkNeedsGradeItems(), sent = bkSentBackItems(), auto = bkAutoScoredItems(parentNavWeek);
   const row = (it, icon, extra) => `<button class="bk-q-item" onclick="jumpToReview('${it.key}','${it.t.id}',${Number(it.t.week_number) || 1})">
-      ${icon}<span class="bk-q-text"><span class="bk-q-subj">${DATA[it.key].name}${it.why ? ` · ${it.why}` : ""}</span><span class="bk-q-label">${it.t.label}</span></span>${extra || ""}</button>`;
+      ${icon}<span class="bk-q-text"><span class="bk-q-subj">${DATA[it.key].name}${it.why ? ` · ${it.why}` : ""}</span><span class="bk-q-label">${bkTitle(it.t.label)}</span></span>${extra || ""}</button>`;
   const doneIco = `<span class="bk-q-dot solid">${bkIcon("check", 11)}</span>`;
-  return `<h2>Waiting on you</h2>
+  return `<h2>Waiting On You</h2>
     <div class="bk-q-group"><div class="bk-q-head">Needs your review or grade · ${needs.length}</div>
       ${needs.length ? needs.map(it => row(it, `<span class="bk-q-dot hollow"></span>`)).join("") : `<div class="bk-q-empty">${bkIcon("check", 16)}All caught up</div>`}</div>
     <div class="bk-q-group"><div class="bk-q-head">Sent back · waiting on ${name} · ${sent.length}</div>
@@ -256,7 +258,7 @@ function bkStationCardHTML(key, idx) {
   }).join("");
   const tile = th.tiles[idx % th.tiles.length];
   return `<span class="bk-st-top"><span class="bk-st-tile" style="background:${tile}">${bkPastry(bkPastryFor(key), kid, 56)}</span>${pill}</span>
-    <span class="bk-st-title">${DATA[key].name}</span>
+    <span class="bk-st-title">${bkTitle(DATA[key].name)}</span>
     <span class="bk-st-tag">${subjectTag(key)}</span>
     ${unlocked.length ? `<span class="bk-bar">${segs}</span><span class="bk-st-count">${doneN} of ${unlocked.length} done</span>` : `<span class="bk-st-count">Nothing loaded for this week yet</span>`}
     ${bkLockChips(locked)}`;
@@ -328,7 +330,7 @@ window.render = function render() {
     else if (served) { text = `${name} finished every section of Week ${currentWeek()}.`; btn = `<button class="bk-btn primary" onclick="advanceWeek()">Advance to Week ${nextWk}</button>`; }
     else { text = `Week ${currentWeek()} isn’t fully finished yet${sentBackAll.length ? `: ${sentBackAll.length} ${bkPlural(sentBackAll.length, "item is", "items are")} still sent back` : ""}.`; btn = `<button class="bk-btn plain" onclick="advanceAnyway()">Advance to Week ${nextWk} anyway</button>`; }
     advanceBanner.className = "bk-tool";
-    advanceBanner.innerHTML = `<div class="bk-tool-title">${bkIcon("arrow", 18)}Next week</div><div class="bk-tool-text">${text}</div>${btn}`;
+    advanceBanner.innerHTML = `<div class="bk-tool-title">${bkIcon("arrow", 18)}Next Week</div><div class="bk-tool-text">${text}</div>${btn}`;
   } else {
     advanceBanner.className = "";
     advanceBanner.innerHTML = "";
@@ -347,14 +349,14 @@ window.render = function render() {
     stationsWrap.style.display = "block";
     let notesHTML = "";
     if (served) {
-      notesHTML += `<section class="bk-alldone">${bkPastry(th.emblem, kid, 48)}<div><h2>All done with Week ${currentWeek()}!</h2><p>Nice work! Waiting for Mom to check everything, then you’ll move on to Week ${nextWk}.</p></div></section>`;
+      notesHTML += `<section class="bk-alldone">${bkPastry(th.emblem, kid, 48)}<div><h2>All Done With Week ${currentWeek()}!</h2><p>Nice work! Waiting for Mom to check everything, then you’ll move on to Week ${nextWk}.</p></div></section>`;
     }
     if (sentBackAll.length) {
       notesHTML += `<section class="bk-notes">
-        <div class="bk-notes-head"><span class="bk-notes-ico">${bkIcon("timer", 22)}</span><div><h2>Chef’s notes</h2><p>${sentBackAll.length === 1 ? "This plate is" : `These ${bkNumWord(sentBackAll.length).toLowerCase()} plates are`} back in the oven for a quick touch-up.</p></div></div>
+        <div class="bk-notes-head"><span class="bk-notes-ico">${bkIcon("timer", 22)}</span><div><h2>Chef’s Notes</h2><p>${sentBackAll.length === 1 ? "This plate is" : `These ${bkNumWord(sentBackAll.length).toLowerCase()} plates are`} back in the oven for a quick touch-up.</p></div></div>
         <div class="bk-notes-grid">${sentBackAll.map(({ key, t }) => `<button class="bk-note-row" onclick="bkOpenTask('${key}','${t.id}')">
             <span class="bk-note-pastry">${bkPastry(bkPastryFor(key), kid, 34)}</span>
-            <span class="bk-note-text"><span class="bk-note-subj">${DATA[key].name}</span><span class="bk-note-task">${t.label}</span></span>
+            <span class="bk-note-text"><span class="bk-note-subj">${DATA[key].name}</span><span class="bk-note-task">${bkTitle(t.label)}</span></span>
             ${bkIcon("arrow", 20)}</button>`).join("")}</div>
       </section>`;
     }
@@ -390,7 +392,7 @@ window.render = function render() {
       const note = status === "burning" ? `<div class="burn-note">This station scored below 70%. Redoing it resets the section and keeps the first scores for Mom to see.</div>` : "";
       panel.className = "detail open bk-detail";
       panel.innerHTML = `<div class="detail-head">
-          <div class="bk-detail-title"><span class="bk-st-tile small">${bkPastry(bkPastryFor(openStation), kid, 40)}</span><div><div class="detail-tag">${subjectTag(openStation)}</div><div class="detail-title">${d.name}</div>${note}</div></div>
+          <div class="bk-detail-title"><span class="bk-st-tile small">${bkPastry(bkPastryFor(openStation), kid, 40)}</span><div><div class="detail-tag">${subjectTag(openStation)}</div><div class="detail-title">${bkTitle(d.name)}</div>${note}</div></div>
           <div class="bk-detail-actions">
             ${status === "burning" ? `<button class="bk-btn primary" onclick="redoStation('${openStation}')">Redo this station</button>` : ""}
             <button class="detail-close bk-btn plain" onclick="openStationFn('${openStation}')">${bkIcon("close", 16)}Close</button>
@@ -421,7 +423,7 @@ window.taskHeadHTML = function taskHeadHTML(key, t) {
   const s = state[key].tasks[t.id];
   if (isTaskLocked(t)) {
     const msg = t.termFinal ? "Unlocks at end of term" : `Unlocks in Week ${nextMonthlyTestWeek()}`;
-    return `<div class="task-head locked-task"><span class="bk-th-ico lock">${bkIcon("lock", 16)}</span><span class="label">${t.label}</span><span class="status-text">${msg}</span></div>`;
+    return `<div class="task-head locked-task"><span class="bk-th-ico lock">${bkIcon("lock", 16)}</span><span class="label">${bkTitle(t.label)}</span><span class="status-text">${msg}</span></div>`;
   }
   let cls = "", pill;
   const isParent = currentView === "parent";
@@ -431,7 +433,7 @@ window.taskHeadHTML = function taskHeadHTML(key, t) {
   else pill = bkPill("neutral", "Not started");
   const ico = s.done ? `<span class="bk-th-ico done">${bkIcon("check", 14)}</span>` : (s.sentBack ? `<span class="bk-th-ico note">${bkIcon("timer", 14)}</span>` : `<span class="bk-th-ico"></span>`);
   return `<div class="task-head ${cls}" role="button" tabindex="0" onclick="toggleTask('${key}','${t.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleTask('${key}','${t.id}')}">
-    ${ico}<span class="label">${t.label}</span><span class="status-text">${pill}</span></div>`;
+    ${ico}<span class="label">${bkTitle(t.label)}</span><span class="status-text">${pill}</span></div>`;
 };
 
 // Everything app.js draws inside a task keeps its behavior; only emoji become icons.
@@ -476,7 +478,7 @@ window.attemptHistoryHTML = function attemptHistoryHTML(t, s, opts) {
       ${h.feedback ? `<div class="bk-bubble small"><div class="bk-block-label">${bkIcon("note", 14)}${forStudent ? "Feedback you got" : "Your note"}</div>${escHtml(h.feedback)}</div>` : ""}
     </div>`;
   }).join("");
-  const label = forStudent ? `My earlier drafts (${hist.length})` : `Earlier attempts (${hist.length})`;
+  const label = forStudent ? `My Earlier Drafts (${hist.length})` : `Earlier Attempts (${hist.length})`;
   return `<details class="attempt-history bk-history"${opts && opts.open ? " open" : ""}><summary>${bkIcon("history", 16)}${label}</summary>${rows}</details>`;
 };
 
@@ -572,7 +574,7 @@ window.renderPastTaskReport = function renderPastTaskReport(key, t, s) {
     }
   } else if (t.type === "read") {
     if (t.parentNotes) body += bkTeachBlock(t.parentNotes);
-    body += `<details class="bk-lesson"><summary>${bkIcon("book", 16)}Lesson she read</summary><div class="bk-lesson-body">${bkDeEmoji(t.content || "")}</div></details>`;
+    body += `<details class="bk-lesson"><summary>${bkIcon("book", 16)}Lesson She Read</summary><div class="bk-lesson-body">${bkDeEmoji(t.content || "")}</div></details>`;
   } else {
     if (s.done && AUTO_GRADED_TYPES.includes(t.type)) {
       const work = taskBodyHTML(key, t).replace('class="task-body ', 'class="task-body open ');
@@ -585,21 +587,21 @@ window.renderPastTaskReport = function renderPastTaskReport(key, t, s) {
     if (histHtml) body += histHtml;
   }
   if (s.done && !awaiting) {
-    body += `<details class="sendback-box bk-sendback"><summary>${bkIcon("sendBack", 16)}Send back just this section</summary>
+    body += `<details class="sendback-box bk-sendback"><summary>${bkIcon("sendBack", 16)}Send Back Just This Section</summary>
       <label class="bk-sendback-label" for="sendback-${key}-${t.id}">Note for ${name} (she sees this)</label>
       <textarea id="sendback-${key}-${t.id}" placeholder="What should she fix?"></textarea>
       <div class="bk-actions"><button class="bk-btn soft" onclick="sendBackSection('${key}','${t.id}')">Send back &amp; reset this section</button></div>
     </details>`;
   }
   return `<article class="bk-item review-item${awaiting ? " needs-attention" : ""}" id="review-${key}-${t.id}">
-    <header class="bk-item-head"><div><div class="bk-item-subj">${DATA[key].name}</div><h3>${t.label}</h3></div><div class="bk-chips">${bkStatusChips(t, s, awaiting)}</div></header>
+    <header class="bk-item-head"><div><div class="bk-item-subj">${DATA[key].name}</div><h3>${bkTitle(t.label)}</h3></div><div class="bk-chips">${bkStatusChips(t, s, awaiting)}</div></header>
     ${body}
   </article>`;
 };
 
 window.renderUpcomingTaskPreview = function renderUpcomingTaskPreview(t) {
-  return `<article class="bk-item review-item"><header class="bk-item-head"><div><div class="bk-item-subj">Coming up</div><h3>${t.label}</h3></div><div class="bk-chips">${bkPill("neutral", "Preview")}</div></header>
-    <details class="bk-lesson"><summary>${bkIcon("book", 16)}What she’ll see</summary><div class="bk-lesson-body">${bkDeEmoji(renderTaskContent(t))}</div></details></article>`;
+  return `<article class="bk-item review-item"><header class="bk-item-head"><div><div class="bk-item-subj">Coming up</div><h3>${bkTitle(t.label)}</h3></div><div class="bk-chips">${bkPill("neutral", "Preview")}</div></header>
+    <details class="bk-lesson"><summary>${bkIcon("book", 16)}What She’ll See</summary><div class="bk-lesson-body">${bkDeEmoji(renderTaskContent(t))}</div></details></article>`;
 };
 
 window.renderWeekReportPanel = function renderWeekReportPanel() {
@@ -611,13 +613,13 @@ window.renderWeekReportPanel = function renderWeekReportPanel() {
   SUBJECT_ORDER.forEach(key => {
     const tasks = weekScopedTasks(key, week);
     if (tasks.length === 0) return;
-    sections.push(`<div class="bk-report-subject">${bkPastry(bkPastryFor(key), kid, 34)}<span>${DATA[key].name}</span><span class="bk-report-tag">${escHtml(DATA[key].tagsByWeek[week] || DATA[key].tag || "")}</span></div>`);
+    sections.push(`<div class="bk-report-subject">${bkPastry(bkPastryFor(key), kid, 34)}<span>${bkTitle(DATA[key].name)}</span><span class="bk-report-tag">${escHtml(DATA[key].tagsByWeek[week] || DATA[key].tag || "")}</span></div>`);
     tasks.forEach(t => {
       const s = state[key].tasks[t.id];
       sections.push(isPast ? renderPastTaskReport(key, t, s) : renderUpcomingTaskPreview(t));
     });
   });
-  const titleSuffix = week < currentWeek() ? "Completed record" : week === currentWeek() ? "In progress" : "Preview";
+  const titleSuffix = week < currentWeek() ? "Completed Record" : week === currentWeek() ? "In Progress" : "Preview";
   panel.innerHTML = `<div class="bk-report-title">Week ${week} · ${titleSuffix}</div>
     ${sections.length ? sections.join("") : `<div class="empty-note">Nothing planned yet for Week ${week}.</div>`}`;
 };
