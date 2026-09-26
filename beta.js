@@ -206,7 +206,7 @@ function bkParentHeroHTML(keys, doneCount) {
       <div class="bk-stat"><b>${sent}</b><span>sent back</span></div>
       <div class="bk-stat"><b>${needs}</b><span>waiting on you</span></div>
       <div class="bk-stat"><b>Week ${currentWeek()}</b><span>she’s working on</span></div>
-      <div class="bk-stat"><b>${bkRankInfo().name}</b><span>chef rank · ${bkRankInfo().plates} plates</span></div>
+      <div class="bk-stat"><b>${bkRankInfo().name}</b><span>chef rank · ${bkRankInfo().plates} ${bkPlural(bkRankInfo().plates, "plate", "plates")}</span></div>
       <div class="bk-stat"><b>${bkTreatsCollected()} / ${bkTreatsTotal()}</b><span>passport treats</span></div>
     </div>
   </div>`;
@@ -681,7 +681,7 @@ function bkPerfected(key) {
 
 function bkRankHTML() {
   const r = bkRankInfo();
-  const sub = r.next ? `${r.plates} of ${r.nextAt} plates to ${r.next}` : `${r.plates} plates served. Top rank!`;
+  const sub = r.next ? `${r.plates} of ${r.nextAt} plates to ${r.next}` : `${r.plates} ${bkPlural(r.plates, "plate", "plates")} served. Top rank!`;
   return `<div class="bk-rank"><span class="bk-rank-chip"><span class="bk-rank-hat">${bkIcon("hat", 18)}</span>${r.name}</span>
     <span class="bk-rank-prog"><span class="bk-rank-bar"><span style="width:${r.pct}%"></span></span><span class="bk-rank-sub">${sub}</span></span></div>`;
 }
@@ -807,7 +807,14 @@ function bkCelebrate(key, unlockedWeek) {
     <div class="bk-cel-btns"><button class="bk-btn primary" onclick="bkDismissCelebration();bkOpenPassport(${unlockedWeek})">See my treat</button><button class="bk-btn plain" onclick="bkDismissCelebration()">Later</button></div>`;
   else if (treat && left > 0) line2 = `<div class="bk-cel-sub2">${left} more to unlock this week’s treat from ${treat.city}</div>`;
   const colors = ["var(--bk-aw1)", "var(--bk-aw2)", "var(--bk-aw3)", "#F6D77C", "var(--bk-accent)"];
-  const sprinkles = Array.from({ length: 14 }, (_, i) => `<span class="bk-cel-spr" style="--a:${i * (360 / 14)}deg;background:${colors[i % colors.length]}"></span>`).join("");
+  const celStyle = (typeof bkKitchenFor === "function" ? bkKitchenFor().celebration : "sprinkles") || "sprinkles";
+  const sprinkles = Array.from({ length: 14 }, (_, i) => {
+    const c = colors[i % colors.length], angle = `--a:${i * (360 / 14)}deg;`;
+    if (celStyle === "stars") return `<span class="bk-cel-spr shape" style="${angle}"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z" fill="${c}"/></svg></span>`;
+    if (celStyle === "hearts") return `<span class="bk-cel-spr shape" style="${angle}"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 21s-7-4.4-9.3-8.8C1.2 8.8 3 5.5 6.3 5c2-.3 3.7.6 4.7 2.3C12 5.6 13.7 4.7 15.7 5c3.3.5 5.1 3.8 3.6 7.2C17 16.6 12 21 12 21z" fill="${c}"/></svg></span>`;
+    if (celStyle === "confetti") return `<span class="bk-cel-spr confetti" style="${angle}background:${c}"></span>`;
+    return `<span class="bk-cel-spr" style="${angle}background:${c}"></span>`;
+  }).join("");
   const el = document.createElement("div");
   el.className = "bk-celebrate" + (reduce ? " calm" : "") + (unlockedWeek ? " stay" : "");
   el.setAttribute("role", "status");
@@ -865,5 +872,341 @@ window.render = function render() {
     } else if (unlockedNow) {
       setTimeout(() => bkCelebrate(Object.keys(DATA)[0], unlockedNow), 150);
     }
+  }
+};
+
+// ======================================================================
+// STAGE 3: Make It Your Kitchen (customization) + Word Recipe Cards
+// ======================================================================
+
+// ---------- Customization: options & persistence ----------
+const BK_KITCHEN_OPTIONS = {
+  pastries: ["croissant", "macaron", "cupcake", "donut", "cookie"],
+  awnings: {
+    kenley: [["mint", "Mint & Sky", ["#9ED6C6", "#A9D3EE", "#C4E3B5"]], ["ocean", "Ocean", ["#7FB8E0", "#B9DDF3", "#5E9BC9"]], ["sage", "Sage Garden", ["#C4E3B5", "#9ED6C6", "#E3F0D8"]], ["lagoon", "Lagoon", ["#8CD3D0", "#D7EFEA", "#A9D3EE"]]],
+    adelyn: [["cotton", "Cotton Candy", ["#F6B8D0", "#CDB8EC", "#B9DDF3"]], ["berry", "Berry", ["#E893B8", "#F6B8D0", "#B99BE0"]], ["lilac", "Lilac Sky", ["#CDB8EC", "#B9DDF3", "#E6DCF7"]], ["bubblegum", "Bubblegum", ["#F6B8D0", "#FCE6EF", "#B9DDF3"]]]
+  },
+  styles: [["sweet", "Sweet Shop", "Sprinkles, stickers and extra treats"], ["pro", "Pro Kitchen", "Clean and simple, like a real pastry kitchen"]],
+  lettering: [["classic", "Classic", "'Young Serif', Georgia, serif"], ["bubbly", "Bubbly", "'Fredoka', sans-serif"], ["fancy", "Fancy", "'Pacifico', cursive"]],
+  patterns: ["plain", "polka", "gingham", "stripes", "sprinkles"],
+  celebrations: ["sprinkles", "stars", "hearts", "confetti"],
+  buddies: ["cat", "puppy", "unicorn", "none"]
+};
+const BK_KITCHEN_DEFAULTS = {
+  kenley: { name: "Kenley’s Pâtisserie", pastry: "croissant", awning: "mint", style: "pro", lettering: "classic", pattern: "gingham", celebration: "stars", buddy: "cat", motto: "Bake it till you make it" },
+  adelyn: { name: "Adelyn’s Pâtisserie", pastry: "macaron", awning: "cotton", style: "sweet", lettering: "fancy", pattern: "polka", celebration: "confetti", buddy: "unicorn", motto: "A sprinkle of sweetness every day" }
+};
+function bkKitchenFor(kid) {
+  kid = kid || currentChild;
+  let saved = {};
+  try { saved = JSON.parse((childrenCache._settings || {})[`kitchen_${kid}`] || "{}"); } catch (e) {}
+  return Object.assign({}, BK_KITCHEN_DEFAULTS[kid], saved);
+}
+function bkSaveKitchen(kid, patch) {
+  const merged = Object.assign({}, bkKitchenFor(kid), patch);
+  childrenCache._settings = childrenCache._settings || {};
+  childrenCache._settings[`kitchen_${kid}`] = JSON.stringify(merged);
+  apiPost("saveSetting", { key: `kitchen_${kid}`, value: JSON.stringify(merged) }).catch(() => {});
+  return merged;
+}
+// Applies the saved awning colors + page pattern as CSS custom properties/attrs.
+function bkApplyKitchenTheme() {
+  const k = bkKitchenFor();
+  const awn = (BK_KITCHEN_OPTIONS.awnings[currentChild] || []).find(a => a[0] === k.awning) || BK_KITCHEN_OPTIONS.awnings[currentChild][0];
+  document.body.style.setProperty("--bk-aw1", awn[2][0]);
+  document.body.style.setProperty("--bk-aw2", awn[2][1]);
+  document.body.style.setProperty("--bk-aw3", awn[2][2]);
+  const lett = BK_KITCHEN_OPTIONS.lettering.find(l => l[0] === k.lettering) || BK_KITCHEN_OPTIONS.lettering[0];
+  document.body.style.setProperty("--bk-name-font", lett[2]);
+  document.body.setAttribute("data-bk-pattern", k.pattern || "plain");
+  document.body.setAttribute("data-bk-style", k.style || "pro");
+}
+
+// ---------- Sous-chef buddy artwork ----------
+function bkBuddySVG(kind, size) {
+  const s = size || 52;
+  if (kind === "cat") return `<svg width="${s}" height="${s}" viewBox="0 0 64 64" aria-hidden="true"><path d="M15 30L17 10L29 21Z" fill="#E4E1DC" stroke="#8C8279" stroke-width="2.5" stroke-linejoin="round"/><path d="M49 30L47 10L35 21Z" fill="#E4E1DC" stroke="#8C8279" stroke-width="2.5" stroke-linejoin="round"/><circle cx="32" cy="37" r="19" fill="#E4E1DC" stroke="#8C8279" stroke-width="2.5"/><circle cx="25" cy="35" r="2.4" fill="#2B3B39"/><circle cx="39" cy="35" r="2.4" fill="#2B3B39"/><path d="M30 41h4l-2 2.5z" fill="#E88FA8"/><path d="M14 40h8M14 45l8-2M50 40h-8M50 45l-8-2" stroke="#8C8279" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+  if (kind === "puppy") return `<svg width="${s}" height="${s}" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="36" r="18" fill="#F3DEC3" stroke="#B98A5E" stroke-width="2.5"/><ellipse cx="39" cy="33" rx="5.5" ry="5" fill="#E2C29E"/><path d="M14 22C8 24 7 38 12 44C16 40 19 32 20 26Z" fill="#C99A6B" stroke="#8F6440" stroke-width="2.5" stroke-linejoin="round"/><path d="M50 22C56 24 57 38 52 44C48 40 45 32 44 26Z" fill="#C99A6B" stroke="#8F6440" stroke-width="2.5" stroke-linejoin="round"/><circle cx="26" cy="34" r="2.4" fill="#2B3B39"/><circle cx="38" cy="34" r="2.4" fill="#2B3B39"/><ellipse cx="32" cy="41" rx="3.2" ry="2.4" fill="#3A2A20"/><path d="M28.5 45q3.5 3 7 0" stroke="#8F6440" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M30.5 46.5q1.5 4 3 0z" fill="#F28CAB"/></svg>`;
+  if (kind === "unicorn") return `<svg width="${s}" height="${s}" viewBox="0 0 64 64" aria-hidden="true"><path d="M17 27L16 13L26 21Z" fill="#FFFFFF" stroke="#B9A7C9" stroke-width="2.5" stroke-linejoin="round"/><path d="M47 27L48 13L38 21Z" fill="#FFFFFF" stroke="#B9A7C9" stroke-width="2.5" stroke-linejoin="round"/><circle cx="32" cy="38" r="18" fill="#FFFFFF" stroke="#B9A7C9" stroke-width="2.5"/><circle cx="22" cy="24" r="5" fill="#F7BCD3"/><circle cx="28" cy="21" r="4.5" fill="#CDB8EC"/><circle cx="37" cy="21.5" r="4.5" fill="#B9DDF3"/><path d="M32 4L28 21H36Z" fill="#F6D77C" stroke="#C9A43A" stroke-width="2" stroke-linejoin="round"/><path d="M29.8 12h4.4M29 16.5h6" stroke="#C9A43A" stroke-width="1.5"/><path d="M22 38q3-3 6 0M36 38q3-3 6 0" stroke="#2B3B39" stroke-width="2.2" stroke-linecap="round" fill="none"/><circle cx="21" cy="44" r="3" fill="#FCE6EF"/><circle cx="43" cy="44" r="3" fill="#FCE6EF"/><path d="M29 46q3 2.5 6 0" stroke="#B9A7C9" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>`;
+  return "";
+}
+function bkBuddyBadgeHTML() {
+  const k = bkKitchenFor();
+  if (!k.buddy || k.buddy === "none") return "";
+  return `<span class="bk-buddy-badge" aria-hidden="true">${bkBuddySVG(k.buddy, 44)}</span>`;
+}
+
+// ---------- Customize screen ----------
+let bkCustomizeOpen = false;
+let bkKitchenDraft = null;
+function bkOpenCustomize() {
+  bkKitchenDraft = bkKitchenFor();
+  bkCustomizeOpen = true;
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function bkCloseCustomize() { bkCustomizeOpen = false; bkKitchenDraft = null; render(); window.scrollTo({ top: 0 }); }
+function bkSetDraft(field, value) { if (bkKitchenDraft) { bkKitchenDraft[field] = value; render(); } }
+function bkSubmitKitchenName(input) { bkSetDraft("name", input.value); }
+function bkSubmitKitchenMotto(input) { bkSetDraft("motto", input.value); }
+function bkSaveKitchenDraft() {
+  const nameEl = document.getElementById("bkKitchenNameInput");
+  const mottoEl = document.getElementById("bkKitchenMottoInput");
+  if (nameEl) bkKitchenDraft.name = nameEl.value;
+  if (mottoEl) bkKitchenDraft.motto = mottoEl.value;
+  bkSaveKitchen(currentChild, bkKitchenDraft);
+  bkApplyKitchenTheme();
+  bkCloseCustomize();
+}
+function bkChoiceBtn(active, onclick, inner, extraCls) {
+  return `<button type="button" class="bk-choice${active ? " active" : ""}${extraCls ? " " + extraCls : ""}" aria-pressed="${active}" onclick="${onclick}">${inner}${active ? `<span class="bk-choice-check">${bkIcon("check", 12)}</span>` : ""}</button>`;
+}
+function bkPatternSwatchHTML(id) {
+  if (id === "polka") return `<span class="bk-pat-swatch bk-pat-polka"></span>`;
+  if (id === "gingham") return `<span class="bk-pat-swatch bk-pat-gingham"></span>`;
+  if (id === "stripes") return `<span class="bk-pat-swatch bk-pat-stripes"></span>`;
+  if (id === "sprinkles") return `<span class="bk-pat-swatch bk-pat-sprinkles"></span>`;
+  return `<span class="bk-pat-swatch"></span>`;
+}
+function bkCelebrationSwatchHTML(id) {
+  const c = ["var(--bk-aw1)", "var(--bk-aw2)", "var(--bk-aw3)"];
+  let marks = "";
+  if (id === "stars") marks = c.map((col, i) => `<svg width="16" height="16" viewBox="0 0 24 24" style="position:absolute;left:${18 + i * 24}px;top:${i % 2 ? 6 : 2}px"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z" fill="${col}"/></svg>`).join("");
+  else if (id === "hearts") marks = c.map((col, i) => `<svg width="16" height="16" viewBox="0 0 24 24" style="position:absolute;left:${18 + i * 24}px;top:${i % 2 ? 6 : 2}px"><path d="M12 21s-7-4.4-9.3-8.8C1.2 8.8 3 5.5 6.3 5c2-.3 3.7.6 4.7 2.3C12 5.6 13.7 4.7 15.7 5c3.3.5 5.1 3.8 3.6 7.2C17 16.6 12 21 12 21z" fill="${col}"/></svg>`).join("");
+  else if (id === "confetti") marks = c.map((col, i) => `<span style="position:absolute;left:${16 + i * 22}px;top:${i % 2 ? 8 : 4}px;width:9px;height:7px;border-radius:2px;background:${col};transform:rotate(${(i - 1) * 25}deg)"></span>`).join("");
+  else marks = c.map((col, i) => `<span style="position:absolute;left:${16 + i * 22}px;top:${i % 2 ? 8 : 4}px;width:12px;height:5px;border-radius:3px;background:${col};transform:rotate(${(i - 1) * 20}deg)"></span>`).join("");
+  return `<span class="bk-cel-swatch">${marks}</span>`;
+}
+function bkCustomizeHTML() {
+  const kid = currentChild, name = CHILD_META[kid].name, d = bkKitchenDraft || bkKitchenFor();
+  const awnList = BK_KITCHEN_OPTIONS.awnings[kid];
+  const lett = BK_KITCHEN_OPTIONS.lettering.find(l => l[0] === d.lettering) || BK_KITCHEN_OPTIONS.lettering[0];
+  return `<div class="bk-custom">
+    <button class="bk-back" onclick="bkCloseCustomize()">${bkIcon("back", 18)}Back To ${name}’s Kitchen</button>
+    <h1>Make It Your Kitchen</h1>
+    <p class="bk-custom-sub">Pick a name, a signature pastry and your colors.</p>
+    <div class="bk-custom-grid">
+      <div class="bk-custom-main">
+        <div class="bk-custom-field">
+          <label class="bk-field-label" for="bkKitchenNameInput">Kitchen Name</label>
+          <input id="bkKitchenNameInput" type="text" value="${bkAttr(d.name)}" oninput="bkSubmitKitchenName(this)">
+        </div>
+        <div class="bk-custom-field">
+          <div class="bk-field-label">Signature Pastry</div>
+          <div class="bk-choice-grid five">${BK_KITCHEN_OPTIONS.pastries.map(p => bkChoiceBtn(d.pastry === p, `bkSetDraft('pastry','${p}')`, `${bkPastry(p, kid, 44)}${bkTitle(p)}`)).join("")}</div>
+        </div>
+        <div class="bk-custom-field">
+          <div class="bk-field-label">Awning Colors</div>
+          <div class="bk-choice-grid four">${awnList.map(a => bkChoiceBtn(d.awning === a[0], `bkSetDraft('awning','${a[0]}')`, `<span class="bk-awn-swatch" style="background:linear-gradient(90deg,${a[2][0]} 33%,${a[2][1]} 33% 66%,${a[2][2]} 66%)"></span>${a[1]}`)).join("")}</div>
+        </div>
+        <div class="bk-custom-field">
+          <div class="bk-field-label">Kitchen Style</div>
+          <div class="bk-choice-grid two">${BK_KITCHEN_OPTIONS.styles.map(st => bkChoiceBtn(d.style === st[0], `bkSetDraft('style','${st[0]}')`, `<span class="bk-style-name">${st[1]}</span><span class="bk-style-sub">${st[2]}</span>`, "bk-choice-wide")).join("")}</div>
+        </div>
+      </div>
+      <div class="bk-custom-preview">
+        <div class="bk-field-label">Preview</div>
+        <div class="bk-preview-card">
+          <svg class="bk-awning" width="100%" height="30" aria-hidden="true" preserveAspectRatio="none"><defs><pattern id="bkPrevAwn" width="84" height="30" patternUnits="userSpaceOnUse"><rect width="28" height="16" fill="${awnList.find(a=>a[0]===d.awning)[2][0]}"/><rect x="28" width="28" height="16" fill="${awnList.find(a=>a[0]===d.awning)[2][1]}"/><rect x="56" width="28" height="16" fill="${awnList.find(a=>a[0]===d.awning)[2][2]}"/></pattern></defs><rect width="100%" height="30" fill="url(#bkPrevAwn)"/></svg>
+          <div class="bk-preview-body bk-pat-${d.pattern}">
+            <div class="bk-preview-emblem">${bkPastry(d.pastry, kid, 72)}</div>
+            <div class="bk-preview-name" style="font-family:${lett[2]}">${bkAttr(d.name) || "Your Kitchen"}</div>
+            <div class="bk-preview-motto">“${bkAttr(d.motto) || "Add a motto below"}”</div>
+            <span class="bk-rank-chip small"><span class="bk-rank-hat">${bkIcon("hat", 14)}</span>${bkRankInfo().name}</span>
+            ${d.buddy !== "none" ? `<span class="bk-preview-buddy">${bkBuddySVG(d.buddy, 52)}</span>` : ""}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bk-custom-more">
+      <h2>More Ways To Make It Yours</h2>
+      <div class="bk-more-grid">
+        <div class="bk-custom-field">
+          <div class="bk-field-label">Name Lettering</div>
+          <div class="bk-choice-grid three">${BK_KITCHEN_OPTIONS.lettering.map(l => bkChoiceBtn(d.lettering === l[0], `bkSetDraft('lettering','${l[0]}')`, `<span class="bk-lett-sample" style="font-family:${l[2]}">${name}</span>${l[1]}`)).join("")}</div>
+        </div>
+        <div class="bk-custom-field">
+          <div class="bk-field-label">Page Pattern</div>
+          <div class="bk-choice-grid five">${BK_KITCHEN_OPTIONS.patterns.map(p => bkChoiceBtn(d.pattern === p, `bkSetDraft('pattern','${p}')`, `${bkPatternSwatchHTML(p)}${bkTitle(p)}`)).join("")}</div>
+        </div>
+        <div class="bk-custom-field">
+          <div class="bk-field-label">Celebration Style</div>
+          <div class="bk-choice-grid four">${BK_KITCHEN_OPTIONS.celebrations.map(c => bkChoiceBtn(d.celebration === c, `bkSetDraft('celebration','${c}')`, `${bkCelebrationSwatchHTML(c)}${bkTitle(c)}`)).join("")}</div>
+        </div>
+        <div class="bk-custom-field">
+          <div class="bk-field-label">Sous-Chef Buddy</div>
+          <div class="bk-choice-grid four">${BK_KITCHEN_OPTIONS.buddies.map(b => bkChoiceBtn(d.buddy === b, `bkSetDraft('buddy','${b}')`, b === "none" ? `<span class="bk-no-buddy"></span>No Buddy` : `${bkBuddySVG(b, 40)}${bkTitle(b)}`)).join("")}</div>
+        </div>
+      </div>
+    </div>
+    <div class="bk-custom-footer">
+      <div class="bk-custom-field grow">
+        <label class="bk-field-label" for="bkKitchenMottoInput">Kitchen Motto</label>
+        <input id="bkKitchenMottoInput" type="text" value="${bkAttr(d.motto)}" oninput="bkSubmitKitchenMotto(this)">
+      </div>
+      <button class="bk-btn primary big" onclick="bkSaveKitchenDraft()">Save My Kitchen</button>
+    </div>
+  </div>`;
+}
+
+// ---------- Word Recipe Cards ----------
+// A morpheme-decomposition engine so a card can be built for ANY vocab word,
+// plus a small curated set for words we know are being taught right now.
+const BK_MORPHEMES = {
+  prefixes: [
+    ["incred", "in-", "not / without", "Latin"], // handled by curated entry, kept out of generic table
+    ["un", "not / opposite of", "Old English"], ["re", "again / back", "Latin"], ["dis", "not / apart", "Latin"],
+    ["mis", "wrongly", "Old English"], ["pre", "before", "Latin"], ["sub", "under", "Latin"], ["non", "not", "Latin"],
+    ["inter", "between", "Latin"], ["trans", "across", "Latin"], ["anti", "against", "Greek"], ["semi", "half", "Latin"],
+    ["super", "above / beyond", "Latin"], ["extra", "beyond", "Latin"], ["ex", "out of / former", "Latin"],
+    ["im", "not", "Latin"], ["il", "not", "Latin"], ["ir", "not", "Latin"], ["in", "not / into", "Latin"],
+    ["de", "down / away / reverse", "Latin"], ["over", "too much / above", "Old English"], ["under", "too little / below", "Old English"],
+    ["mono", "one", "Greek"], ["uni", "one", "Latin"], ["bi", "two", "Latin"], ["tri", "three", "Latin"], ["poly", "many", "Greek"],
+    ["micro", "small", "Greek"], ["auto", "self", "Greek"], ["tele", "far", "Greek"], ["mid", "middle", "Old English"]
+  ],
+  roots: [
+    ["cred", "believe", "Latin"], ["duc", "lead", "Latin"], ["duct", "lead", "Latin"], ["spect", "look", "Latin"],
+    ["scrib", "write", "Latin"], ["script", "write", "Latin"], ["port", "carry", "Latin"], ["dict", "say / speak", "Latin"],
+    ["struct", "build", "Latin"], ["vis", "see", "Latin"], ["vid", "see", "Latin"], ["tract", "pull / drag", "Latin"],
+    ["rupt", "break", "Latin"], ["ject", "throw", "Latin"], ["fer", "carry", "Latin"], ["mit", "send", "Latin"],
+    ["miss", "send", "Latin"], ["pos", "place", "Latin"], ["pon", "place", "Latin"], ["grad", "step", "Latin"],
+    ["gress", "step / go", "Latin"], ["cede", "go / yield", "Latin"], ["ceed", "go / yield", "Latin"], ["cess", "go / yield", "Latin"],
+    ["cap", "take", "Latin"], ["cept", "take", "Latin"], ["voc", "call / voice", "Latin"], ["vok", "call", "Latin"],
+    ["aud", "hear", "Latin"], ["photo", "light", "Greek"], ["graph", "write", "Greek"], ["bio", "life", "Greek"],
+    ["geo", "earth", "Greek"], ["therm", "heat", "Greek"], ["meter", "measure", "Greek"], ["scope", "see / watch", "Greek"],
+    ["phone", "sound", "Greek"], ["chron", "time", "Greek"], ["path", "feeling / suffering", "Greek"], ["log", "word / study", "Greek"],
+    ["morph", "form / shape", "Greek"], ["sili", "jump / leap", "Latin (salire)"], ["ten", "hold", "Latin"], ["tain", "hold", "Latin"],
+    ["sist", "stand", "Latin"], ["val", "worth / strength", "Latin"], ["fid", "faith / trust", "Latin"], ["metus", "fear", "Latin"],
+    ["sens", "feel", "Latin"], ["sent", "feel", "Latin"], ["gen", "birth / kind", "Latin"], ["form", "shape", "Latin"],
+    ["ven", "come", "Latin"], ["vert", "turn", "Latin"], ["vers", "turn", "Latin"], ["ann", "year", "Latin"], ["circ", "ring / around", "Latin"]
+  ],
+  suffixes: [
+    ["ion", "act / state of", "Latin"], ["tion", "act / state of", "Latin"], ["ulous", "full of / tending to", "Latin"],
+    ["able", "able to be", "Latin"], ["ible", "able to be", "Latin"], ["ent", "one who / state of", "Latin"],
+    ["ant", "one who / state of", "Latin"], ["ive", "having the nature of", "Latin"], ["ous", "full of", "Latin"],
+    ["ity", "state or quality of", "Latin"], ["ment", "result / act of", "Latin"], ["ful", "full of", "Old English"],
+    ["less", "without", "Old English"], ["ly", "in a certain way", "Old English"], ["er", "one who / more", "Old English"],
+    ["est", "most", "Old English"], ["ize", "to make", "Greek"], ["ist", "one who practices", "Greek"], ["ology", "study of", "Greek"]
+  ]
+};
+// Curated cards for words currently in the girls' lesson content, hand-checked
+// so the etymology is right even where the generic table would be too rough.
+const BK_WORD_CARDS = {
+  incredulous: { prefix: ["in-", "not"], root: ["cred", "believe"], suffix: ["-ulous", "full of / tending to"], origin: "Latin", meaning: "not willing or able to believe something; showing disbelief", example: "She gave an incredulous look when her brother said he'd cleaned his whole room in five minutes.", tip: "Same root as \"credit\" and \"credible\" — all about believing." },
+  deduction: { prefix: ["de-", "down / from"], root: ["duct", "lead"], suffix: ["-ion", "act of"], origin: "Latin", meaning: "a conclusion reached by reasoning from general facts to a specific one", example: "From the muddy footprints, the detective made a deduction about which door the thief had used.", tip: "\"Lead down\" from facts to a conclusion — like Sherlock Holmes." },
+  meticulous: { prefix: null, root: ["metus", "fear"], suffix: ["-ulous", "full of / tending to"], origin: "Latin", meaning: "showing great attention to detail; very careful and precise", example: "Adelyn was meticulous about lining up every sticker perfectly in her passport.", tip: "Comes from a word for \"fearful\" — being so careful you're almost afraid to make a mistake." },
+  resilient: { prefix: ["re-", "back"], root: ["sili", "jump / leap"], suffix: ["-ent", "state of"], origin: "Latin", meaning: "able to recover quickly from difficulties; springing back into shape", example: "After a rough first attempt, Kenley was resilient and tried the recipe again the next day.", tip: "Think of a rubber band \"jumping back\" into shape." }
+};
+// Falls back to a generic morpheme breakdown for any word not in the curated list.
+function bkAnalyzeWord(word) {
+  const w = String(word || "").toLowerCase().trim();
+  if (!w) return null;
+  if (BK_WORD_CARDS[w]) return Object.assign({ word: w }, BK_WORD_CARDS[w]);
+  const findSeg = (list, fromStart) => {
+    let best = null;
+    list.forEach(([seg, meaning, origin]) => {
+      if (seg.length < 2) return;
+      const hit = fromStart ? w.startsWith(seg) : w.endsWith(seg);
+      if (hit && (!best || seg.length > best[0].length) && seg.length < w.length - 1) best = [seg, meaning, origin];
+    });
+    return best;
+  };
+  const pre = findSeg(BK_MORPHEMES.prefixes, true);
+  const suf = findSeg(BK_MORPHEMES.suffixes, false);
+  let mid = w;
+  if (pre) mid = mid.slice(pre[0].length);
+  if (suf && mid.endsWith(suf[0])) mid = mid.slice(0, mid.length - suf[0].length);
+  const rootMatch = BK_MORPHEMES.roots.find(([seg]) => mid.includes(seg) || w.includes(seg));
+  if (!pre && !suf && !rootMatch) return { word: w, prefix: null, root: null, suffix: null, origin: null, meaning: null, example: null, tip: null, unknown: true };
+  return {
+    word: w,
+    prefix: pre ? [pre[0] + "-", pre[1]] : null,
+    root: rootMatch ? [rootMatch[0], rootMatch[1]] : null,
+    suffix: suf ? ["-" + suf[0], suf[1]] : null,
+    origin: (rootMatch && rootMatch[2]) || (pre && pre[2]) || (suf && suf[2]) || null,
+    meaning: null, example: null, tip: null
+  };
+}
+function bkIngredientChip(label, part) {
+  if (!part) return "";
+  return `<div class="bk-ingredient"><span class="bk-ingredient-part">${label}</span><span class="bk-ingredient-seg">${part[0]}</span><span class="bk-ingredient-mean">${part[1]}</span></div>`;
+}
+function bkWordCardHTML(word) {
+  const a = bkAnalyzeWord(word);
+  if (!a) return `<div class="bk-recipecard empty">Type a word to see its recipe card.</div>`;
+  if (a.unknown) {
+    return `<div class="bk-recipecard">
+      <div class="bk-rc-head"><span class="bk-rc-word">${bkTitle(a.word)}</span></div>
+      <div class="bk-rc-empty">We don’t have a breakdown for this word yet — but you can still look up what it means and add it to the review bank.</div>
+    </div>`;
+  }
+  return `<div class="bk-recipecard">
+    <div class="bk-rc-head"><span class="bk-rc-word">${bkTitle(a.word)}</span>${a.origin ? `<span class="bk-rc-origin">${a.origin}</span>` : ""}</div>
+    <div class="bk-rc-ingredients">
+      ${bkIngredientChip("Prefix", a.prefix)}
+      ${bkIngredientChip("Root", a.root)}
+      ${bkIngredientChip("Suffix", a.suffix)}
+    </div>
+    ${a.meaning ? `<div class="bk-rc-block"><div class="bk-field-label">Meaning</div><p>${a.meaning}</p></div>` : ""}
+    ${a.example ? `<div class="bk-rc-block"><div class="bk-field-label">In A Sentence</div><p>${a.example}</p></div>` : ""}
+    ${a.tip ? `<div class="bk-rc-block bk-rc-tip"><div class="bk-field-label">${bkIcon("bulb", 14)}Memory Tip</div><p>${a.tip}</p></div>` : ""}
+  </div>`;
+}
+
+// ---------- Word Recipe Box (browse words she's practiced + curated set) ----------
+let bkRecipeBoxOpen = false;
+let bkRecipeBoxWord = null;
+function bkOpenRecipeBox() { bkRecipeBoxOpen = true; bkRecipeBoxWord = Object.keys(BK_WORD_CARDS)[0] || null; render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+function bkCloseRecipeBox() { bkRecipeBoxOpen = false; render(); window.scrollTo({ top: 0 }); }
+function bkPickRecipeWord(w) { bkRecipeBoxWord = w; render(); }
+function bkRecipeBoxWordList() {
+  const practiced = (reviewPoolCache[currentChild] || []).map(r => r.word).filter(Boolean);
+  const curated = Object.keys(BK_WORD_CARDS);
+  const seen = {}, out = [];
+  curated.concat(practiced).forEach(w => { const key = String(w).toLowerCase(); if (!seen[key]) { seen[key] = true; out.push(w); } });
+  return out;
+}
+function bkRecipeBoxHTML() {
+  const name = CHILD_META[currentChild].name;
+  const words = bkRecipeBoxWordList();
+  const active = bkRecipeBoxWord || words[0];
+  return `<div class="bk-custom">
+    <button class="bk-back" onclick="bkCloseRecipeBox()">${bkIcon("back", 18)}Back To ${name}’s Kitchen</button>
+    <h1>Word Recipe Box</h1>
+    <p class="bk-custom-sub">Every word breaks down into ingredients — a prefix, a root and a suffix. Pick a word to see its card.</p>
+    <div class="bk-recipebox-grid">
+      <div class="bk-recipebox-list">
+        ${words.length ? words.map(w => `<button class="bk-word-chip${String(w).toLowerCase() === String(active).toLowerCase() ? " active" : ""}" onclick="bkPickRecipeWord('${bkAttr(w)}')">${bkTitle(w)}</button>`).join("") : `<div class="bk-rc-empty">No practiced words yet — check back after a few vocabulary rounds.</div>`}
+      </div>
+      <div class="bk-recipebox-card">${active ? bkWordCardHTML(active) : ""}</div>
+    </div>
+  </div>`;
+}
+
+// ---------- Hook Stage 3 views into the renderer ----------
+const bkStage2Render = window.render;
+window.render = function render() {
+  const isParent = currentView === "parent";
+  if (isParent) { bkCustomizeOpen = false; bkRecipeBoxOpen = false; }
+  bkApplyKitchenTheme();
+  bkStage2Render();
+
+  const pv = document.getElementById("bkPassportView");
+  const kitchenParts = ["bkHero", "sentBackBanner", "bkStationsWrap", "detailPanel"];
+  if (!isParent && (bkCustomizeOpen || bkRecipeBoxOpen)) {
+    pv.innerHTML = bkCustomizeOpen ? bkCustomizeHTML() : bkRecipeBoxHTML();
+    pv.style.display = "block";
+    kitchenParts.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = "none"; });
+    const pbtn = document.getElementById("bkPassportBtn");
+    if (pbtn) pbtn.style.display = "none";
+    const cbtn = document.getElementById("bkCustomizeBtn"), rbtn = document.getElementById("bkRecipeBoxBtn");
+    if (cbtn) cbtn.style.display = "none";
+    if (rbtn) rbtn.style.display = "none";
+  }
+
+  // Buddy mascot rides along on the kid-view hero, next to the passport teaser.
+  if (!isParent && !bkCustomizeOpen && !bkRecipeBoxOpen && bkPassport === null) {
+    const hero = document.querySelector("#bkHero .bk-hero");
+    if (hero && !hero.querySelector(".bk-buddy-badge")) hero.insertAdjacentHTML("beforeend", bkBuddyBadgeHTML());
   }
 };

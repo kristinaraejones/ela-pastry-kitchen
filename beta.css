@@ -554,3 +554,93 @@ body[data-view="parent"] .bk-passport-btn{display:none;}
 .bk-stats{grid-template-columns:repeat(3,minmax(0,1fr));}
 
 @media (max-width:1100px){ .bk-who{display:none;} }
+
+/* ======================================================================
+   STAGE 3: Make It Your Kitchen + Word Recipe Cards
+   ====================================================================== */
+.bk-custom{display:flex;flex-direction:column;gap:22px;}
+.bk-custom h1{margin:6px 0 0;font-size:44px;line-height:1.1;color:var(--bk-accent-ink);}
+.bk-custom-sub{margin:0;font-size:17px;font-weight:600;color:var(--bk-accent-ink);opacity:.85;}
+.bk-field-label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--bk-muted);}
+.bk-custom-grid{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;}
+.bk-custom-main{flex:1;min-width:320px;display:flex;flex-direction:column;gap:24px;padding:26px 28px;background:#fff;border:1px solid var(--bk-border);border-radius:28px;}
+.bk-custom-field{display:flex;flex-direction:column;gap:10px;}
+.bk-custom-field.grow{flex:1;}
+.bk-custom-field input[type="text"]{height:50px;padding:0 16px;border:2px solid var(--bk-bar);border-radius:14px;background:var(--bk-ground);font-family:'Nunito',sans-serif;font-size:18px;font-weight:700;color:var(--bk-accent-ink);box-sizing:border-box;}
+.bk-choice-grid{display:grid;gap:10px;}
+.bk-choice-grid.five{grid-template-columns:repeat(5,minmax(0,1fr));}
+.bk-choice-grid.four{grid-template-columns:repeat(4,minmax(0,1fr));}
+.bk-choice-grid.three{grid-template-columns:repeat(3,minmax(0,1fr));}
+.bk-choice-grid.two{grid-template-columns:repeat(2,minmax(0,1fr));}
+@media (max-width:640px){.bk-choice-grid.five{grid-template-columns:repeat(3,minmax(0,1fr));}.bk-choice-grid.four{grid-template-columns:repeat(2,minmax(0,1fr));}}
+.bk-choice{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px 10px;border:1.5px solid var(--bk-border);border-radius:18px;background:#fff;font:800 13px 'Nunito',sans-serif;color:var(--bk-muted);cursor:pointer;text-align:center;}
+.bk-choice.active{border:2.5px solid var(--bk-accent);background:var(--bk-soft);color:var(--bk-accent-ink);}
+.bk-choice-check{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;background:var(--bk-accent);border:2px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;}
+.bk-choice-wide{flex-direction:column;align-items:flex-start;text-align:left;padding:14px 16px;}
+.bk-style-name{font-family:'Fredoka',sans-serif;font-weight:600;font-size:18px;color:var(--bk-accent-ink);}
+.bk-style-sub{font-size:13px;font-weight:600;color:var(--bk-muted);}
+.bk-awn-swatch{display:block;width:100%;height:22px;border-radius:8px;}
+.bk-lett-sample{display:block;font-size:20px;color:var(--bk-accent-ink);}
+.bk-pat-swatch{display:block;height:40px;border-radius:10px;background:var(--bk-soft);}
+.bk-pat-polka{background-image:radial-gradient(#fff 2.5px,transparent 3px);background-size:12px 12px;}
+.bk-pat-gingham{background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.55) 0 6px,transparent 6px 12px),repeating-linear-gradient(90deg,rgba(255,255,255,.55) 0 6px,transparent 6px 12px);}
+.bk-pat-stripes{background-image:repeating-linear-gradient(90deg,#fff 0 7px,transparent 7px 14px);}
+.bk-pat-sprinkles{background-image:radial-gradient(#fff 1.6px,transparent 2px);background-size:9px 9px;}
+.bk-cel-swatch{position:relative;display:block;width:100%;height:30px;border-radius:8px;background:var(--bk-soft);overflow:hidden;}
+.bk-no-buddy{display:block;width:40px;height:40px;border-radius:50%;border:2px dashed var(--bk-border);}
+.bk-custom-preview{width:360px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;}
+@media (max-width:900px){.bk-custom-preview{width:100%;}}
+.bk-preview-card{border:1px solid var(--bk-border);border-radius:26px;overflow:hidden;background:#fff;}
+.bk-preview-body{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;padding:26px 22px;background:var(--bk-soft);}
+.bk-preview-body.bk-pat-gingham{background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.5) 0 9px,transparent 9px 18px),repeating-linear-gradient(90deg,rgba(255,255,255,.5) 0 9px,transparent 9px 18px);}
+.bk-preview-body.bk-pat-polka{background-image:radial-gradient(#fff 3px,transparent 3.5px);background-size:14px 14px;}
+.bk-preview-body.bk-pat-stripes{background-image:repeating-linear-gradient(90deg,#fff 0 8px,transparent 8px 16px);}
+.bk-preview-body.bk-pat-sprinkles{background-image:radial-gradient(#fff 1.8px,transparent 2.4px);background-size:11px 11px;}
+.bk-preview-emblem{width:88px;height:88px;border-radius:50%;background:#fff;box-shadow:0 5px 0 var(--bk-hero-shadow);display:flex;align-items:center;justify-content:center;}
+.bk-preview-name{font-size:26px;color:var(--bk-accent-ink);text-align:center;line-height:1.15;}
+.bk-preview-motto{padding:3px 12px;background:#fff;border-radius:10px;font-size:14px;font-weight:700;font-style:italic;color:var(--bk-accent-ink);}
+.bk-preview-buddy{position:absolute;right:12px;bottom:12px;width:52px;height:52px;border-radius:50%;background:#fff;box-shadow:0 3px 0 var(--bk-hero-shadow);display:flex;align-items:center;justify-content:center;}
+.bk-custom-more{display:flex;flex-direction:column;gap:20px;padding:26px 28px;background:#fff;border:1px solid var(--bk-border);border-radius:28px;}
+.bk-custom-more h2{margin:0;font-size:24px;color:var(--bk-accent-ink);}
+.bk-more-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 32px;}
+@media (max-width:800px){.bk-more-grid{grid-template-columns:minmax(0,1fr);}}
+.bk-custom-footer{display:flex;align-items:flex-end;gap:16px;padding-top:18px;border-top:1.5px dashed var(--bk-border);flex-wrap:wrap;}
+.bk-btn.big{height:52px;padding:0 30px;font-size:16px;border-radius:999px;}
+
+/* Buddy badge on the kid hero */
+.bk-buddy-badge{position:absolute;right:14px;bottom:14px;width:52px;height:52px;border-radius:50%;background:#fff;box-shadow:0 3px 0 var(--bk-hero-shadow);display:flex;align-items:center;justify-content:center;}
+.bk-hero{position:relative;}
+
+/* Page pattern applied via the saved customization (kid view only) */
+body[data-view!="parent"][data-bk-pattern="gingham"] .bk-hero{background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.5) 0 9px,transparent 9px 18px),repeating-linear-gradient(90deg,rgba(255,255,255,.5) 0 9px,transparent 9px 18px);}
+body[data-view!="parent"][data-bk-pattern="polka"] .bk-hero{background-image:radial-gradient(#fff 3px,transparent 3.5px);background-size:14px 14px;}
+body[data-view!="parent"][data-bk-pattern="stripes"] .bk-hero{background-image:repeating-linear-gradient(90deg,#fff 0 8px,transparent 8px 16px);}
+body[data-view!="parent"][data-bk-pattern="sprinkles"] .bk-hero{background-image:radial-gradient(#fff 1.8px,transparent 2.4px);background-size:11px 11px;}
+
+/* Name lettering picked in Make It Your Kitchen */
+.bk-hero-text h1{font-family:var(--bk-name-font,'Fredoka',sans-serif);}
+
+/* Word recipe cards */
+.bk-recipebox-grid{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap;}
+.bk-recipebox-list{display:flex;flex-direction:column;gap:8px;width:220px;flex-shrink:0;}
+@media (max-width:700px){.bk-recipebox-list{width:100%;flex-direction:row;flex-wrap:wrap;}}
+.bk-word-chip{padding:10px 16px;border:1.5px solid var(--bk-border);border-radius:14px;background:#fff;font:800 15px 'Nunito',sans-serif;color:var(--bk-muted);cursor:pointer;text-align:left;}
+.bk-word-chip.active{border-color:var(--bk-accent);background:var(--bk-soft);color:var(--bk-accent-ink);}
+.bk-recipebox-card{flex:1;min-width:280px;}
+.bk-recipecard{padding:26px 28px;background:#fff;border:1px solid var(--bk-border);border-radius:26px;display:flex;flex-direction:column;gap:16px;}
+.bk-rc-head{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.bk-rc-word{font-family:'Fredoka',sans-serif;font-weight:600;font-size:30px;color:var(--bk-accent-ink);}
+.bk-rc-origin{padding:4px 12px;border-radius:999px;background:var(--bk-soft);color:var(--bk-accent-ink);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}
+.bk-rc-ingredients{display:flex;gap:12px;flex-wrap:wrap;}
+.bk-ingredient{display:flex;flex-direction:column;gap:2px;padding:12px 16px;border-radius:16px;background:var(--bk-ground);border:1px solid var(--bk-border);min-width:110px;}
+.bk-ingredient-part{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bk-muted);}
+.bk-ingredient-seg{font-family:'Fredoka',sans-serif;font-weight:600;font-size:20px;color:var(--bk-accent-ink);}
+.bk-ingredient-mean{font-size:13px;font-weight:600;color:var(--bk-muted);}
+.bk-rc-block p{margin:4px 0 0;font-size:15px;line-height:1.5;color:var(--bk-ink);}
+.bk-rc-tip{background:var(--bk-note-bg);border-radius:16px;padding:14px 16px;}
+.bk-rc-tip .bk-field-label{color:var(--bk-note-ink);}
+.bk-rc-empty{font-size:14px;font-weight:600;color:var(--bk-muted);padding:10px 0;}
+.bk-recipecard.empty{color:var(--bk-muted);font-weight:700;}
+body[data-view!="parent"][data-bk-style="pro"] .bk-hero .bk-sprinkle{display:none;}
+.bk-cel-spr.shape{background:none !important;display:flex;align-items:center;justify-content:center;width:16px;height:16px;margin:-8px 0 0 -8px;}
+.bk-cel-spr.confetti{border-radius:2px;transform:rotate(var(--a)) translateX(0) rotate(20deg);}
