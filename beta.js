@@ -152,10 +152,12 @@ function bkKidHeroHTML(keys, doneCount, sentBackCount) {
       <div class="bk-eyebrow">${CHILD_META[kid].subtitle} · WEEK ${currentWeek()}${testWeek}</div>
       <h1>${name}’s Kitchen</h1>
       <p>${line}</p>
+      ${typeof bkRankHTML === "function" ? bkRankHTML() : ""}
     </div>
     <div class="bk-plates">
       <div class="bk-plate-row">${keys.map(bkPlateHTML).join("")}</div>
       <div class="bk-plate-label">${doneCount} of ${keys.length} plates served</div>
+      ${typeof bkTreatTeaserHTML === "function" ? bkTreatTeaserHTML() : ""}
     </div>
   </div>`;
 }
@@ -204,6 +206,8 @@ function bkParentHeroHTML(keys, doneCount) {
       <div class="bk-stat"><b>${sent}</b><span>sent back</span></div>
       <div class="bk-stat"><b>${needs}</b><span>waiting on you</span></div>
       <div class="bk-stat"><b>Week ${currentWeek()}</b><span>she’s working on</span></div>
+      <div class="bk-stat"><b>${bkRankInfo().name}</b><span>chef rank · ${bkRankInfo().plates} plates</span></div>
+      <div class="bk-stat"><b>${bkTreatsCollected()} / ${bkTreatsTotal()}</b><span>passport treats</span></div>
     </div>
   </div>`;
 }
@@ -245,7 +249,8 @@ function bkStationCardHTML(key, idx) {
   const doneN = unlocked.filter(t => state[key].tasks[t.id].done).length;
   const sentBack = bkSentBackTasks(key).length;
   let pill;
-  if (status === "served") pill = bkPill("served", "Served", "check");
+  if (status === "served" && typeof bkPerfected === "function" && bkPerfected(key)) pill = bkPill("perfected", "Perfected", "star");
+  else if (status === "served") pill = bkPill("served", "Served", "check");
   else if (status === "burning") pill = bkPill("note", "Redo this station", "timer");
   else if (sentBack > 0) pill = bkPill("note", `${sentBack} chef’s ${bkPlural(sentBack, "note", "notes")}`, "timer");
   else if (status === "empty") pill = bkPill("neutral", "Nothing yet");
@@ -378,6 +383,8 @@ window.render = function render() {
         }
       }
       card.onclick = () => openStationFn(key);
+      card.dataset.key = key;
+      if (typeof bkPerfected === "function" && bkPerfected(key)) card.classList.add("perfected");
       card.innerHTML = bkStationCardHTML(key, idx);
       grid.appendChild(card);
     });
@@ -622,4 +629,241 @@ window.renderWeekReportPanel = function renderWeekReportPanel() {
   const titleSuffix = week < currentWeek() ? "Completed Record" : week === currentWeek() ? "In Progress" : "Preview";
   panel.innerHTML = `<div class="bk-report-title">Week ${week} · ${titleSuffix}</div>
     ${sections.length ? sections.join("") : `<div class="empty-note">Nothing planned yet for Week ${week}.</div>`}`;
+};
+
+// =====================================================================
+// STAGE 2 — chef ranks, Perfected badge, served celebration, pastry passport.
+// Everything here is worked out from data the Sheet already has.
+// =====================================================================
+
+let bkPassport = null;          // null = kitchen, "case" = passport case, number = that week's treat card
+const bkWeekSeen = {};          // "kenley:1" -> was the week complete at the last render?
+let bkPendingCelebration = null;
+
+const BK_RANKS = [[0, "Commis"], [10, "Line Cook"], [25, "Pastry Cook"], [45, "Sous Chef"], [70, "Head Pastry Chef"]];
+
+function bkIsTestTask(t) { return !!(t.monthlyTest || t.termFinal || t.dynamic); }
+// true / false for a week's plate in one subject, or null if that subject had nothing that week
+function bkPlateServed(key, w) {
+  if (w === currentWeek()) return unlockedActiveTasks(key).length ? stationDone(key) : null;
+  const tasks = DATA[key].tasks.filter(t => t.week_number === w && !bkIsTestTask(t));
+  if (!tasks.length) return null;
+  return tasks.every(t => state[key].tasks[t.id].done);
+}
+function bkWeekComplete(w) {
+  const res = Object.keys(DATA).map(k => bkPlateServed(k, w)).filter(v => v !== null);
+  return res.length > 0 && res.every(Boolean);
+}
+function bkPlatesServedTotal() {
+  let n = 0;
+  for (let w = 1; w <= currentWeek(); w++) Object.keys(DATA).forEach(k => { if (bkPlateServed(k, w) === true) n++; });
+  return n;
+}
+function bkRankInfo() {
+  const plates = bkPlatesServedTotal();
+  let idx = 0;
+  BK_RANKS.forEach((r, i) => { if (plates >= r[0]) idx = i; });
+  const next = BK_RANKS[idx + 1];
+  const from = BK_RANKS[idx][0];
+  return { plates, name: BK_RANKS[idx][1], next: next ? next[1] : null, nextAt: next ? next[0] : null,
+    pct: next ? Math.max(4, Math.round(((plates - from) / (next[0] - from)) * 100)) : 100 };
+}
+function bkTreatForWeek(w) { return (typeof BK_TREATS !== "undefined" ? BK_TREATS : []).find(t => t.week === w) || null; }
+function bkTreatUnlocked(w) { return w <= currentWeek() && !!bkTreatForWeek(w) && bkWeekComplete(w); }
+function bkTreatsCollected() { return (typeof BK_TREATS !== "undefined" ? BK_TREATS : []).filter(t => bkTreatUnlocked(t.week)).length; }
+function bkTreatsTotal() { return (typeof BK_TREATS !== "undefined" ? BK_TREATS : []).length; }
+
+// A station is Perfected when it's served and at least one of its tasks was sent back and then fixed.
+function bkPerfected(key) {
+  if (stationStatus(key) !== "served") return false;
+  return unlockedActiveTasks(key).some(t => (state[key].tasks[t.id].history || []).some(h => h.by === "parent"));
+}
+
+function bkRankHTML() {
+  const r = bkRankInfo();
+  const sub = r.next ? `${r.plates} of ${r.nextAt} plates to ${r.next}` : `${r.plates} plates served. Top rank!`;
+  return `<div class="bk-rank"><span class="bk-rank-chip"><span class="bk-rank-hat">${bkIcon("hat", 18)}</span>${r.name}</span>
+    <span class="bk-rank-prog"><span class="bk-rank-bar"><span style="width:${r.pct}%"></span></span><span class="bk-rank-sub">${sub}</span></span></div>`;
+}
+function bkTreatTeaserHTML() {
+  const w = currentWeek(), treat = bkTreatForWeek(w);
+  if (!treat) return "";
+  if (bkTreatUnlocked(w)) return `<button class="bk-teaser unlocked" onclick="bkOpenPassport(${w})">${bkIcon("check", 16)}Treat unlocked: ${treat.name}!</button>`;
+  return `<button class="bk-teaser" onclick="bkOpenPassport('case')">${bkPassportIcon(16)}Serve all 5 to unlock a treat from ${treat.city}</button>`;
+}
+function bkPassportIcon(size) {
+  return `<svg class="bk-ico" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="10" r="3.5"/><path d="M8.5 10h7M9 17h6"/></svg>`;
+}
+function bkClocheSVG(size, fill, stroke, mark) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true"><path d="M11 45C11 31 20.5 21 32 21S53 31 53 45Z" fill="${fill}" stroke="${stroke}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="32" cy="17.5" r="3.5" fill="${fill}" stroke="${stroke}" stroke-width="2.5"/><path d="M6 46.5H58" stroke="${stroke}" stroke-width="3" stroke-linecap="round"/>${mark ? `<text x="33" y="41" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="15" font-weight="600" fill="${stroke}">?</text>` : ""}</svg>`;
+}
+function bkTreatPlateSVG(size) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="40" rx="26" ry="10" fill="#FFFFFF" stroke="#E0B84A" stroke-width="2.5"/><path d="M14 38C14 26 22 20 32 20S50 26 50 38Z" fill="#F6C98A" stroke="#C98B45" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 26l-2 10M32 23v13M40 26l2 10" stroke="#C98B45" stroke-width="2" stroke-linecap="round"/><path d="M50 12l2 4 4 .6-3 2.8.8 4.2-3.8-2-3.8 2 .8-4.2-3-2.8 4-.6z" fill="#F4D77A" stroke="#C9A43A" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
+}
+const BK_CREMA_ART = `<svg width="100%" height="100%" viewBox="0 0 548 368" preserveAspectRatio="xMidYMid slice" aria-label="Illustration of crema catalana in a terracotta dish" role="img"><rect width="548" height="368" fill="#F4E9DA"/><path d="M0 60H548M0 150H548M0 240H548M0 330H548M70 0V368M190 0V368M310 0V368M430 0V368" stroke="#EBDCC7" stroke-width="18"/><ellipse cx="274" cy="222" rx="206" ry="112" fill="#000" opacity="0.08"/><ellipse cx="274" cy="206" rx="192" ry="104" fill="#A9542E"/><ellipse cx="274" cy="186" rx="192" ry="104" fill="#C8693D"/><ellipse cx="274" cy="182" rx="170" ry="90" fill="#DA8350"/><ellipse cx="274" cy="184" rx="156" ry="80" fill="#E0A04A"/><ellipse cx="226" cy="170" rx="52" ry="22" fill="#EFBE62"/><ellipse cx="324" cy="198" rx="46" ry="18" fill="#EFBE62"/><ellipse cx="300" cy="150" rx="30" ry="11" fill="#C07A2E"/><ellipse cx="200" cy="208" rx="26" ry="9" fill="#C07A2E"/><path d="M190 160l30 12 18-8 34 20M280 196l26-10 24 14 30-6M232 214l22-14M312 150l-10 18" stroke="#8F5420" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><rect x="48" y="300" width="150" height="22" rx="11" fill="#9A5B34" transform="rotate(-14 123 311)"/><path d="M392 318c26-22 64-28 96-14c-8 16-44 30-78 30c-8 0-14-6-18-16z" fill="#F4D35E" stroke="#D9B53C" stroke-width="3" stroke-linejoin="round"/></svg>`;
+
+// ---------- Navigation ----------
+function bkOpenPassport(where) {
+  bkPassport = where == null ? "case" : where;
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function bkClosePassport() { bkPassport = null; render(); window.scrollTo({ top: 0 }); }
+const bkOrigSwitchChild = window.switchChild;
+window.switchChild = function switchChild(id) { bkPassport = null; return bkOrigSwitchChild(id); };
+const bkOrigToggleView = window.toggleView;
+window.toggleView = function toggleView() { bkPassport = null; return bkOrigToggleView(); };
+
+// ---------- Passport case ----------
+function bkPassportCaseHTML() {
+  const kid = currentChild, name = CHILD_META[kid].name, th = bkTheme();
+  const treats = BK_TREATS, cw = currentWeek();
+  const cur = bkTreatForWeek(cw);
+  const keys = Object.keys(DATA);
+  const doneNow = keys.filter(k => stationDone(k)).length;
+  let feature = "";
+  if (cur && bkTreatUnlocked(cw)) {
+    feature = `<div class="bk-pp-feature"><div class="bk-pp-feature-art">${bkTreatPlateSVG(120)}</div><div class="bk-pp-feature-text">
+      <div class="bk-eyebrow">THIS WEEK’S TREAT · WEEK ${cw} · ${cur.city.toUpperCase()}, ${cur.country.toUpperCase()}</div>
+      <h2>You Unlocked ${cur.name}!</h2><p>It’s in your case now. Open the card for its story and a recipe to bake together.</p>
+      <button class="bk-btn primary" onclick="bkOpenPassport(${cw})">Open the treat card</button></div></div>`;
+  } else if (cur) {
+    feature = `<div class="bk-pp-feature"><div class="bk-pp-feature-art">${bkClocheSVG(124, "#FFFFFF", th.bar, true)}</div><div class="bk-pp-feature-text">
+      <div class="bk-eyebrow">THIS WEEK’S TREAT · WEEK ${cw} · ${cur.city.toUpperCase()}, ${cur.country.toUpperCase()}</div>
+      <h2>Something Delicious Is Hiding Under The Lid</h2><p>Serve all ${keys.length} plates this week to lift the lid and add it to your case.</p>
+      <div class="bk-pp-progress"><span class="bk-bar">${keys.map((k, i) => `<span class="bk-seg ${i < doneNow ? "done" : ""}"></span>`).join("")}</span><b>${doneNow} of ${keys.length} plates</b></div></div></div>`;
+  }
+  const slot = t => {
+    const unlocked = bkTreatUnlocked(t.week), isNow = t.week === cw;
+    if (unlocked) {
+      return `<button class="bk-slot unlocked" onclick="bkOpenPassport(${t.week})" aria-label="Open ${t.name}">
+        <span class="bk-slot-plate"><img src="images/treats/${t.slug}.jpg" alt="" onerror="this.remove()">${bkTreatPlateSVG(62)}</span>
+        <span class="bk-slot-name">${t.name}</span><span class="bk-slot-where">Week ${t.week} · ${t.city}</span></button>`;
+    }
+    return `<div class="bk-slot${isNow ? " now" : ""}">
+      <span class="bk-slot-plate">${bkClocheSVG(58, isNow ? "#FFFFFF" : "#F1EEF3", isNow ? th.bar : "#A79DB3", isNow)}</span>
+      ${isNow ? `<span class="bk-slot-badge">Baking Now</span>` : ""}
+      <span class="bk-slot-name">${t.city}</span><span class="bk-slot-where">Week ${t.week} · ${t.country}</span></div>`;
+  };
+  const shelves = [];
+  for (let i = 0; i < treats.length; i += 4) shelves.push(`<div class="bk-shelf">${treats.slice(i, i + 4).map(slot).join("")}</div>`);
+  return `<div class="bk-pp">
+    <div class="bk-pp-head">
+      <div><button class="bk-back" onclick="bkClosePassport()">${bkIcon("back", 18)}Back To ${name}’s Kitchen</button>
+        <h1>${name}’s Pastry Passport</h1><p>Finish a week, unlock a treat from somewhere new in the world.</p></div>
+      <div class="bk-pp-count">${bkPassportIcon(28)}<div><b>${bkTreatsCollected()} of ${bkTreatsTotal()}</b><span>treats collected this term</span></div></div>
+    </div>
+    ${feature}
+    <section class="bk-case"><div class="bk-case-head"><h2>My Pastry Case</h2><span>A new stop every week</span></div>${shelves.join("")}</section>
+  </div>`;
+}
+
+// ---------- Treat card ----------
+const BK_WHO = { kid: ["Kid Job", "kid"], grown: ["Grown-Up Job", "grown"], together: ["Together", "together"] };
+function bkTreatCardHTML(w) {
+  const t = bkTreatForWeek(w);
+  if (!t || !bkTreatUnlocked(w)) return bkPassportCaseHTML();
+  const r = t.recipe;
+  const art = t.slug === "crema-catalana" ? BK_CREMA_ART : `<div class="bk-photo-ph">${bkTreatPlateSVG(140)}<span>${t.name}</span></div>`;
+  return `<div class="bk-treat">
+    <div class="bk-treat-head">
+      <div class="bk-stamp"><span>WEEK ${t.week}</span><b>${t.city}</b><span>${t.country.toUpperCase()}</span></div>
+      <div class="bk-treat-title"><button class="bk-back" onclick="bkOpenPassport('case')">${bkIcon("back", 18)}Back To My Passport</button>
+        <h1>${t.name}</h1><p><i>${t.altName}</i> · ${t.tagline}</p></div>
+      <span class="bk-pill bk-pill-served big">${bkIcon("check", 16)}In Your Case</span>
+    </div>
+    <div class="bk-treat-grid">
+      <div class="bk-treat-left">
+        <div class="bk-photo"><img src="images/treats/${t.slug}.jpg" alt="${t.name}" onerror="this.remove()">${art}</div>
+        ${t.photoCredit ? `<div class="bk-photo-credit">Photo: ${t.photoCredit}</div>` : ""}
+        <div class="bk-where"><span class="bk-where-ico">${bkIcon("pin", 26)}</span><div><div class="bk-where-label">Where It’s From</div><div class="bk-where-name">${t.where}</div><div class="bk-where-sub">${t.whereSub}</div></div></div>
+      </div>
+      <div class="bk-story"><h2>The Story</h2><p>${t.story}</p>
+        <div class="bk-facts">${t.facts.map((f, i) => `<div class="bk-fact"><span class="bk-fact-n n${i}">${i + 1}</span><span>${f}</span></div>`).join("")}</div></div>
+    </div>
+    <section class="bk-recipe">
+      <div class="bk-recipe-head"><h2>Let’s Make It Together</h2><div class="bk-recipe-meta"><span>${r.serves}</span><span>${r.time}</span><span>${r.tools}</span></div></div>
+      ${r.note ? `<div class="bk-recipe-note">${r.note}</div>` : ""}
+      <div class="bk-recipe-body">
+        <div class="bk-ingredients"><div class="bk-where-label">Ingredients</div><ul>${r.ingredients.map(i => `<li>${i}</li>`).join("")}</ul></div>
+        <ol class="bk-steps">${r.steps.map(([txt, who]) => `<li><span class="bk-step-text">${txt}</span><span class="bk-job ${BK_WHO[who][1]}">${BK_WHO[who][0]}</span></li>`).join("")}</ol>
+      </div>
+    </section>
+  </div>`;
+}
+BK_ICON_PATHS.pin = `<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>`;
+BK_ICON_PATHS.star = `<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/>`;
+
+// ---------- Served celebration ----------
+function bkCelebrate(key, unlockedWeek) {
+  const existing = document.querySelector(".bk-celebrate");
+  if (existing) { if (!unlockedWeek) return; existing.remove(); }
+  const kid = currentChild, keys = Object.keys(DATA);
+  const served = keys.filter(k => stationDone(k)).length, left = keys.length - served;
+  const treat = bkTreatForWeek(currentWeek());
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let line2 = "";
+  if (unlockedWeek && treat) line2 = `<div class="bk-cel-unlock">${bkPassportIcon(18)}You unlocked a treat from ${treat.city}!</div>
+    <div class="bk-cel-btns"><button class="bk-btn primary" onclick="bkDismissCelebration();bkOpenPassport(${unlockedWeek})">See my treat</button><button class="bk-btn plain" onclick="bkDismissCelebration()">Later</button></div>`;
+  else if (treat && left > 0) line2 = `<div class="bk-cel-sub2">${left} more to unlock this week’s treat from ${treat.city}</div>`;
+  const colors = ["var(--bk-aw1)", "var(--bk-aw2)", "var(--bk-aw3)", "#F6D77C", "var(--bk-accent)"];
+  const sprinkles = Array.from({ length: 14 }, (_, i) => `<span class="bk-cel-spr" style="--a:${i * (360 / 14)}deg;background:${colors[i % colors.length]}"></span>`).join("");
+  const el = document.createElement("div");
+  el.className = "bk-celebrate" + (reduce ? " calm" : "") + (unlockedWeek ? " stay" : "");
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
+  el.innerHTML = `<div class="bk-cel-card" onclick="event.stopPropagation()">
+      <div class="bk-cel-stage">${sprinkles}<div class="bk-cel-plate">${bkPastry(bkPastryFor(key), kid, 84)}</div></div>
+      <div class="bk-cel-title">Served!</div>
+      <div class="bk-cel-sub">${bkTitle(DATA[key].name)} · ${served} of ${keys.length} plates served</div>
+      ${line2}
+    </div>`;
+  el.addEventListener("click", bkDismissCelebration);
+  document.body.appendChild(el);
+  if (!unlockedWeek) setTimeout(bkDismissCelebration, reduce ? 2600 : 2400);
+}
+function bkDismissCelebration() {
+  const el = document.querySelector(".bk-celebrate");
+  if (!el) return;
+  el.classList.add("out");
+  setTimeout(() => el.remove(), 250);
+}
+
+// ---------- Hook Stage 2 into the Stage 1 renderer ----------
+const bkStage1Render = window.render;
+window.render = function render() {
+  const kid = currentChild, isParent = currentView === "parent";
+  if (isParent) bkPassport = null;
+  const wkKey = `${kid}:${currentWeek()}`;
+  const seeded = !!stampSeeded[kid];
+  bkStage1Render();
+
+  // Passport screens replace the kitchen (kid view only)
+  const pv = document.getElementById("bkPassportView");
+  const kitchenParts = ["bkHero", "sentBackBanner", "bkStationsWrap", "detailPanel"];
+  if (!isParent && bkPassport !== null) {
+    pv.innerHTML = bkPassport === "case" ? bkPassportCaseHTML() : bkTreatCardHTML(bkPassport);
+    pv.style.display = "block";
+    kitchenParts.forEach(id => { document.getElementById(id).style.display = "none"; });
+  } else {
+    pv.innerHTML = ""; pv.style.display = "none";
+    kitchenParts.forEach(id => { document.getElementById(id).style.display = ""; });
+    if (!isParent && !openStation) document.getElementById("detailPanel").style.display = "";
+  }
+  const pbtn = document.getElementById("bkPassportBtn");
+  if (pbtn) pbtn.style.display = isParent ? "none" : "";
+
+  // Newly served plates → celebrate (only after the first render for this child)
+  const nowComplete = bkWeekComplete(currentWeek());
+  const unlockedNow = seeded && nowComplete && bkWeekSeen[wkKey] === false && bkTreatForWeek(currentWeek()) ? currentWeek() : null;
+  bkWeekSeen[wkKey] = nowComplete;
+  if (!isParent && seeded) {
+    const fresh = document.querySelector("#stationsGrid .bk-station.stamp-new");
+    if (fresh && fresh.dataset.key && !fresh.dataset.celebrated) {
+      fresh.dataset.celebrated = "1";
+      setTimeout(() => bkCelebrate(fresh.dataset.key, unlockedNow), 150);
+    } else if (unlockedNow) {
+      setTimeout(() => bkCelebrate(Object.keys(DATA)[0], unlockedNow), 150);
+    }
+  }
 };

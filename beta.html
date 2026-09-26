@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="beta.css">
+<link rel="stylesheet" href="beta.css?v=6">
 </head>
 <body class="bk">
 
@@ -29,6 +29,7 @@
       <span class="bk-parent-tag">Parent view</span>
     </div>
     <div class="bk-top-right">
+      <button class="bk-passport-btn" id="bkPassportBtn" onclick="bkOpenPassport('case')"><svg class="bk-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="10" r="3.5"/><path d="M8.5 10h7M9 17h6"/></svg>My Passport</button>
       <span class="bk-who">Who’s baking?</span>
       <div class="bk-switcher" id="childSwitcher"></div>
       <button class="bk-view-toggle" id="viewToggle" onclick="toggleView()" aria-pressed="false"><span id="toggleKnob">Parent view</span><span class="bk-switch" aria-hidden="true"><span></span></span></button>
@@ -38,6 +39,7 @@
   <div class="setup-error bk-sync" id="syncBanner" style="display:none;"></div>
 
   <section id="bkHero"></section>
+  <section id="bkPassportView" style="display:none;"></section>
 
   <!-- Parent-only tools -->
   <section class="bk-tools" id="bkTools">
@@ -124,6 +126,7 @@
 <script src="config.js"></script>
 <script src="standards.js"></script>
 <script src="app.js"></script>
-<script src="beta.js"></script>
+<script src="treats.js?v=6"></script>
+<script src="beta.js?v=6"></script>
 </body>
 </html>
