@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Pastry Kitchen">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F3F9F7">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M6 40C6 23 18 13 32 13S58 23 58 40C54 45 47 46 43 42C40 48 36 50 32 50S24 48 21 42C17 46 10 45 6 40Z' fill='%23F6C98A' stroke='%23C98B45' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M23 16L25 44M41 16L39 44' stroke='%23C98B45' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>The ELA Pastry Kitchen (beta)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="beta.css">
+</head>
+<body class="bk">
+
+<svg class="bk-awning" width="100%" height="44" aria-hidden="true" preserveAspectRatio="none"><defs><pattern id="bkAwning" width="120" height="44" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="40" height="24" class="aw1"></rect><rect x="40" y="0" width="40" height="24" class="aw2"></rect><rect x="80" y="0" width="40" height="24" class="aw3"></rect><circle cx="20" cy="24" r="20" class="aw1"></circle><circle cx="60" cy="24" r="20" class="aw2"></circle><circle cx="100" cy="24" r="20" class="aw3"></circle></pattern></defs><rect width="100%" height="44" fill="url(#bkAwning)"></rect></svg>
+
+<div class="board" id="board" style="display:none;">
+
+  <header class="bk-topbar">
+    <div class="bk-brand">
+      <span class="bk-brand-ico" id="bkBrandIco"></span>
+      <span class="bk-brand-name">The ELA Pastry Kitchen</span>
+      <span class="bk-parent-tag">Parent view</span>
+    </div>
+    <div class="bk-top-right">
+      <span class="bk-who">Who’s baking?</span>
+      <div class="bk-switcher" id="childSwitcher"></div>
+      <button class="bk-view-toggle" id="viewToggle" onclick="toggleView()" aria-pressed="false"><span id="toggleKnob">Parent view</span><span class="bk-switch" aria-hidden="true"><span></span></span></button>
+    </div>
+  </header>
+
+  <div class="setup-error bk-sync" id="syncBanner" style="display:none;"></div>
+
+  <section id="bkHero"></section>
+
+  <!-- Parent-only tools -->
+  <section class="bk-tools" id="bkTools">
+    <div class="bk-tool">
+      <div class="bk-tool-title"><span class="bk-ico-slot" data-ico="chart"></span>Grade sheet</div>
+      <div class="bk-tool-text" id="gradeSheetLabel">Grade sheet</div>
+      <button class="bk-btn outline" onclick="openGradeSheet()">Open grade sheet</button>
+    </div>
+    <div class="bk-tool">
+      <div class="bk-tool-title"><span class="bk-ico-slot" data-ico="download"></span>Export PDF</div>
+      <div class="bk-tool-row">
+        <label for="exportFromWeek">Weeks</label>
+        <input type="number" id="exportFromWeek" min="1">
+        <label for="exportToWeek">to</label>
+        <input type="number" id="exportToWeek" min="1">
+      </div>
+      <button class="bk-btn outline" onclick="exportWeeksPdf()">Export</button>
+    </div>
+    <div class="bk-tool">
+      <div class="bk-tool-title"><span class="bk-ico-slot" data-ico="lock"></span>Tests</div>
+      <div class="bk-tool-text"><span id="monthlyTestModeText"></span> <span id="termFinalText"></span></div>
+      <div class="bk-tool-btns">
+        <button class="bk-btn plain" id="monthlyTestBtn" onclick="toggleMonthlyTests()"></button>
+        <button class="bk-btn plain" id="termFinalBtn" onclick="toggleTermFinals()"></button>
+      </div>
+    </div>
+    <div class="bk-tool" id="advanceBanner"></div>
+  </section>
+
+  <!-- Parent-only key -->
+  <section class="bk-legend" id="bkLegend"></section>
+
+  <!-- Kid-only: chef's notes -->
+  <div id="sentBackBanner"></div>
+
+  <!-- Kid-only: stations -->
+  <section class="bk-stations-wrap" id="bkStationsWrap">
+    <div class="bk-section-head">
+      <h2>This week’s stations</h2>
+      <span class="bk-section-meta" id="bkWeekMeta"></span>
+    </div>
+    <div class="stations bk-stations" id="stationsGrid"></div>
+  </section>
+  <div class="detail" id="detailPanel"></div>
+
+  <!-- Parent-only: queue + week report -->
+  <section class="bk-parent-main" id="bkParentMain">
+    <aside class="bk-queue" id="bkQueue"></aside>
+    <div class="week-report bk-report" id="weekReportPanel" style="display:none;"></div>
+  </section>
+
+  <div class="waiting-on-you" id="waitingOnYou" style="display:none;"><div id="reviewList"></div></div>
+
+  <div id="projectsPanel"></div>
+
+  <div class="review-queue bk-bank" id="reviewQueue" style="display:none;">
+    <h3>Review bank</h3>
+    <div id="reviewBank" style="margin-bottom:20px;"></div>
+    <h3>Redo log — sections redone</h3>
+    <div id="burnLogList"></div>
+  </div>
+</div>
+
+<div class="loading-note" id="loadingNote">Loading the kitchen…</div>
+
+<div class="setup-overlay" id="setupOverlay" style="display:none;">
+  <div class="setup-card">
+    <h2>Connect the Kitchen</h2>
+    <p>This device needs the Apps Script Web App URL for your Google Sheet backend. You only have to do this once per device — see <code>DEPLOY.md</code> in the repo for how to get this URL.</p>
+    <div class="setup-error" id="setupError" style="display:none;"></div>
+    <input type="text" id="setupUrlInput" placeholder="https://script.google.com/macros/s/XXXX/exec">
+    <button class="btn primary" onclick="submitSetupUrl()">Connect</button>
+  </div>
+</div>
+
+<div class="grade-overlay" id="gradeOverlay" style="display:none;">
+  <div class="grade-toolbar no-print">
+    <button class="btn primary" onclick="window.print()">Print / Save as PDF</button>
+    <button class="btn" onclick="closeGradeSheet()">Close</button>
+  </div>
+  <div class="grade-sheet" id="gradeSheet"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="config.js"></script>
+<script src="standards.js"></script>
+<script src="app.js"></script>
+<script src="beta.js"></script>
+</body>
+</html>
