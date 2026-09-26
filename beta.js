@@ -118,7 +118,7 @@ function bkUnlockHint(t) {
 function bkLockChips(locked) {
   if (!locked.length) return "";
   return `<div class="bk-st-locks">${locked.map(t =>
-    `<span class="bk-lock-chip">${bkIcon("lock", 14)}<span>${t.label}</span><span class="bk-lock-when">· ${bkUnlockHint(t)}</span></span>`).join("")}</div>`;
+    `<span class="bk-lock-chip">${bkIcon("lock", 14)}${t.label} <span class="bk-lock-when">· ${bkUnlockHint(t)}</span></span>`).join("")}</div>`;
 }
 
 // ---------- Kid hero ----------
@@ -229,7 +229,8 @@ function bkQueueHTML() {
     <div class="bk-q-group"><div class="bk-q-head">Sent back · waiting on ${name} · ${sent.length}</div>
       ${sent.length ? sent.map(it => row(it, `<span class="bk-q-ico note">${bkIcon("timer", 17)}</span>`)).join("") : `<div class="bk-q-empty">${bkIcon("check", 16)}Nothing sent back</div>`}</div>
     <div class="bk-q-group"><div class="bk-q-head">Scored in Week ${parentNavWeek}</div>
-      ${auto.length ? auto.map(it => row(it, doneIco, `<span class="bk-q-score">${it.s.score}</span>`)).join("") : `<div class="bk-q-empty">Nothing scored yet</div>`}</div>`;
+      ${auto.length ? auto.slice(0, 4).map(it => row(it, doneIco, `<span class="bk-q-score">${it.s.score}</span>`)).join("") : `<div class="bk-q-empty">Nothing scored yet</div>`}
+      ${auto.length > 4 ? `<details class="bk-q-more"><summary>Show ${auto.length - 4} more</summary>${auto.slice(4).map(it => row(it, doneIco, `<span class="bk-q-score">${it.s.score}</span>`)).join("")}</details>` : ""}</div>`;
 }
 
 // ---------- Station card (kid view) ----------
