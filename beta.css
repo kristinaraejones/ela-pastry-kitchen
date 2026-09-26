@@ -644,3 +644,8 @@ body[data-view!="parent"][data-bk-pattern="sprinkles"] .bk-hero{background-image
 body[data-view!="parent"][data-bk-style="pro"] .bk-hero .bk-sprinkle{display:none;}
 .bk-cel-spr.shape{background:none !important;display:flex;align-items:center;justify-content:center;width:16px;height:16px;margin:-8px 0 0 -8px;}
 .bk-cel-spr.confetti{border-radius:2px;transform:rotate(var(--a)) translateX(0) rotate(20deg);}
+
+/* "Make It Your Kitchen" footer entry point (kid view, bottom of page) */
+#bkCustomizeFooter{display:flex;justify-content:center;margin:36px 0 8px;}
+.bk-customize-footer-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border:1.5px solid var(--bk-border);border-radius:999px;background:#fff;color:var(--bk-muted);font:800 14px 'Nunito',sans-serif;cursor:pointer;opacity:.85;}
+.bk-customize-footer-btn:hover{opacity:1;border-color:var(--bk-accent);color:var(--bk-accent-ink);}

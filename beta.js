@@ -1183,6 +1183,11 @@ function bkRecipeBoxHTML() {
   </div>`;
 }
 
+// ---------- Make It Your Kitchen: footer entry point (kid view only, tucked at the bottom) ----------
+function bkCustomizeFooterHTML() {
+  return `<button class="bk-customize-footer-btn" onclick="bkOpenCustomize()">${bkIcon("star", 16)}Make It Your Kitchen</button>`;
+}
+
 // ---------- Hook Stage 3 views into the renderer ----------
 const bkStage2Render = window.render;
 window.render = function render() {
@@ -1193,19 +1198,28 @@ window.render = function render() {
 
   const pv = document.getElementById("bkPassportView");
   const kitchenParts = ["bkHero", "sentBackBanner", "bkStationsWrap", "detailPanel"];
-  if (!isParent && (bkCustomizeOpen || bkRecipeBoxOpen)) {
+  const overlayOpen = !isParent && (bkCustomizeOpen || bkRecipeBoxOpen);
+
+  // This always runs (not just when opening) so buttons never get stuck hidden
+  // from a previous render — e.g. after backing out of Word Recipes.
+  if (overlayOpen) {
     pv.innerHTML = bkCustomizeOpen ? bkCustomizeHTML() : bkRecipeBoxHTML();
     pv.style.display = "block";
     kitchenParts.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = "none"; });
-    const pbtn = document.getElementById("bkPassportBtn");
-    if (pbtn) pbtn.style.display = "none";
-    const cbtn = document.getElementById("bkCustomizeBtn"), rbtn = document.getElementById("bkRecipeBoxBtn");
-    if (cbtn) cbtn.style.display = "none";
-    if (rbtn) rbtn.style.display = "none";
+  }
+  const anyOverlay = overlayOpen || bkPassport !== null;
+  const pbtn = document.getElementById("bkPassportBtn");
+  const rbtn = document.getElementById("bkRecipeBoxBtn");
+  const foot = document.getElementById("bkCustomizeFooter");
+  if (pbtn) pbtn.style.display = (isParent || overlayOpen) ? "none" : "";
+  if (rbtn) rbtn.style.display = (isParent || anyOverlay) ? "none" : "";
+  if (foot) {
+    if (isParent || anyOverlay) { foot.style.display = "none"; foot.innerHTML = ""; }
+    else { foot.style.display = ""; foot.innerHTML = bkCustomizeFooterHTML(); }
   }
 
   // Buddy mascot rides along on the kid-view hero, next to the passport teaser.
-  if (!isParent && !bkCustomizeOpen && !bkRecipeBoxOpen && bkPassport === null) {
+  if (!isParent && !anyOverlay) {
     const hero = document.querySelector("#bkHero .bk-hero");
     if (hero && !hero.querySelector(".bk-buddy-badge")) hero.insertAdjacentHTML("beforeend", bkBuddyBadgeHTML());
   }
