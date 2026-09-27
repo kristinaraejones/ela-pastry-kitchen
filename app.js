@@ -27,7 +27,7 @@ let exportControlsReady = false; // guards one-time default-fill of the export r
 
 let DATA = null;   // current child's { subjectKey: {name, tag, tasks:[...]} }
 let state = null;  // current child's { subjectKey: { tasks: { taskId: {...} } } }
-let settings = { weeks: { kenley: 1, adelyn: 1 }, termFinalsUnlocked: false, monthlyTestOverride: null };
+let settings = { weeks: { kenley: 1, adelyn: 1 }, termFinalsUnlocked: false, monthlyTestOverride: null, vocabGameSynced: { kenley: "", adelyn: "" } };
 
 const childrenCache = {};   // { kenley: {DATA, state} }
 const reviewPoolCache = {}; // { kenley: [ {word,timesMissed,...} ] }
@@ -238,6 +238,7 @@ async function init() {
   try {
     await loadChild("kenley");
     settings = parseSettings(childrenCache._settings);
+    autoMarkVocabGamePlayed("kenley");
     currentChild = "kenley";
     DATA = childrenCache.kenley.DATA;
     state = childrenCache.kenley.state;
@@ -270,11 +271,16 @@ function parseSettings(raw) {
   raw = raw || {};
   const override = raw.monthlyTestOverride === "true" ? true : raw.monthlyTestOverride === "false" ? false : null;
   const weeks = {};
-  Object.keys(CHILD_META).forEach(id => { weeks[id] = Number(raw[`${id}_current_week`]) || 1; });
+  const vocabGameSynced = {};
+  Object.keys(CHILD_META).forEach(id => {
+    weeks[id] = Number(raw[`${id}_current_week`]) || 1;
+    vocabGameSynced[id] = raw[`${id}_vocabgame_synced_ts`] || "";
+  });
   return {
     weeks,
     termFinalsUnlocked: raw.termFinalsUnlocked === "true" || raw.termFinalsUnlocked === true,
-    monthlyTestOverride: override
+    monthlyTestOverride: override,
+    vocabGameSynced
   };
 }
 
@@ -285,14 +291,16 @@ function buildChildFromBootstrap(resp) {
     if (tasksForSubject.length === 0) return;
     const tagsByWeek = {};
     tasksForSubject.forEach(t => { tagsByWeek[Number(t.week_number) || 1] = t.subject_tag; });
+    let tasks = tasksForSubject.map(t => Object.assign(
+      { id: t.id, type: t.type, label: t.label, dynamic: t.dynamic, termFinal: t.termFinal, monthlyTest: t.monthlyTest, week_number: Number(t.week_number) || 1 },
+      t.content || {}
+    ));
+    if (subjectKey === "vocab") tasks = injectWordRecipeTasks(tasks);
     DATA[subjectKey] = {
       name: tasksForSubject[0].subject_name,
       tag: tasksForSubject[0].subject_tag, // fallback for weeks with no dedicated tag (e.g. Adelyn's single-week placeholders)
       tagsByWeek,
-      tasks: tasksForSubject.map(t => Object.assign(
-        { id: t.id, type: t.type, label: t.label, dynamic: t.dynamic, termFinal: t.termFinal, monthlyTest: t.monthlyTest, week_number: Number(t.week_number) || 1 },
-        t.content || {}
-      ))
+      tasks
     };
   });
 
@@ -352,16 +360,18 @@ function statusLabel(s) {
   return "Not started";
 }
 
-function persistTask(key, id) {
-  const s = state[key].tasks[id];
+function persistTaskFor(student, s, id) {
   apiPost("saveSubmission", {
-    student: currentChild,
+    student,
     task_id: id,
     status: deriveStatus(s),
     score: s.score || "",
     parent_comment: s.parentComment || "",
     answers: { answers: s.answers, labels: s.labels, selections: s.selections, results: s.results, history: s.history || [] }
   }).catch(() => {});
+}
+function persistTask(key, id) {
+  persistTaskFor(currentChild, state[key].tasks[id], id);
 }
 
 async function switchChild(id) {
@@ -372,6 +382,7 @@ async function switchChild(id) {
     document.getElementById("board").style.display = "none";
     try {
       await loadChild(id);
+      autoMarkVocabGamePlayed(id);
     } catch (err) {
       showSetupOverlay("Couldn't load " + CHILD_META[id].name + "'s kitchen: " + err.message);
       return;
@@ -724,6 +735,157 @@ function logReviewResult(word, correct) {
   if (correct) { existing.timesCorrect++; if (existing.timesCorrect >= 2) existing.status = "mastered"; }
   else { existing.timesMissed++; existing.timesCorrect = 0; }
   persistReviewWord(existing);
+}
+
+// ---------- Word Recipe flashcard review (required weekly vocab task) ----------
+// Injected client-side (not authored in the Sheet) for every week that has a
+// vocab "study words" lesson, for both kids, so a backend patch was never
+// needed. The deck is this week's target words plus any earlier vocab word
+// still active in the shared missed-word pool — reusing the exact same
+// timesCorrect/timesMissed/status mechanic spelling's review-pool dictation
+// already uses, so "right twice and it rolls off" comes for free. Note: since
+// ReviewPool has no subject column, a word only counts as "vocab" here if it
+// also appears in one of DATA.vocab's own study-words tables — spelling words
+// essentially never collide with these multi-syllable/root vocab words, so
+// the two review pools stay practically separate without a schema change.
+function extractVocabWordsFromHTML(html) {
+  if (!html) return [];
+  const out = [];
+  const re = /<tr>\s*<td((?:(?!colspan)[^>])*)>([\s\S]*?)<\/td>\s*<td/gi;
+  let m;
+  while ((m = re.exec(html))) {
+    let word = m[2].replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").trim().split(/\s+/)[0] || "";
+    word = word.replace(/[^A-Za-z'-]/g, "");
+    if (word.length >= 3) out.push(word.toLowerCase());
+  }
+  return out;
+}
+function isVocabWordTableTask(t) {
+  return t.type === "read" && /vocab-table/i.test(t.content || "");
+}
+// Every week that has a study-words lesson gets a "Word Recipe Flashcards"
+// task appended right after it, unless one's already there (idempotent).
+function injectWordRecipeTasks(tasks) {
+  const byWeek = {};
+  tasks.forEach(t => { (byWeek[t.week_number] = byWeek[t.week_number] || []).push(t); });
+  const out = [];
+  Object.keys(byWeek).map(Number).sort((a, b) => a - b).forEach(week => {
+    const weekTasks = byWeek[week];
+    out.push(...weekTasks);
+    const hasStudy = weekTasks.some(isVocabWordTableTask);
+    const hasFlashcards = weekTasks.some(t => t.type === "flashcard-review");
+    if (hasStudy && !hasFlashcards) {
+      out.push({ id: `wordrecipe_w${week}`, type: "flashcard-review", label: "Word Recipe Flashcards", week_number: week });
+    }
+  });
+  return out;
+}
+function currentWeekVocabWords() {
+  if (!DATA.vocab) return [];
+  const week = currentWeek();
+  const seen = {}, out = [];
+  DATA.vocab.tasks.filter(t => t.week_number === week && isVocabWordTableTask(t)).forEach(t => {
+    extractVocabWordsFromHTML(t.content).forEach(w => { if (!seen[w]) { seen[w] = true; out.push(w); } });
+  });
+  return out;
+}
+function allTaughtVocabWordSet() {
+  const set = {};
+  if (DATA.vocab) DATA.vocab.tasks.filter(isVocabWordTableTask).forEach(t => {
+    extractVocabWordsFromHTML(t.content).forEach(w => { set[w] = true; });
+  });
+  return set;
+}
+function pastMissedVocabWords() {
+  const vocabSet = allTaughtVocabWordSet();
+  const curWeek = {};
+  currentWeekVocabWords().forEach(w => { curWeek[w] = true; });
+  return loadPool()
+    .filter(p => p.status === "active" && vocabSet[p.word.toLowerCase()] && !curWeek[p.word.toLowerCase()])
+    .map(p => p.word.toLowerCase());
+}
+function vocabFlashcardDeck() {
+  const seen = {}, out = [];
+  currentWeekVocabWords().concat(pastMissedVocabWords()).forEach(w => {
+    if (!seen[w]) { seen[w] = true; out.push(w); }
+  });
+  return out;
+}
+function ensurePoolEntry(word) {
+  const pool = loadPool();
+  let existing = pool.find(p => p.word.toLowerCase() === word.toLowerCase());
+  if (!existing) {
+    existing = { word, timesMissed: 0, timesCorrect: 0, lastSeen: "Word Recipe review", status: "active" };
+    pool.push(existing);
+  }
+  return existing;
+}
+function recordFlashcardResult(word, gotIt) {
+  const existing = ensurePoolEntry(word);
+  if (gotIt) {
+    existing.timesCorrect = (existing.timesCorrect || 0) + 1;
+    if (existing.timesCorrect >= 2) existing.status = "mastered";
+  } else {
+    existing.timesMissed = (existing.timesMissed || 0) + 1;
+    existing.timesCorrect = 0;
+    existing.status = "active";
+  }
+  existing.lastSeen = "Word Recipe review";
+  persistReviewWord(existing);
+}
+function answerFlashcard(key, id, gotIt) {
+  const s = state[key].tasks[id];
+  const deck = s._deck || [];
+  const word = deck[s._deckPos || 0];
+  if (word) {
+    recordFlashcardResult(word, gotIt);
+    s.answers.reviewed = s.answers.reviewed || {};
+    s.answers.reviewed[word] = gotIt;
+  }
+  s._deckPos = (s._deckPos || 0) + 1;
+  if (s._deckPos >= deck.length) {
+    s.done = true;
+    persistTask(key, id);
+  }
+  render();
+}
+
+// ---------- Vocab game auto-complete (Case Files / Word Bakery) ----------
+// The "Play in the ___" task's checkbox is manual, so a kid who plays the
+// external vocab game but forgets to check it back in still shows as
+// outstanding. Instead, treat fresh AnswerLog activity from that game as
+// crediting the current week's task automatically. A per-student cursor
+// (the latest log timestamp already "spent" this way) makes this safe across
+// week advances: playing once credits THIS week only, next week needs new
+// play to auto-credit again.
+const VOCAB_GAME_RE = /case files|word bakery/i;
+function isVocabGameTask(t) {
+  return t.type === "external" && /case-files|word-bakery/i.test(t.url || "");
+}
+function latestVocabGameLogTs(student) {
+  return (answerLogCache[student] || [])
+    .filter(r => VOCAB_GAME_RE.test(r.game || ""))
+    .reduce((mx, r) => (r.timestamp > mx ? r.timestamp : mx), "");
+}
+function autoMarkVocabGamePlayed(student) {
+  const built = childrenCache[student];
+  if (!built) return;
+  const latest = latestVocabGameLogTs(student);
+  if (!latest) return;
+  settings.vocabGameSynced = settings.vocabGameSynced || {};
+  const cursor = settings.vocabGameSynced[student] || "";
+  if (latest <= cursor) return;
+  settings.vocabGameSynced[student] = latest;
+  apiPost("saveSetting", { key: `${student}_vocabgame_synced_ts`, value: latest }).catch(() => {});
+  const week = settings.weeks[student] || 1;
+  const vocabTasks = (built.DATA.vocab && built.DATA.vocab.tasks) || [];
+  const task = vocabTasks.find(t => t.week_number === week && isVocabGameTask(t));
+  if (!task) return;
+  const s = built.state.vocab.tasks[task.id];
+  if (s && !s.done) {
+    s.done = true;
+    persistTaskFor(student, s, task.id);
+  }
 }
 
 // Logs one graded item from ANY subject/task type (MC, fill-in, pos-tagger,
@@ -1841,6 +2003,28 @@ function taskBodyHTML(key, t) {
     } else {
       inner += `<button class="btn primary" onclick="submitMC('${key}','${t.id}')">Submit answers</button>`;
     }
+  } else if (t.type === "flashcard-review") {
+    if (!s._deck) {
+      s._deck = vocabFlashcardDeck();
+      s._deckPos = 0;
+      s.answers.reviewed = s.answers.reviewed || {};
+      if (s._deck.length === 0 && !s.done) { s.done = true; persistTask(key, t.id); }
+    }
+    const deck = s._deck;
+    if (s.done) {
+      const reviewedWords = Object.keys(s.answers.reviewed || {});
+      const chips = reviewedWords.map(w => `<span class="word-chip ${s.answers.reviewed[w] ? "chip-correct" : "chip-incorrect"}">${w}</span>`).join(" ");
+      inner = `<div class="lesson-text">${reviewedWords.length ? "Word Recipe review complete for this week." : "No new or missed words to review this week — nothing to do here."}</div>${chips ? `<div style="margin-top:8px;">${chips}</div>` : ""}`;
+    } else {
+      const word = deck[s._deckPos || 0];
+      const cardHtml = (typeof bkWordCardHTML === "function") ? bkWordCardHTML(word) : `<div class="lesson-text"><b>${word}</b></div>`;
+      inner = `<div class="lesson-text" style="opacity:.75;font-size:0.78rem;">Card ${(s._deckPos || 0) + 1} of ${deck.length}</div>
+        ${cardHtml}
+        <div class="flashcard-actions">
+          <button class="btn primary" onclick="answerFlashcard('${key}','${t.id}',true)">🍞 Got it!</button>
+          <button class="btn" onclick="answerFlashcard('${key}','${t.id}',false)">📖 Keep reviewing</button>
+        </div>`;
+    }
   }
   if (s.sentBack && !s.done && s.parentComment && t.type !== "reflection") {
     inner = `<div class="parent-feedback">📝 Sent back — please redo this part: ${s.parentComment}</div>` + inner;
@@ -1921,7 +2105,16 @@ function renderTaskContent(t) {
   if (t.type === "pos-tagger") return renderPosTaggerPreview(t);
   if (t.type === "phrase-tagger") return renderPhraseTaggerPreview(t);
   if (t.type === "concept-check") return renderConceptCheckPreview(t);
+  if (t.type === "flashcard-review") return renderFlashcardReviewPreview(t);
   return `<div class="lesson-text">(interactive exercise — nothing to preview yet)</div>`;
+}
+// Read-only summary of a completed flashcard pass: which words she said she had, which need more practice.
+function renderFlashcardReviewPreview(t) {
+  const s = state.vocab && state.vocab.tasks[t.id];
+  const reviewed = (s && s.answers && s.answers.reviewed) || {};
+  const words = Object.keys(reviewed);
+  if (words.length === 0) return `<div class="lesson-text">(no words reviewed yet)</div>`;
+  return `<div>${words.map(w => `<span class="word-chip ${reviewed[w] ? "chip-correct" : "chip-incorrect"}">${w}</span>`).join(" ")}</div>`;
 }
 
 // Task types with real per-item auto-grading, where taskBodyHTML's "done"
@@ -1937,15 +2130,17 @@ function escHtml(str) {
   return String(str == null ? "" : str).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
 }
 function isCaseFilesTask(t) {
-  return t.type === "external" && /case-files/i.test(t.url || "");
+  return isVocabGameTask(t);
 }
-// Which vocab words she has played in Case Files, and which she missed, from
-// the answer log the game pushes to the Sheet (vocabulary questions only).
+// Which vocab words she has played in Case Files/Word Bakery, and which she
+// missed, from the answer log the game pushes to the Sheet (vocabulary
+// questions only). Shared report for both kids — each just sees her own game.
 function caseFilesVocabReportHTML() {
+  const gameName = currentChild === "adelyn" ? "Word Bakery" : "Case Files";
   const rows = (answerLogCache[currentChild] || []).filter(r =>
-    /case files/i.test(r.game || "") && /vocab/i.test(r.subject || "") && !/^TEST/i.test(r.word || ""));
+    VOCAB_GAME_RE.test(r.game || "") && (/vocab/i.test(r.subject || "") || /vocabulary/i.test(r.subject || "")) && !/^TEST/i.test(r.word || ""));
   if (rows.length === 0) {
-    return `<div class="cf-report"><b>📚 Case Files vocabulary</b><div class="cf-empty">No vocabulary answers from Case Files have come in yet. Once ${CHILD_META[currentChild].name} plays a round, the words she practiced and any she missed will show here.</div></div>`;
+    return `<div class="cf-report"><b>📚 ${gameName} vocabulary</b><div class="cf-empty">No vocabulary answers from ${gameName} have come in yet. Once ${CHILD_META[currentChild].name} plays a round, the words she practiced and any she missed will show here.</div></div>`;
   }
   const byWord = {};
   rows.forEach(r => {
@@ -1960,7 +2155,7 @@ function caseFilesVocabReportHTML() {
   const missLines = missed.map(w => w.misses.map(m =>
     `<div class="cf-miss"><b>${escHtml(w.word)}</b> — she chose "${escHtml(m.givenAnswer)}"; the right answer is "${escHtml(m.correctAnswer)}".</div>`).join("")).join("");
   const lastPlay = new Date(rows.reduce((mx, r) => (r.timestamp > mx ? r.timestamp : mx), rows[0].timestamp)).toLocaleDateString();
-  return `<div class="cf-report"><b>📚 Case Files vocabulary</b>
+  return `<div class="cf-report"><b>📚 ${gameName} vocabulary</b>
     <div class="cf-summary">${words.length} word${words.length === 1 ? "" : "s"} practiced · ${missed.length} with a miss · last played ${lastPlay}</div>
     <div>${chips}</div>
     ${missed.length ? `<div class="cf-miss-title">Missed:</div>${missLines}` : `<div class="cf-summary">No misses — every word she's answered so far was right. 🎉</div>`}
@@ -1975,7 +2170,7 @@ function renderPastTaskReport(key, t, s) {
   let extra = (s.done && AUTO_GRADED_TYPES.includes(t.type))
     ? taskBodyHTML(key, t).replace('class="task-body ', 'class="task-body open ')
     : renderTaskContent(t);
-  if (isCaseFilesTask(t) && currentChild === "kenley") extra += caseFilesVocabReportHTML();
+  if (isCaseFilesTask(t)) extra += caseFilesVocabReportHTML();
   const awaiting = t.type === "reflection" && s.needsReview && !s.reviewed;
   const histHtml = attemptHistoryHTML(t, s, { open: t.type === "reflection" });
   if (histHtml && t.type !== "reflection") extra += histHtml;

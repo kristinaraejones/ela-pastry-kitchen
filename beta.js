@@ -1102,12 +1102,6 @@ const BK_WORD_CARDS = {
   unbelievable: { prefix: ["un-", "not"], root: null, suffix: ["-able", "able to be"], origin: "Old English / Latin", meaning: "impossible or hard to believe", example: "It was unbelievable how fast Adelyn finished her word cards.", tip: "Start with the whole word \"believe,\" then add un- and -able on each end." },
   disagree: { prefix: ["dis-", "not / apart"], root: null, suffix: null, origin: "Latin", meaning: "to have a different opinion than someone else", example: "The sisters disagreed about which pastry to bake first.", tip: "\"Dis-\" flips a word to its opposite — agree becomes disagree." }
 };
-// Which curated words show by default when the recipe box opens, per child —
-// Kenley's are drawn from her Set A vocab; Adelyn's from her current root unit.
-const BK_FEATURED_WORDS = {
-  kenley: ["incredulous", "deduction", "meticulous", "resilient"],
-  adelyn: ["telephone", "television", "unbelievable", "disagree"]
-};
 // Falls back to a generic morpheme breakdown for any word not in the curated list.
 function bkAnalyzeWord(word) {
   const w = String(word || "").toLowerCase().trim();
@@ -1164,36 +1158,6 @@ function bkWordCardHTML(word) {
   </div>`;
 }
 
-// ---------- Word Recipe Box (browse words she's practiced + curated set) ----------
-let bkRecipeBoxOpen = false;
-let bkRecipeBoxWord = null;
-function bkOpenRecipeBox() { bkRecipeBoxOpen = true; bkRecipeBoxWord = (BK_FEATURED_WORDS[currentChild] || [])[0] || null; render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
-function bkCloseRecipeBox() { bkRecipeBoxOpen = false; render(); window.scrollTo({ top: 0 }); }
-function bkPickRecipeWord(w) { bkRecipeBoxWord = w; render(); }
-function bkRecipeBoxWordList() {
-  const practiced = (reviewPoolCache[currentChild] || []).map(r => r.word).filter(Boolean);
-  const featured = BK_FEATURED_WORDS[currentChild] || [];
-  const seen = {}, out = [];
-  featured.concat(practiced).forEach(w => { const key = String(w).toLowerCase(); if (!seen[key]) { seen[key] = true; out.push(w); } });
-  return out;
-}
-function bkRecipeBoxHTML() {
-  const name = CHILD_META[currentChild].name;
-  const words = bkRecipeBoxWordList();
-  const active = bkRecipeBoxWord || words[0];
-  return `<div class="bk-custom">
-    <button class="bk-back" onclick="bkCloseRecipeBox()">${bkIcon("back", 18)}Back To ${name}’s Kitchen</button>
-    <h1>Word Recipe Box</h1>
-    <p class="bk-custom-sub">Every word breaks down into ingredients — a prefix, a root and a suffix. Pick a word to see its card.</p>
-    <div class="bk-recipebox-grid">
-      <div class="bk-recipebox-list">
-        ${words.length ? words.map(w => `<button class="bk-word-chip${String(w).toLowerCase() === String(active).toLowerCase() ? " active" : ""}" onclick="bkPickRecipeWord('${bkAttr(w)}')">${bkTitle(w)}</button>`).join("") : `<div class="bk-rc-empty">No practiced words yet — check back after a few vocabulary rounds.</div>`}
-      </div>
-      <div class="bk-recipebox-card">${active ? bkWordCardHTML(active) : ""}</div>
-    </div>
-  </div>`;
-}
-
 // ---------- Make It Your Kitchen: footer entry point (kid view only, tucked at the bottom) ----------
 function bkCustomizeFooterHTML() {
   return `<button class="bk-customize-footer-btn" onclick="bkOpenCustomize()">${bkIcon("star", 16)}Make It Your Kitchen</button>`;
@@ -1203,27 +1167,25 @@ function bkCustomizeFooterHTML() {
 const bkStage2Render = window.render;
 window.render = function render() {
   const isParent = currentView === "parent";
-  if (isParent) { bkCustomizeOpen = false; bkRecipeBoxOpen = false; }
+  if (isParent) { bkCustomizeOpen = false; }
   bkApplyKitchenTheme();
   bkStage2Render();
 
   const pv = document.getElementById("bkPassportView");
   const kitchenParts = ["bkHero", "sentBackBanner", "bkStationsWrap", "detailPanel"];
-  const overlayOpen = !isParent && (bkCustomizeOpen || bkRecipeBoxOpen);
+  const overlayOpen = !isParent && bkCustomizeOpen;
 
   // This always runs (not just when opening) so buttons never get stuck hidden
-  // from a previous render — e.g. after backing out of Word Recipes.
+  // from a previous render.
   if (overlayOpen) {
-    pv.innerHTML = bkCustomizeOpen ? bkCustomizeHTML() : bkRecipeBoxHTML();
+    pv.innerHTML = bkCustomizeHTML();
     pv.style.display = "block";
     kitchenParts.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = "none"; });
   }
   const anyOverlay = overlayOpen || bkPassport !== null;
   const pbtn = document.getElementById("bkPassportBtn");
-  const rbtn = document.getElementById("bkRecipeBoxBtn");
   const foot = document.getElementById("bkCustomizeFooter");
   if (pbtn) pbtn.style.display = (isParent || overlayOpen) ? "none" : "";
-  if (rbtn) rbtn.style.display = (isParent || anyOverlay) ? "none" : "";
   if (foot) {
     if (isParent || anyOverlay) { foot.style.display = "none"; foot.innerHTML = ""; }
     else { foot.style.display = ""; foot.innerHTML = bkCustomizeFooterHTML(); }

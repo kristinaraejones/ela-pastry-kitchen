@@ -429,11 +429,11 @@ body[data-view="parent"] .bk-view-toggle{color:#fff;border:1px solid #56626F;bor
 .bk-teaser.unlocked{background:#FFF4D1;color:#4A3508;}
 .bk-teaser.unlocked .bk-ico{color:#8A6408;}
 
-/* Perfected */
-.bk-pill-perfected{background:#F4D77A;color:#4A3508;}
-.bk-pill-perfected .bk-ico{fill:#8A6408;stroke:#8A6408;}
-.bk .station.bk-station.perfected,.bk .station.bk-station.perfected:hover{border:2.5px solid #E0B84A;box-shadow:0 3px 0 #E0B84A;}
-.bk .station.bk-station.perfected .bk-seg.done{background:#E0B84A;}
+/* Perfected — pink, so it never gets confused with the gold "sent back" note color */
+.bk-pill-perfected{background:#FBD3E6;color:#7A2856;}
+.bk-pill-perfected .bk-ico{fill:#C24A82;stroke:#C24A82;}
+.bk .station.bk-station.perfected,.bk .station.bk-station.perfected:hover{border:2.5px solid #E888B8;box-shadow:0 3px 0 #E888B8;}
+.bk .station.bk-station.perfected .bk-seg.done{background:#E888B8;}
 
 /* Passport case */
 #bkPassportView{margin-bottom:24px;}
@@ -649,3 +649,7 @@ body[data-view!="parent"][data-bk-style="pro"] .bk-hero .bk-sprinkle{display:non
 #bkCustomizeFooter{display:flex;justify-content:center;margin:36px 0 8px;}
 .bk-customize-footer-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border:1.5px solid var(--bk-border);border-radius:999px;background:#fff;color:var(--bk-muted);font:800 14px 'Nunito',sans-serif;cursor:pointer;opacity:.85;}
 .bk-customize-footer-btn:hover{opacity:1;border-color:var(--bk-accent);color:var(--bk-accent-ink);}
+
+/* Word Recipe flashcard review (required weekly vocab task) */
+.flashcard-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;}
+.flashcard-actions .btn{min-height:48px;padding:0 20px;font-size:15px;}
