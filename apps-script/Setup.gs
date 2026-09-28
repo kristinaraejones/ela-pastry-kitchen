@@ -139,6 +139,17 @@ function migrateToPerStudentWeeks() {
 
 // ---------- Seed content, ported 1:1 from the validated mockup ----------
 
+// Level 2 ("Tag the Parts of the Sentence") convention, MCT-consistent as of
+// 2026-09-27: every sentence-part span (Subject, Direct Object, Indirect
+// Object, Subject Complement...) tags ONLY the head noun/pronoun, never its
+// article or adjectives — those already got their own individual tag at
+// Level 1, so re-bundling them into a Level 2 span is redundant and
+// inconsistent. Subject has always followed this correctly (e.g. "Reynie,"
+// not "the newest member,"); Direct Object originally did NOT (it used to
+// span the full noun phrase, e.g. "the flashlight" / "an entire pizza") —
+// fixed across Weeks 1-5 on this date. Keep every future week's Direct
+// Object / Indirect Object / Subject Complement spans matching Subject's
+// bare-head-word pattern.
 var GRAMMAR_LEVEL_OPTIONS_SEED = {
   pos: ['Noun', 'Pronoun', 'Verb', 'Adjective', 'Adverb', 'Preposition', 'Conjunction', 'Interjection'],
   sentence: ['Subject', 'Action Verb Predicate', 'Linking Verb Predicate', 'Direct Object', 'Indirect Object', 'Subject Complement'],
@@ -260,7 +271,7 @@ var DATA_BY_CHILD_SEED = {
             { start: 4, end: 4, type: 'Subject Complement', explanation: '"Dangerous" describes the subject "mission" after the linking verb "seemed" — that\'s exactly what a subject complement does.' },
             { start: 5, end: 5, type: 'Subject', explanation: '"Reynie" is who the main clause is about — the one doing the action.' },
             { start: 9, end: 9, type: 'Action Verb Predicate', explanation: '"Carried" shows a real action Reynie performed, and it takes a direct object — only action verbs can do that.' },
-            { start: 10, end: 11, type: 'Direct Object', explanation: '"The flashlight" is what got carried — the direct object answers "what."' }
+            { start: 11, end: 11, type: 'Direct Object', explanation: '"Flashlight" is what got carried — the direct object answers "what." Just the head noun, same as how "Reynie" above is the Subject without "the" — the article is already tagged separately as an adjective at Level 1.' }
           ] },
         { id: 'g4', label: 'Level 3 — Mark the Phrases', type: 'phrase-tagger', sentence: SHARED_SENTENCE, options: GRAMMAR_LEVEL_OPTIONS_SEED.phrase,
           phrases: [

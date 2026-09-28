@@ -132,7 +132,7 @@ var MONTH1_WEEKS_2_TO_5 = [
               { start: 4, end: 4, type: 'Subject Complement', explanation: '"Exhausted" describes the subject "wizard" after the linking verb "seemed" — that\'s exactly what a subject complement does.' },
               { start: 5, end: 5, type: 'Subject', explanation: '"Pickles" is who the main clause is about — the one doing the action.' },
               { start: 9, end: 9, type: 'Action Verb Predicate', explanation: '"Devoured" shows a real action Pickles performed, and it takes a direct object — only action verbs can do that.' },
-              { start: 10, end: 12, type: 'Direct Object', explanation: '"An entire pizza" is what got devoured — the direct object answers "what."' }
+              { start: 12, end: 12, type: 'Direct Object', explanation: '"Pizza" is what got devoured — the direct object answers "what." Just the head noun, same as how "Pickles" above is the Subject without "the" — "an" and "entire" are already tagged separately at Level 1.' }
             ] },
           { id: 'g2c', label: 'Level 3 — Mark the Phrases', type: 'phrase-tagger',
             sentence: ['Although', 'the', 'wizard', 'seemed', 'exhausted,', 'Pickles,', 'the', 'ridiculous', 'parrot,', 'devoured', 'an', 'entire', 'pizza', 'during', 'the', 'movie.'],
@@ -273,7 +273,7 @@ var MONTH1_WEEKS_2_TO_5 = [
               { start: 4, end: 4, type: 'Subject Complement', explanation: '"Disgusting" describes the subject "soup" after the linking verb "tasted" — that\'s exactly what a subject complement does.' },
               { start: 5, end: 5, type: 'Subject', explanation: '"Waffles" is who the main clause is about — the one doing the action.' },
               { start: 9, end: 9, type: 'Action Verb Predicate', explanation: '"Dumped" shows a real action Waffles performed, and it takes a direct object — only action verbs can do that.' },
-              { start: 10, end: 12, type: 'Direct Object', explanation: '"The entire pot" is what got dumped — the direct object answers "what."' }
+              { start: 12, end: 12, type: 'Direct Object', explanation: '"Pot" is what got dumped — the direct object answers "what." Just the head noun, same as how "Waffles" above is the Subject without "the" — "the" and "entire" are already tagged separately at Level 1.' }
             ] },
           { id: 'g3c', label: 'Level 3 — Mark the Phrases', type: 'phrase-tagger',
             sentence: ['Because', 'the', 'soup', 'tasted', 'disgusting,', 'Waffles,', 'the', 'overconfident', 'chef,', 'dumped', 'the', 'entire', 'pot', 'into', 'the', 'garden.'],
@@ -407,7 +407,7 @@ var MONTH1_WEEKS_2_TO_5 = [
               { start: 4, end: 4, type: 'Subject Complement', explanation: '"Furious" describes the subject "referee" after the linking verb "looked" — that\'s exactly what a subject complement does.' },
               { start: 5, end: 5, type: 'Subject', explanation: '"Bruno" is who the main clause is about — the one doing the action.' },
               { start: 9, end: 9, type: 'Action Verb Predicate', explanation: '"Launched" shows a real action Bruno performed, and it takes a direct object — only action verbs can do that.' },
-              { start: 10, end: 11, type: 'Direct Object', explanation: '"The ball" is what got launched — the direct object answers "what."' }
+              { start: 11, end: 11, type: 'Direct Object', explanation: '"Ball" is what got launched — the direct object answers "what." Just the head noun, same as how "Bruno" above is the Subject without "the" — "the" is already tagged separately at Level 1.' }
             ] },
           { id: 'g4c', label: 'Level 3 — Mark the Phrases', type: 'phrase-tagger',
             sentence: ['Since', 'the', 'referee', 'looked', 'furious,', 'Bruno,', 'the', 'clumsiest', 'player,', 'launched', 'the', 'ball', 'straight', 'through', 'the', 'window.'],
@@ -540,7 +540,7 @@ var MONTH1_WEEKS_2_TO_5 = [
               { start: 4, end: 4, type: 'Subject Complement', explanation: '"Nervous" describes the subject "professor" after the linking verb "grew" — that\'s exactly what a subject complement does.' },
               { start: 5, end: 5, type: 'Subject', explanation: '"Nugget" is who the main clause is about — the one doing the action.' },
               { start: 9, end: 9, type: 'Action Verb Predicate', explanation: '"Wrecked" shows a real action Nugget performed, and it takes a direct object — only action verbs can do that.' },
-              { start: 10, end: 12, type: 'Direct Object', explanation: '"The entire display" is what got wrecked — the direct object answers "what."' }
+              { start: 12, end: 12, type: 'Direct Object', explanation: '"Display" is what got wrecked — the direct object answers "what." Just the head noun, same as how "Nugget" above is the Subject without "the" — "the" and "entire" are already tagged separately at Level 1.' }
             ] },
           { id: 'g5c', label: 'Level 3 — Mark the Phrases', type: 'phrase-tagger',
             sentence: ['While', 'the', 'professor', 'grew', 'nervous,', 'Nugget,', 'the', 'tiniest', 'hamster,', 'wrecked', 'the', 'entire', 'display', 'before', 'lunch.'],
