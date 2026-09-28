@@ -653,3 +653,34 @@ body[data-view!="parent"][data-bk-style="pro"] .bk-hero .bk-sprinkle{display:non
 /* Word Recipe flashcard review (required weekly vocab task) */
 .flashcard-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;}
 .flashcard-actions .btn{min-height:48px;padding:0 20px;font-size:15px;}
+
+/* ---------- Pacing toggle (parent "Next Week" card) ---------- */
+.bk-ahead-toggle{display:flex;align-items:center;gap:10px;padding:6px 2px;margin-top:2px;border:none;background:transparent;color:var(--bk-ink);font:700 13.5px 'Nunito',sans-serif;cursor:pointer;text-align:left;}
+.bk-ahead-toggle .bk-switch{flex-shrink:0;}
+.bk-ahead-toggle.on .bk-switch{background:var(--bk-accent);}
+.bk-ahead-toggle.on .bk-switch span{transform:translateX(16px);}
+.bk-ahead-label{line-height:1.3;}
+
+/* ---------- Chef's-note flag: inline, gated note on an approved reflection ---------- */
+.chef-note-flag{display:flex;flex-direction:column;gap:8px;padding:12px 14px;background:var(--bk-note-bg);border:1.5px solid var(--bk-note-seg);border-radius:14px;margin-bottom:8px;}
+.chef-note-flag-head{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:var(--bk-note-ink);}
+.chef-note-flag-badge{padding:2px 9px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;background:var(--bk-note-ink);color:#fff;}
+.chef-note-flag-text{font-size:14.5px;line-height:1.5;color:var(--bk-ink);}
+.chef-note-flag .btn{align-self:flex-start;margin-top:0;}
+
+/* ---------- "New note, unread" / "notes from earlier weeks" note rows ---------- */
+.bk-note-row.unread{background:var(--bk-note-bg);}
+.bk-note-row.unread:hover{background:#FFE9AD;}
+.bk-past-notes{display:flex;flex-direction:column;gap:14px;padding:22px 26px;margin-bottom:26px;background:#fff;border:1px dashed var(--bk-note-border);border-radius:26px;}
+.bk-notes-ico.past{background:var(--bk-soft);color:var(--bk-accent-ink);}
+.bk-note-row.past{background:var(--bk-soft2);}
+.bk-note-row.past:hover{background:var(--bk-soft);}
+
+/* ---------- Chef's-note read-and-acknowledge overlay (past-week notes) ---------- */
+.chef-note-overlay{position:fixed;inset:0;z-index:60;background:rgba(43,59,57,.45);display:flex;align-items:center;justify-content:center;padding:20px;}
+.chef-note-card{background:#fff;border-radius:24px;padding:26px 28px;max-width:440px;width:100%;box-shadow:0 20px 48px rgba(43,59,57,.3);display:flex;flex-direction:column;gap:16px;}
+.chef-note-card-head{display:flex;align-items:flex-start;gap:12px;color:var(--bk-note-ink);}
+.chef-note-card-title{font-family:'Fredoka','Nunito',sans-serif;font-weight:600;font-size:19px;color:var(--bk-ink);}
+.chef-note-card-sub{font-size:13px;font-weight:700;color:var(--bk-muted);margin-top:2px;}
+.chef-note-card-body{background:var(--bk-note-row);border-radius:16px;padding:14px 16px;font-size:15px;line-height:1.55;color:var(--bk-ink);}
+.chef-note-card-actions{display:flex;justify-content:flex-end;gap:10px;}

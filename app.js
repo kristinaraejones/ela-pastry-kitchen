@@ -24,10 +24,11 @@ let phraseRangeStart = null;
 let pendingPhraseRange = null;
 let parentNavWeek = null;      // parent-only week browser; null = not yet landed on current week
 let exportControlsReady = false; // guards one-time default-fill of the export range inputs
+let chefNoteOpen = null;       // { key, id } — the read-and-acknowledge overlay for a chef's note on a past week's task
 
 let DATA = null;   // current child's { subjectKey: {name, tag, tasks:[...]} }
 let state = null;  // current child's { subjectKey: { tasks: { taskId: {...} } } }
-let settings = { weeks: { kenley: 1, adelyn: 1 }, termFinalsUnlocked: false, monthlyTestOverride: null, vocabGameSynced: { kenley: "", adelyn: "" } };
+let settings = { weeks: { kenley: 1, adelyn: 1 }, termFinalsUnlocked: false, monthlyTestOverride: null, vocabGameSynced: { kenley: "", adelyn: "" }, allowAhead: { kenley: false, adelyn: false } };
 
 const childrenCache = {};   // { kenley: {DATA, state} }
 const reviewPoolCache = {}; // { kenley: [ {word,timesMissed,...} ] }
@@ -272,15 +273,18 @@ function parseSettings(raw) {
   const override = raw.monthlyTestOverride === "true" ? true : raw.monthlyTestOverride === "false" ? false : null;
   const weeks = {};
   const vocabGameSynced = {};
+  const allowAhead = {};
   Object.keys(CHILD_META).forEach(id => {
     weeks[id] = Number(raw[`${id}_current_week`]) || 1;
     vocabGameSynced[id] = raw[`${id}_vocabgame_synced_ts`] || "";
+    allowAhead[id] = raw[`${id}_allow_ahead`] === "true" || raw[`${id}_allow_ahead`] === true;
   });
   return {
     weeks,
     termFinalsUnlocked: raw.termFinalsUnlocked === "true" || raw.termFinalsUnlocked === true,
     monthlyTestOverride: override,
-    vocabGameSynced
+    vocabGameSynced,
+    allowAhead
   };
 }
 
@@ -322,6 +326,10 @@ function buildChildFromBootstrap(resp) {
         answers: a.answers || {},
         score: (sub && sub.score) || null,
         parentComment: (sub && sub.parent_comment) || null,
+        // Whether she's clicked "I've read this note" on the current parentComment.
+        // Reset to false any time a parent leaves a fresh comment (approveReflection /
+        // sendBackReflection) — see those functions.
+        commentAcked: !!a.commentAcked,
         results: a.results || null,
         history: a.history || []
       };
@@ -336,7 +344,7 @@ function buildChildFromBootstrap(resp) {
 
 // A blank, not-started state for one task (right shape for its type).
 function freshTaskState(t) {
-  const base = { open: false, done: false, needsReview: false, reviewed: false, sentBack: false, answers: {}, score: null, parentComment: null, results: null, history: [] };
+  const base = { open: false, done: false, needsReview: false, reviewed: false, sentBack: false, answers: {}, score: null, parentComment: null, commentAcked: false, results: null, history: [] };
   if (t.type === "pos-tagger") base.labels = new Array(t.sentence.length).fill(null);
   if (t.type === "phrase-tagger") base.selections = [];
   if (t.type === "concept-check") base.labels = {};
@@ -367,7 +375,7 @@ function persistTaskFor(student, s, id) {
     status: deriveStatus(s),
     score: s.score || "",
     parent_comment: s.parentComment || "",
-    answers: { answers: s.answers, labels: s.labels, selections: s.selections, results: s.results, history: s.history || [] }
+    answers: { answers: s.answers, labels: s.labels, selections: s.selections, results: s.results, history: s.history || [], commentAcked: !!s.commentAcked }
   }).catch(() => {});
 }
 function persistTask(key, id) {
@@ -424,6 +432,62 @@ function advanceAnyway() {
 function advanceWeek() {
   settings.weeks[currentChild] = currentWeek() + 1;
   apiPost("saveSetting", { key: `${currentChild}_current_week`, value: String(settings.weeks[currentChild]) }).catch(() => {});
+  render();
+}
+// Whether a task's parentComment is the one currently "on display" to the student —
+// true while it's sent-back-and-not-yet-resubmitted, or while it's the comment from
+// her latest approval. Once she resubmits, that comment becomes part of the attempt
+// history instead (see taskBodyHTML's feedbackNote), so it stops needing a read.
+function isLiveComment(s) {
+  return !!(s.parentComment && !(s.done && !s.reviewed));
+}
+function hasUnreadComment(s) {
+  return isLiveComment(s) && !s.commentAcked;
+}
+// Unread chef's notes on THIS week's tasks — these are a hard gate on advancing,
+// independent of the "allow ahead work" toggle (that toggle only ever relaxes the
+// pending-review gate below).
+function unreadCommentCount(week) {
+  let n = 0;
+  Object.keys(DATA).forEach(key => DATA[key].tasks.forEach(t => {
+    if (t.dynamic || t.week_number !== week) return;
+    if (hasUnreadComment(state[key].tasks[t.id])) n++;
+  }));
+  return n;
+}
+// Unread chef's notes left on weeks she's already moved past (only possible once
+// "allow ahead work" has let her advance while a note was still waiting). These don't
+// block anything further — she just needs a way back to them.
+function pastUnreadComments() {
+  const items = [];
+  Object.keys(DATA).forEach(key => DATA[key].tasks.forEach(t => {
+    if (t.dynamic || t.week_number >= currentWeek()) return;
+    const s = state[key].tasks[t.id];
+    if (hasUnreadComment(s)) items.push({ key, t, s });
+  }));
+  return items;
+}
+function ackComment(key, id) {
+  const s = state[key].tasks[id];
+  s.commentAcked = true;
+  persistTask(key, id);
+  if (chefNoteOpen && chefNoteOpen.key === key && chefNoteOpen.id === id) chefNoteOpen = null;
+  render();
+}
+function openChefNote(key, id) {
+  chefNoteOpen = { key, id };
+  render();
+}
+function closeChefNote() {
+  chefNoteOpen = null;
+  render();
+}
+// Parent-set per-student pacing override: when on, she can be advanced to the next
+// week even while written work is still awaiting review (a straight-up unread chef's
+// note is a separate, always-on gate — see unreadCommentCount above).
+function toggleAllowAhead() {
+  settings.allowAhead[currentChild] = !settings.allowAhead[currentChild];
+  apiPost("saveSetting", { key: `${currentChild}_allow_ahead`, value: String(settings.allowAhead[currentChild]) }).catch(() => {});
   render();
 }
 function toggleTermFinals() {
@@ -1668,6 +1732,7 @@ function approveReflection(key, id) {
   applyGradeInput(key, id);
   s.reviewed = true;
   s.parentComment = comment || null;
+  s.commentAcked = !comment; // nothing to acknowledge if she wasn't left a note
   s.sentBack = false;
   persistTask(key, id);
   render();
@@ -1679,6 +1744,7 @@ function sendBackReflection(key, id) {
   snapshotAttempt(key, id, "parent", comment);
   s.score = null; // the grade belonged to the earlier draft; regrade the revision
   s.parentComment = comment || "Please take another look and resubmit.";
+  s.commentAcked = false;
   s.done = false;
   s.needsReview = false;
   s.reviewed = false;
@@ -1736,7 +1802,21 @@ function taskBodyHTML(key, t) {
   } else if (t.type === "reflection") {
     const promptId = `refl-prompt-${key}-${t.id}`;
     // Once she has resubmitted (and it's not yet approved), the old note belongs to the earlier draft, which the drafts panel below shows.
-    const feedbackNote = (s.parentComment && !(s.done && !s.reviewed)) ? `<div class="parent-feedback">📝 ${s.reviewed ? "Feedback from parent:" : "Refired — please revise:"} ${s.parentComment}</div>` : "";
+    let feedbackNote = "";
+    if (isLiveComment(s)) {
+      if (s.reviewed && !s.commentAcked) {
+        // Approved, but she hasn't confirmed she's read the note yet — flag it and
+        // require the explicit click. (A sent-back note doesn't need this: resubmitting
+        // already means she had to come back through this note to do it.)
+        feedbackNote = `<div class="chef-note-flag">
+          <div class="chef-note-flag-head">📝 New note from Mom <span class="chef-note-flag-badge">Unread</span></div>
+          <div class="chef-note-flag-text">${s.parentComment}</div>
+          <button class="btn primary" onclick="ackComment('${key}','${t.id}')">I've read this note</button>
+        </div>`;
+      } else {
+        feedbackNote = `<div class="parent-feedback">📝 ${s.reviewed ? "Feedback from parent:" : "Refired — please revise:"} ${s.parentComment}</div>`;
+      }
+    }
     inner = `${trimReadAloud && key === "reading" ? "" : readAloudButton(promptId, "Read the question to me")}
       <div class="lesson-text" id="${promptId}"><p>${t.prompt}</p></div>
       ${feedbackNote}

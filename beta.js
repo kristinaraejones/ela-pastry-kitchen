@@ -248,8 +248,10 @@ function bkStationCardHTML(key, idx) {
   const locked = active.filter(t => isTaskLocked(t));
   const doneN = unlocked.filter(t => state[key].tasks[t.id].done).length;
   const sentBack = bkSentBackTasks(key).length;
+  const unread = unlocked.filter(t => hasUnreadComment(state[key].tasks[t.id])).length;
   let pill;
-  if (status === "served" && typeof bkPerfected === "function" && bkPerfected(key)) pill = bkPill("perfected", "Perfected", "star");
+  if (unread > 0) pill = bkPill("note", `${unread} new chef’s ${bkPlural(unread, "note", "notes")}`, "note");
+  else if (status === "served" && typeof bkPerfected === "function" && bkPerfected(key)) pill = bkPill("perfected", "Perfected", "star");
   else if (status === "served") pill = bkPill("served", "Served", "check");
   else if (status === "burning") pill = bkPill("note", "Redo this station", "timer");
   else if (sentBack > 0) pill = bkPill("note", `${sentBack} chef’s ${bkPlural(sentBack, "note", "notes")}`, "timer");
@@ -330,12 +332,20 @@ window.render = function render() {
   const name = CHILD_META[kid].name, nextWk = currentWeek() + 1;
   if (isParent) {
     const pending = pendingReviewCount();
+    const unread = unreadCommentCount(currentWeek());
+    const aheadAllowed = !!settings.allowAhead[kid];
     let text, btn;
-    if (served && pending > 0) { text = `${name} finished every section of Week ${currentWeek()}. ${pending} written ${bkPlural(pending, "answer is", "answers are")} still waiting on your review.`; btn = `<button class="bk-btn plain" disabled>Advance to Week ${nextWk}</button>`; }
+    if (unread > 0) { text = `${name} has ${unread} chef’s ${bkPlural(unread, "note", "notes")} from Week ${currentWeek()} she hasn’t marked as read yet — she needs to read ${unread === 1 ? "it" : "them"} before moving on, no matter the pacing setting below.`; btn = `<button class="bk-btn plain" disabled>Advance to Week ${nextWk}</button>`; }
+    else if (served && pending > 0 && !aheadAllowed) { text = `${name} finished every section of Week ${currentWeek()}. ${pending} written ${bkPlural(pending, "answer is", "answers are")} still waiting on your review.`; btn = `<button class="bk-btn plain" disabled>Advance to Week ${nextWk}</button>`; }
+    else if (served && pending > 0 && aheadAllowed) { text = `${name} finished every section of Week ${currentWeek()}. ${pending} written ${bkPlural(pending, "answer is", "answers are")} still waiting on your review — but you’ve allowed her to keep working ahead.`; btn = `<button class="bk-btn primary" onclick="advanceWeek()">Advance to Week ${nextWk}</button>`; }
     else if (served) { text = `${name} finished every section of Week ${currentWeek()}.`; btn = `<button class="bk-btn primary" onclick="advanceWeek()">Advance to Week ${nextWk}</button>`; }
     else { text = `Week ${currentWeek()} isn’t fully finished yet${sentBackAll.length ? `: ${sentBackAll.length} ${bkPlural(sentBackAll.length, "item is", "items are")} still sent back` : ""}.`; btn = `<button class="bk-btn plain" onclick="advanceAnyway()">Advance to Week ${nextWk} anyway</button>`; }
+    const aheadToggle = `<button class="bk-ahead-toggle${aheadAllowed ? " on" : ""}" onclick="toggleAllowAhead()" aria-pressed="${aheadAllowed}">
+        <span class="bk-switch" aria-hidden="true"><span></span></span>
+        <span class="bk-ahead-label">Let ${name} work ahead even if you’re behind on reviewing</span>
+      </button>`;
     advanceBanner.className = "bk-tool";
-    advanceBanner.innerHTML = `<div class="bk-tool-title">${bkIcon("arrow", 18)}Next Week</div><div class="bk-tool-text">${text}</div>${btn}`;
+    advanceBanner.innerHTML = `<div class="bk-tool-title">${bkIcon("arrow", 18)}Next Week</div><div class="bk-tool-text">${text}</div>${btn}${aheadToggle}`;
   } else {
     advanceBanner.className = "";
     advanceBanner.innerHTML = "";
@@ -352,17 +362,42 @@ window.render = function render() {
     renderWeekReportPanel();
   } else {
     stationsWrap.style.display = "block";
+    // Approved-but-unread notes on THIS week's tasks — these sit alongside sent-back
+    // tasks in the same "Chef's Notes" section since both need her attention, just
+    // with a different click target (an unread note just needs the read+ack, not a redo).
+    const unreadCurrent = [];
+    keys.forEach(key => activeTasks(key).forEach(t => { if (hasUnreadComment(state[key].tasks[t.id])) unreadCurrent.push({ key, t }); }));
+    // Notes left on weeks she's already moved past (only reachable if "allow ahead
+    // work" let her advance while one was still waiting) — these don't block her,
+    // they just need a way back.
+    const pastUnread = pastUnreadComments();
     let notesHTML = "";
+    if (pastUnread.length) {
+      notesHTML += `<section class="bk-past-notes">
+        <div class="bk-notes-head"><span class="bk-notes-ico past">${bkIcon("note", 22)}</span><div><h2>Notes From Earlier Weeks</h2><p>Chef left ${pastUnread.length === 1 ? "a note" : `${bkNumWord(pastUnread.length).toLowerCase()} notes`} on work you’ve already moved past. Give ${pastUnread.length === 1 ? "it" : "them"} a read when you get a chance.</p></div></div>
+        <div class="bk-notes-grid">${pastUnread.map(({ key, t }) => `<button class="bk-note-row past" onclick="openChefNote('${key}','${t.id}')">
+            <span class="bk-note-pastry">${bkPastry(bkPastryFor(key), kid, 34)}</span>
+            <span class="bk-note-text"><span class="bk-note-subj">${DATA[key].name} · Week ${t.week_number}</span><span class="bk-note-task">${bkTitle(t.label)}</span></span>
+            ${bkIcon("arrow", 20)}</button>`).join("")}</div>
+      </section>`;
+    }
     if (served) {
       notesHTML += `<section class="bk-alldone">${bkPastry(th.emblem, kid, 48)}<div><h2>All Done With Week ${currentWeek()}!</h2><p>Nice work! Waiting for Mom to check everything, then you’ll move on to Week ${nextWk}.</p></div></section>`;
     }
-    if (sentBackAll.length) {
+    if (sentBackAll.length || unreadCurrent.length) {
+      const total = sentBackAll.length + unreadCurrent.length;
       notesHTML += `<section class="bk-notes">
-        <div class="bk-notes-head"><span class="bk-notes-ico">${bkIcon("timer", 22)}</span><div><h2>Chef’s Notes</h2><p>${sentBackAll.length === 1 ? "This plate is" : `These ${bkNumWord(sentBackAll.length).toLowerCase()} plates are`} back in the oven for a quick touch-up.</p></div></div>
-        <div class="bk-notes-grid">${sentBackAll.map(({ key, t }) => `<button class="bk-note-row" onclick="bkOpenTask('${key}','${t.id}')">
+        <div class="bk-notes-head"><span class="bk-notes-ico">${bkIcon("timer", 22)}</span><div><h2>Chef’s Notes</h2><p>${total === 1 ? "This plate needs" : `These ${bkNumWord(total).toLowerCase()} plates need`} your attention before you keep going.</p></div></div>
+        <div class="bk-notes-grid">
+          ${sentBackAll.map(({ key, t }) => `<button class="bk-note-row" onclick="bkOpenTask('${key}','${t.id}')">
             <span class="bk-note-pastry">${bkPastry(bkPastryFor(key), kid, 34)}</span>
-            <span class="bk-note-text"><span class="bk-note-subj">${DATA[key].name}</span><span class="bk-note-task">${bkTitle(t.label)}</span></span>
-            ${bkIcon("arrow", 20)}</button>`).join("")}</div>
+            <span class="bk-note-text"><span class="bk-note-subj">${DATA[key].name}</span><span class="bk-note-task">${bkTitle(t.label)} · back in the oven</span></span>
+            ${bkIcon("arrow", 20)}</button>`).join("")}
+          ${unreadCurrent.map(({ key, t }) => `<button class="bk-note-row unread" onclick="bkOpenTask('${key}','${t.id}')">
+            <span class="bk-note-pastry">${bkPastry(bkPastryFor(key), kid, 34)}</span>
+            <span class="bk-note-text"><span class="bk-note-subj">${DATA[key].name}</span><span class="bk-note-task">${bkTitle(t.label)} · new note, unread</span></span>
+            ${bkIcon("arrow", 20)}</button>`).join("")}
+        </div>
       </section>`;
     }
     notes.innerHTML = notesHTML;
@@ -423,7 +458,31 @@ window.render = function render() {
       ? `<div class="empty-note">No sections have needed a redo yet.</div>`
       : burnLog.map(rec => `<div class="review-item"><strong>${rec.station} — ${rec.tag}</strong><div class="meta">${rec.date} · ${rec.reason}</div><div class="submitted-text">${rec.items.join("\n")}</div></div>`).join("");
   }
+
+  // Chef's-note read overlay — only way to reach a past week's note without a full
+  // page of past-week UI. Works from either view; harmless if a parent peeks at it.
+  const chefNoteOverlay = document.getElementById("chefNoteOverlay");
+  const openNoteTask = chefNoteOpen && DATA[chefNoteOpen.key] && DATA[chefNoteOpen.key].tasks.find(x => x.id === chefNoteOpen.id);
+  if (openNoteTask) {
+    chefNoteOverlay.style.display = "flex";
+    chefNoteOverlay.innerHTML = bkChefNoteModalHTML(chefNoteOpen.key, openNoteTask, state[chefNoteOpen.key].tasks[chefNoteOpen.id]);
+  } else {
+    chefNoteOverlay.style.display = "none";
+    chefNoteOverlay.innerHTML = "";
+  }
 };
+
+// ---------- Chef's-note read-and-acknowledge overlay ----------
+function bkChefNoteModalHTML(key, t, s) {
+  return `<div class="chef-note-card">
+    <div class="chef-note-card-head">${bkIcon("note", 22)}<div><div class="chef-note-card-title">Chef’s Note</div><div class="chef-note-card-sub">${DATA[key].name} · ${bkTitle(t.label)}${t.week_number ? ` · Week ${t.week_number}` : ""}</div></div></div>
+    <div class="chef-note-card-body">${escHtml(s.parentComment || "")}</div>
+    <div class="chef-note-card-actions">
+      <button class="bk-btn plain" onclick="closeChefNote()">Not now</button>
+      <button class="bk-btn primary" onclick="ackComment('${key}','${t.id}')">${bkIcon("check", 16)}I’ve Read This Note</button>
+    </div>
+  </div>`;
+}
 
 // ---------- Task header (kid + parent station list) ----------
 window.taskHeadHTML = function taskHeadHTML(key, t) {
