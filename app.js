@@ -257,7 +257,8 @@ async function init() {
 async function loadChild(student) {
   const resp = await apiGetBootstrap(student);
   childrenCache._settings = resp.settings; // shared/global, same on every bootstrap call
-  const built = buildChildFromBootstrap(resp);
+  const studentWeek = parseSettings(resp.settings).weeks[student] || 1;
+  const built = buildChildFromBootstrap(resp, studentWeek);
   childrenCache[student] = built;
   reviewPoolCache[student] = resp.reviewPool;
   answerLogCache[student] = resp.answerLog || [];
@@ -288,7 +289,7 @@ function parseSettings(raw) {
   };
 }
 
-function buildChildFromBootstrap(resp) {
+function buildChildFromBootstrap(resp, week) {
   const DATA = {};
   SUBJECT_ORDER.forEach(subjectKey => {
     const tasksForSubject = resp.schedule.filter(t => t.subject_key === subjectKey);
@@ -317,21 +318,34 @@ function buildChildFromBootstrap(resp) {
     DATA[key].tasks.forEach(t => {
       const sub = subMap[t.id];
       const a = (sub && sub.answers) || {};
+      // The review-words drill (dynamic:'reviewPool') is the one standing task
+      // meant to be redone every week, not just once ever — its id is the same
+      // across all weeks (it's a single seeded row, not re-seeded weekly like
+      // regular lesson/dictation tasks), so its stored submission would
+      // otherwise still read as "done" (with last week's graded results) the
+      // moment a new week starts. Treat it as fresh whenever the submission's
+      // recorded week doesn't match the week actually being viewed; the
+      // underlying missed-word pool itself (reviewPoolCache/ReviewPool sheet)
+      // is unaffected — only this per-attempt submission record resets.
+      const stale = t.dynamic === "reviewPool" && sub && Number(a.completedWeek) !== week;
+      const effSub = stale ? null : sub;
+      const effA = stale ? {} : a;
       const base = {
         open: false,
-        done: sub ? ["complete", "needs_review", "reviewed"].includes(sub.status) : false,
-        needsReview: sub ? sub.status === "needs_review" : false,
-        reviewed: sub ? sub.status === "reviewed" : false,
-        sentBack: sub ? sub.status === "sent_back" : false,
-        answers: a.answers || {},
-        score: (sub && sub.score) || null,
-        parentComment: (sub && sub.parent_comment) || null,
+        done: effSub ? ["complete", "needs_review", "reviewed"].includes(effSub.status) : false,
+        needsReview: effSub ? effSub.status === "needs_review" : false,
+        reviewed: effSub ? effSub.status === "reviewed" : false,
+        sentBack: effSub ? effSub.status === "sent_back" : false,
+        answers: effA.answers || {},
+        score: (effSub && effSub.score) || null,
+        parentComment: (effSub && effSub.parent_comment) || null,
         // Whether she's clicked "I've read this note" on the current parentComment.
         // Reset to false any time a parent leaves a fresh comment (approveReflection /
         // sendBackReflection) — see those functions.
-        commentAcked: !!a.commentAcked,
-        results: a.results || null,
-        history: a.history || []
+        commentAcked: !!effA.commentAcked,
+        results: effA.results || null,
+        history: a.history || [],
+        completedWeek: a.completedWeek || null
       };
       if (t.type === "pos-tagger") base.labels = a.labels || new Array(t.sentence.length).fill(null);
       if (t.type === "phrase-tagger") base.selections = a.selections || [];
@@ -375,7 +389,7 @@ function persistTaskFor(student, s, id) {
     status: deriveStatus(s),
     score: s.score || "",
     parent_comment: s.parentComment || "",
-    answers: { answers: s.answers, labels: s.labels, selections: s.selections, results: s.results, history: s.history || [], commentAcked: !!s.commentAcked }
+    answers: { answers: s.answers, labels: s.labels, selections: s.selections, results: s.results, history: s.history || [], commentAcked: !!s.commentAcked, completedWeek: s.completedWeek || null }
   }).catch(() => {});
 }
 function persistTask(key, id) {
@@ -519,9 +533,22 @@ function isTaskLocked(t) {
 // the data model's own "one row per week, or per 'unlocked whenever' for
 // banks" description. Past/future week content just isn't part of this set
 // at all — it's not "locked," it's simply not this week's work.
+// Standing (dynamic) tasks like the review-words drill and the locked tests
+// stay in the schedule at whatever array position they were first seeded,
+// which used to leave them sorted ahead of that week's own lesson/dictation
+// rows. Rank them explicitly instead: this week's own content first, then
+// the recurring review drill, then the locked monthly/term tests last.
+function taskOrderRank(t) {
+  if (t.termFinal) return 3;
+  if (t.monthlyTest) return 2;
+  if (t.dynamic) return 1;
+  return 0;
+}
 function activeTasks(key) {
   const week = currentWeek();
-  return DATA[key].tasks.filter(t => t.dynamic || t.week_number === week);
+  return DATA[key].tasks
+    .filter(t => t.dynamic || t.week_number === week)
+    .sort((a, b) => taskOrderRank(a) - taskOrderRank(b));
 }
 function unlockedActiveTasks(key) {
   return activeTasks(key).filter(t => !isTaskLocked(t));
@@ -1308,6 +1335,7 @@ function checkDictation(key, id) {
   state[key].tasks[id].results = results;
   state[key].tasks[id].score = `${correctCount}/${possible}`;
   state[key].tasks[id].done = true;
+  if (t.dynamic === "reviewPool") state[key].tasks[id].completedWeek = currentWeek();
   if (t.dynamic === "spellingMonthBank") markTested(banksCache[currentChild].spelling || [], "spelling");
   persistTask(key, id);
   render();
