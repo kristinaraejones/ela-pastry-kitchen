@@ -111,18 +111,6 @@ function bkOpenTask(key, id) {
   if (panel) panel.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-// ---------- Locked quiz / test chips on each station ----------
-function bkUnlockHint(t) {
-  if (t.termFinal) return "end of term";
-  if (t.monthlyTest) return `Week ${nextMonthlyTestWeek()}`;
-  return "later";
-}
-function bkLockChips(locked) {
-  if (!locked.length) return "";
-  return `<div class="bk-st-locks">${locked.map(t =>
-    `<span class="bk-lock-chip">${bkIcon("lock", 14)}${bkTitle(t.label)} <span class="bk-lock-when">· ${bkUnlockHint(t)}</span></span>`).join("")}</div>`;
-}
-
 // ---------- Kid hero ----------
 function bkPlateHTML(key) {
   const kid = currentChild, th = bkTheme();
@@ -245,7 +233,6 @@ function bkStationCardHTML(key, idx) {
   const status = stationStatus(key);
   const active = activeTasks(key);
   const unlocked = active.filter(t => !isTaskLocked(t));
-  const locked = active.filter(t => isTaskLocked(t));
   const doneN = unlocked.filter(t => state[key].tasks[t.id].done).length;
   const sentBack = bkSentBackTasks(key).length;
   const unread = unlocked.filter(t => hasUnreadComment(state[key].tasks[t.id])).length;
@@ -267,8 +254,7 @@ function bkStationCardHTML(key, idx) {
   return `<span class="bk-st-top"><span class="bk-st-tile" style="background:${tile}">${bkPastry(bkPastryFor(key), kid, 56)}</span>${pill}</span>
     <span class="bk-st-title">${bkTitle(DATA[key].name)}</span>
     <span class="bk-st-tag">${subjectTag(key)}</span>
-    ${unlocked.length ? `<span class="bk-bar">${segs}</span><span class="bk-st-count">${doneN} of ${unlocked.length} done</span>` : `<span class="bk-st-count">Nothing loaded for this week yet</span>`}
-    ${bkLockChips(locked)}`;
+    ${unlocked.length ? `<span class="bk-bar">${segs}</span><span class="bk-st-count">${doneN} of ${unlocked.length} done</span>` : `<span class="bk-st-count">Nothing loaded for this week yet</span>`}`;
 }
 
 // ---------- Main render (replaces app.js render) ----------

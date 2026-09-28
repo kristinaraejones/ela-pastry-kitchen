@@ -258,7 +258,7 @@ async function loadChild(student) {
   const resp = await apiGetBootstrap(student);
   childrenCache._settings = resp.settings; // shared/global, same on every bootstrap call
   const studentWeek = parseSettings(resp.settings).weeks[student] || 1;
-  const built = buildChildFromBootstrap(resp, studentWeek);
+  const built = buildChildFromBootstrap(resp, studentWeek, student);
   childrenCache[student] = built;
   reviewPoolCache[student] = resp.reviewPool;
   answerLogCache[student] = resp.answerLog || [];
@@ -289,7 +289,7 @@ function parseSettings(raw) {
   };
 }
 
-function buildChildFromBootstrap(resp, week) {
+function buildChildFromBootstrap(resp, week, student) {
   const DATA = {};
   SUBJECT_ORDER.forEach(subjectKey => {
     const tasksForSubject = resp.schedule.filter(t => t.subject_key === subjectKey);
@@ -300,7 +300,10 @@ function buildChildFromBootstrap(resp, week) {
       { id: t.id, type: t.type, label: t.label, dynamic: t.dynamic, termFinal: t.termFinal, monthlyTest: t.monthlyTest, week_number: Number(t.week_number) || 1 },
       t.content || {}
     ));
-    if (subjectKey === "vocab") tasks = injectWordRecipeTasks(tasks);
+    if (subjectKey === "vocab") {
+      tasks = injectWordRecipeTasks(tasks);
+      tasks = injectCaseFilesTasks(tasks, student);
+    }
     DATA[subjectKey] = {
       name: tasksForSubject[0].subject_name,
       tag: tasksForSubject[0].subject_tag, // fallback for weeks with no dedicated tag (e.g. Adelyn's single-week placeholders)
@@ -871,6 +874,34 @@ function injectWordRecipeTasks(tasks) {
   });
   return out;
 }
+// Kenley's "Play Vocab Case Files" link was only ever authored as a single
+// Week 1 row (Setup.gs) — unlike Adelyn's Word Bakery link, which her own
+// seed data (AdelynVocabReadingData.gs) repeats every week. Rather than
+// patch the backend, inject one client-side for every vocab week that
+// doesn't already have a game link, same idempotent pattern as the
+// flashcard task above — including the per-week id, which is what makes a
+// new week's copy start "not started" instead of inheriting a prior week's
+// completed state (the same bug the review-words station had).
+function injectCaseFilesTasks(tasks, student) {
+  if (student !== "kenley") return tasks;
+  const byWeek = {};
+  tasks.forEach(t => { (byWeek[t.week_number] = byWeek[t.week_number] || []).push(t); });
+  const out = [];
+  Object.keys(byWeek).map(Number).sort((a, b) => a - b).forEach(week => {
+    const weekTasks = byWeek[week];
+    out.push(...weekTasks);
+    if (!weekTasks.some(isVocabGameTask)) {
+      out.push({
+        id: `casefiles_w${week}`, type: "external", week_number: week,
+        label: "Play Vocab Case Files",
+        url: "https://root-and-bloom-case-files.vercel.app",
+        linkText: "Open Vocab Case Files",
+        note: "Opens in a new tab. Works offline once you've loaded it there at least once."
+      });
+    }
+  });
+  return out;
+}
 function currentWeekVocabWords() {
   if (!DATA.vocab) return [];
   const week = currentWeek();
@@ -934,10 +965,47 @@ function answerFlashcard(key, id, gotIt) {
     s.answers.reviewed[word] = gotIt;
   }
   s._deckPos = (s._deckPos || 0) + 1;
+  s._dictOpen = false;
+  s._dictResult = null;
   if (s._deckPos >= deck.length) {
     s.done = true;
     persistTask(key, id);
   }
+  render();
+}
+
+// ---------- Optional per-card spelling practice on vocab flashcards ----------
+// Purely a self-check for her — not graded, not persisted, doesn't gate
+// "Got it!"/"Keep reviewing". Reuses the same speakWord() audio the spelling
+// dictation stations use so it sounds and behaves the same way.
+function flashcardDictationHTML(key, id, s, word) {
+  if (!s._dictOpen) {
+    return `<button class="btn" onclick="toggleFlashcardDictation('${key}','${id}')">🔊 Practice spelling it (optional)</button>`;
+  }
+  const res = s._dictResult;
+  const inputId = `flashdict-${key}-${id}`;
+  return `<div class="word-row">
+      <button class="btn" style="flex-shrink:0;" onclick="speakWord('${word.replace(/'/g, "\\'")}')">🔊 Hear it</button>
+      <input type="text" id="${inputId}" placeholder="Type what you hear" ${res ? "disabled" : ""} value="${res ? escHtml(res.typed) : ""}">
+    </div>
+    ${res
+      ? `<div class="score-result ${res.correct ? "pass" : "retry"}">${res.correct ? "✓ Nice, that's right!" : `✗ Correct spelling: <b>${word}</b>`}</div>
+         <button class="btn" onclick="toggleFlashcardDictation('${key}','${id}',true)">Try again</button>`
+      : `<button class="btn primary" onclick="checkFlashcardSpelling('${key}','${id}')">Check my spelling</button>`}`;
+}
+function toggleFlashcardDictation(key, id, reset) {
+  const s = state[key].tasks[id];
+  s._dictOpen = reset ? true : !s._dictOpen;
+  s._dictResult = null;
+  render();
+}
+function checkFlashcardSpelling(key, id) {
+  const s = state[key].tasks[id];
+  const deck = s._deck || [];
+  const word = deck[s._deckPos || 0];
+  const el = document.getElementById(`flashdict-${key}-${id}`);
+  const typed = (el ? el.value : "").trim();
+  s._dictResult = { typed, correct: !!word && typed.toLowerCase() === word.toLowerCase() };
   render();
 }
 
@@ -2128,6 +2196,7 @@ function taskBodyHTML(key, t) {
       const cardHtml = (typeof bkWordCardHTML === "function") ? bkWordCardHTML(word) : `<div class="lesson-text"><b>${word}</b></div>`;
       inner = `<div class="lesson-text" style="opacity:.75;font-size:0.78rem;">Card ${(s._deckPos || 0) + 1} of ${deck.length}</div>
         ${cardHtml}
+        <div style="margin-top:8px;">${flashcardDictationHTML(key, t.id, s, word)}</div>
         <div class="flashcard-actions">
           <button class="btn primary" onclick="answerFlashcard('${key}','${t.id}',true)">🍞 Got it!</button>
           <button class="btn" onclick="answerFlashcard('${key}','${t.id}',false)">📖 Keep reviewing</button>

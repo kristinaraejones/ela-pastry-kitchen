@@ -92,6 +92,15 @@ var MONTH1_WEEKS_2_TO_5 = [
       grammar: {
         name: 'Grammar', tag: 'MCT-Based · Month 1, Week 2 Review',
         tasks: [
+          { id: 'g2prep', label: 'Prepositions & Prepositional Phrases — Quick Review', type: 'read', content:
+            '<div class="lesson-text"><p><b>Preposition</b> — a word that shows how a noun or pronoun relates to another word in the sentence: where, when, how, or which one. Common ones: <i>in, on, at, by, with, about, above, below, before, after, during, through, between, among, under, over, without, into, onto, from, near, until.</i></p>' +
+            '<p><b>Prepositional phrase</b> — a preposition plus its object (a noun or pronoun), sometimes with a describing word or two in between. It always starts with the preposition and ends with its object.</p>' +
+            '<p><i>Formula:</i> preposition + (describing words) + noun/pronoun</p>' +
+            '<table class="vocab-table"><tr><td>"under the old bridge"</td><td>preposition "under," object "bridge," with "the old" describing the object in between.</td></tr>' +
+            '<tr><td>"with her"</td><td>preposition "with," object "her" — pronouns can be the object of a preposition too.</td></tr>' +
+            '<tr><td>"during the movie"</td><td>preposition "during," object "movie" — no describing words needed for a phrase to count.</td></tr></table>' +
+            '<p><b>Quick test:</b> Find a word from the list above. Does it lead straight into a noun or pronoun (maybe with a describing word or two along the way)? That whole chunk — preposition through object — is the prepositional phrase.</p>' +
+            '<p style="opacity:.8;font-size:0.8rem;">This week\'s sentence has one: "...Pickles, the ridiculous parrot, devoured an entire pizza <b>during the movie</b>." "During" is the preposition and "movie" is its object — that\'s the prepositional phrase to watch for when you tag Level 1 and beyond.</p></div>' },
           { id: 'g2a', label: 'Level 1 — Tag the Parts of Speech', type: 'pos-tagger',
             sentence: ['Although', 'the', 'wizard', 'seemed', 'exhausted,', 'Pickles,', 'the', 'ridiculous', 'parrot,', 'devoured', 'an', 'entire', 'pizza', 'during', 'the', 'movie.'],
             answers: ['Conjunction', 'Adjective', 'Noun', 'Verb', 'Adjective', 'Noun', 'Adjective', 'Adjective', 'Noun', 'Verb', 'Adjective', 'Adjective', 'Noun', 'Preposition', 'Adjective', 'Noun'],
@@ -225,6 +234,14 @@ var MONTH1_WEEKS_2_TO_5 = [
       grammar: {
         name: 'Grammar', tag: 'MCT-Based · Month 1, Week 3 Review',
         tasks: [
+          { id: 'g3prep', label: 'Prepositions & Prepositional Phrases — Quick Review', type: 'read', content:
+            '<div class="lesson-text"><p><b>Preposition</b> — a word that shows how a noun or pronoun relates to another word in the sentence: where, when, how, or which one. Common ones: <i>in, on, at, by, with, about, above, below, before, after, during, through, between, among, under, over, without, into, onto, from, near, until.</i></p>' +
+            '<p><b>Prepositional phrase</b> — a preposition plus its object (a noun or pronoun), sometimes with a describing word or two in between. It always starts with the preposition and ends with its object.</p>' +
+            '<p><i>Formula:</i> preposition + (describing words) + noun/pronoun</p>' +
+            '<table class="vocab-table"><tr><td>"during the movie"</td><td>preposition "during," object "movie," with "the" describing the object in between.</td></tr>' +
+            '<tr><td>"with her"</td><td>preposition "with," object "her" — pronouns can be the object of a preposition too.</td></tr></table>' +
+            '<p><b>Quick test:</b> Find a word from the list above. Does it lead straight into a noun or pronoun (maybe with a describing word or two along the way)? That whole chunk — preposition through object — is the prepositional phrase.</p>' +
+            '<p style="opacity:.8;font-size:0.8rem;">This week\'s sentence has one: "...dumped the entire pot <b>into the garden</b>." "Into" is the preposition and "garden" is its object — that\'s the prepositional phrase to watch for when you tag Level 1 and beyond.</p></div>' },
           { id: 'g3a', label: 'Level 1 — Tag the Parts of Speech', type: 'pos-tagger',
             sentence: ['Because', 'the', 'soup', 'tasted', 'disgusting,', 'Waffles,', 'the', 'overconfident', 'chef,', 'dumped', 'the', 'entire', 'pot', 'into', 'the', 'garden.'],
             answers: ['Conjunction', 'Adjective', 'Noun', 'Verb', 'Adjective', 'Noun', 'Adjective', 'Adjective', 'Noun', 'Verb', 'Adjective', 'Adjective', 'Noun', 'Preposition', 'Adjective', 'Noun'],
@@ -351,6 +368,14 @@ var MONTH1_WEEKS_2_TO_5 = [
       grammar: {
         name: 'Grammar', tag: 'MCT-Based · Month 1, Week 4 Review',
         tasks: [
+          { id: 'g4prep', label: 'Prepositions & Prepositional Phrases — Quick Review', type: 'read', content:
+            '<div class="lesson-text"><p><b>Preposition</b> — a word that shows how a noun or pronoun relates to another word in the sentence: where, when, how, or which one. Common ones: <i>in, on, at, by, with, about, above, below, before, after, during, through, between, among, under, over, without, into, onto, from, near, until.</i></p>' +
+            '<p><b>Prepositional phrase</b> — a preposition plus its object (a noun or pronoun), sometimes with a describing word or two in between. It always starts with the preposition and ends with its object.</p>' +
+            '<p><i>Formula:</i> preposition + (describing words) + noun/pronoun</p>' +
+            '<table class="vocab-table"><tr><td>"into the garden"</td><td>preposition "into," object "garden," with "the" describing the object in between.</td></tr>' +
+            '<tr><td>"with her"</td><td>preposition "with," object "her" — pronouns can be the object of a preposition too.</td></tr></table>' +
+            '<p><b>Quick test:</b> Find a word from the list above. Does it lead straight into a noun or pronoun (maybe with a describing word or two along the way)? That whole chunk — preposition through object — is the prepositional phrase.</p>' +
+            '<p style="opacity:.8;font-size:0.8rem;">This week\'s sentence has one: "...launched the ball straight <b>through the window</b>." "Through" is the preposition and "window" is its object. Watch out — "straight" right before it is an adverb describing "launched," not part of the phrase.</p></div>' },
           { id: 'g4a', label: 'Level 1 — Tag the Parts of Speech', type: 'pos-tagger',
             sentence: ['Since', 'the', 'referee', 'looked', 'furious,', 'Bruno,', 'the', 'clumsiest', 'player,', 'launched', 'the', 'ball', 'straight', 'through', 'the', 'window.'],
             answers: ['Conjunction', 'Adjective', 'Noun', 'Verb', 'Adjective', 'Noun', 'Adjective', 'Adjective', 'Noun', 'Verb', 'Adjective', 'Noun', 'Adverb', 'Preposition', 'Adjective', 'Noun'],
@@ -477,6 +502,14 @@ var MONTH1_WEEKS_2_TO_5 = [
       grammar: {
         name: 'Grammar', tag: 'MCT-Based · Month 1, Week 5 Review',
         tasks: [
+          { id: 'g5prep', label: 'Prepositions & Prepositional Phrases — Quick Review', type: 'read', content:
+            '<div class="lesson-text"><p><b>Preposition</b> — a word that shows how a noun or pronoun relates to another word in the sentence: where, when, how, or which one. Common ones: <i>in, on, at, by, with, about, above, below, before, after, during, through, between, among, under, over, without, into, onto, from, near, until.</i></p>' +
+            '<p><b>Prepositional phrase</b> — a preposition plus its object (a noun or pronoun), sometimes with a describing word or two in between. It always starts with the preposition and ends with its object.</p>' +
+            '<p><i>Formula:</i> preposition + (describing words) + noun/pronoun</p>' +
+            '<table class="vocab-table"><tr><td>"through the window"</td><td>preposition "through," object "window," with "the" describing the object in between.</td></tr>' +
+            '<tr><td>"before lunch"</td><td>preposition "before," object "lunch" — no describing word needed for a phrase to count.</td></tr></table>' +
+            '<p><b>Quick test:</b> Find a word from the list above. Does it lead straight into a noun or pronoun (maybe with a describing word or two along the way)? That whole chunk — preposition through object — is the prepositional phrase.</p>' +
+            '<p style="opacity:.8;font-size:0.8rem;">This week\'s sentence has one: "...wrecked the entire display <b>before lunch</b>." "Before" is the preposition and "lunch" is its object — no article or describing word this time, and that\'s still a complete prepositional phrase.</p></div>' },
           { id: 'g5a', label: 'Level 1 — Tag the Parts of Speech', type: 'pos-tagger',
             sentence: ['While', 'the', 'professor', 'grew', 'nervous,', 'Nugget,', 'the', 'tiniest', 'hamster,', 'wrecked', 'the', 'entire', 'display', 'before', 'lunch.'],
             answers: ['Conjunction', 'Adjective', 'Noun', 'Verb', 'Adjective', 'Noun', 'Adjective', 'Adjective', 'Noun', 'Verb', 'Adjective', 'Adjective', 'Noun', 'Preposition', 'Noun'],
