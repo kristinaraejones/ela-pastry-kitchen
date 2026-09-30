@@ -864,7 +864,7 @@ function extraReviewHTML(key, id, s) {
   } else if (s._extraWords.length === 0) {
     html += `<div class="empty-note">No more review words right now. Nice!</div>`;
   } else {
-    html += s._extraWords.map((w, i) => `<div class="word-row" style="align-items:center;"><button class="btn" style="margin-top:0;flex-shrink:0;" onclick="speakWord('${w.answer.replace(/'/g, "\\'")}')">🔊 Play word ${i + 1}</button><input type="text" id="xdict-${key}-${id}-${i}" placeholder="Type what you hear"></div>`).join("");
+    html += s._extraWords.map((w, i) => `<div class="word-row" style="align-items:center;"><button class="btn" style="margin-top:0;flex-shrink:0;" onclick="speakWord('${w.answer.replace(/'/g, "\\'")}')">🔊 Play word ${i + 1}</button>${slowButton(`'${w.answer.replace(/'/g, "\\'")}'`, "speakSlowly")}<input type="text" id="xdict-${key}-${id}-${i}" placeholder="Type what you hear"></div>`).join("");
     html += `<button class="btn primary" onclick="checkExtraReview('${key}','${id}')">Check my spelling</button>`;
   }
   return html + `</div>`;
@@ -1245,6 +1245,30 @@ function speakSequence(parts) {
   });
 }
 function speakWordInContext(word, context) { speakSequence([word, context, word]); }
+// "Read slower": every word is spoken as its own slow utterance, so the browser
+// can't blur words together the way it does when reading a whole sentence.
+function speakSlowly(text) {
+  if (!("speechSynthesis" in window)) return;
+  window.speechSynthesis.cancel();
+  String(text).split(/\s+/).filter(Boolean).forEach(w => {
+    const u = new SpeechSynthesisUtterance(w);
+    u.voice = pickFriendlyVoice();
+    u.pitch = 1.05;
+    u.rate = 0.55;
+    window.speechSynthesis.speak(u);
+  });
+}
+function speakWordInContextSlowly(word, context) {
+  speakSlowly(word);
+  String(context).split(/\s+/).filter(Boolean).concat([word]).forEach(w => {
+    const u = new SpeechSynthesisUtterance(w);
+    u.voice = pickFriendlyVoice(); u.pitch = 1.05; u.rate = 0.55;
+    window.speechSynthesis.speak(u);
+  });
+}
+function slowButton(jsArgs, fn) {
+  return `<button class="btn" style="margin-top:0;flex-shrink:0;" onclick="${fn}(${jsArgs})" title="Says each word slowly and clearly">🐢 Read slower</button>`;
+}
 
 // Reads aloud whatever text is currently in the DOM element with this id —
 // used for "read this to me" buttons on lesson content and instructions,
@@ -2040,8 +2064,10 @@ function taskBodyHTML(key, t) {
           ? `speakWordInContext('${w.answer.replace(/'/g, "\\'")}','${w.context.replace(/'/g, "\\'")}')`
           : `speakWord('${w.answer.replace(/'/g, "\\'")}')`;
         const btnLabel = isSentence ? "Play sentence" : (hasContext ? `Play word ${i + 1} (in a sentence)` : `Play word ${i + 1}`);
+        const esc = x => x.replace(/'/g, "\\'");
+        const slowBtn = hasContext ? slowButton(`'${esc(w.answer)}','${esc(w.context)}'`, "speakWordInContextSlowly") : slowButton(`'${esc(w.answer)}'`, "speakSlowly");
         inner += `<div class="word-row" style="align-items:${isSentence ? "flex-start" : "center"};">
-          <button class="btn" style="margin-top:0;flex-shrink:0;" onclick="${playFn}">🔊 ${btnLabel}</button>
+          <span style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;"><button class="btn" style="margin-top:0;" onclick="${playFn}">🔊 ${btnLabel}</button>${slowBtn}</span>
           ${isSentence
             ? `<textarea id="dict-${key}-${t.id}-${i}" style="min-height:44px;" placeholder="Type the sentence you hear"></textarea>`
             : `<input type="text" id="dict-${key}-${t.id}-${i}" placeholder="Type what you hear">`}
