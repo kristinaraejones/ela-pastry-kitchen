@@ -111,6 +111,26 @@ function bkOpenTask(key, id) {
   if (panel) panel.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+// Opening a station jumps down to where she left off: the first unfinished (or sent-back)
+// section opens and scrolls into view, so a click never looks like it did nothing.
+const bkOrigOpenStationFn = window.openStationFn;
+window.openStationFn = function openStationFn(key) {
+  const wasOpen = openStation === key;
+  bkOrigOpenStationFn(key);
+  if (wasOpen || openStation !== key) return;
+  const active = activeTasks(key);
+  const isOpen = t => !isTaskLocked(t) && state[key].tasks[t.id].open;
+  let idx = active.findIndex(isOpen);
+  if (idx < 0) {
+    idx = active.findIndex(t => !isTaskLocked(t) && (state[key].tasks[t.id].sentBack || !state[key].tasks[t.id].done));
+    if (idx < 0) idx = active.findIndex(t => !isTaskLocked(t));
+    if (idx >= 0) { state[key].tasks[active[idx].id].open = true; render(); }
+  }
+  const row = idx >= 0 ? document.querySelectorAll("#detailPanel .task-row")[idx] : null;
+  const target = row || document.getElementById("detailPanel");
+  if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
 // ---------- Kid hero ----------
 function bkPlateHTML(key) {
   const kid = currentChild, th = bkTheme();
@@ -368,7 +388,11 @@ window.render = function render() {
       </section>`;
     }
     if (served) {
-      notesHTML += `<section class="bk-alldone">${bkPastry(th.emblem, kid, 48)}<div><h2>All Done With Week ${currentWeek()}!</h2><p>Nice work! Waiting for Mom to check everything, then you’ll move on to Week ${nextWk}.</p></div></section>`;
+      // Mom's "work ahead" toggle lets her move on herself, as long as no chef's note is still unread.
+      const canSelfAdvance = !!settings.allowAhead[kid] && unreadCurrent.length === 0 && sentBackAll.length === 0;
+      notesHTML += canSelfAdvance
+        ? `<section class="bk-alldone"><span>${bkPastry(th.emblem, kid, 48)}</span><div><h2>All Done With Week ${currentWeek()}!</h2><p>Nice work! You’re ready for the next week whenever you are.</p><button class="bk-btn primary" onclick="kidAdvanceWeek()">Go to Week ${nextWk}</button></div></section>`
+        : `<section class="bk-alldone">${bkPastry(th.emblem, kid, 48)}<div><h2>All Done With Week ${currentWeek()}!</h2><p>Nice work! Waiting for Mom to check everything, then you’ll move on to Week ${nextWk}.</p></div></section>`;
     }
     if (sentBackAll.length || unreadCurrent.length) {
       const total = sentBackAll.length + unreadCurrent.length;
@@ -691,7 +715,8 @@ function bkIsTestTask(t) { return !!(t.monthlyTest || t.termFinal || t.dynamic);
 // true / false for a week's plate in one subject, or null if that subject had nothing that week
 function bkPlateServed(key, w) {
   if (w === currentWeek()) return unlockedActiveTasks(key).length ? stationDone(key) : null;
-  const tasks = DATA[key].tasks.filter(t => t.week_number === w && !bkIsTestTask(t));
+  // Repeating tasks share one state across weeks, so they can't say anything about a past week.
+  const tasks = DATA[key].tasks.filter(t => t.week_number === w && !bkIsTestTask(t) && !t.recurring);
   if (!tasks.length) return null;
   return tasks.every(t => state[key].tasks[t.id].done);
 }
@@ -714,7 +739,23 @@ function bkRankInfo() {
     pct: next ? Math.max(4, Math.round(((plates - from) / (next[0] - from)) * 100)) : 100 };
 }
 function bkTreatForWeek(w) { return (typeof BK_TREATS !== "undefined" ? BK_TREATS : []).find(t => t.week === w) || null; }
-function bkTreatUnlocked(w) { return w <= currentWeek() && !!bkTreatForWeek(w) && bkWeekComplete(w); }
+// Once a treat is earned it stays earned (saved in Settings), even if later weeks' data shifts.
+function bkEarnedList() { return (settings.treatsEarned && settings.treatsEarned[currentChild]) || []; }
+function bkTreatUnlocked(w) {
+  if (!bkTreatForWeek(w)) return false;
+  return bkEarnedList().includes(w) || (w <= currentWeek() && bkWeekComplete(w));
+}
+function bkRecordEarnedTreats() {
+  if (!settings.treatsEarned) settings.treatsEarned = {};
+  const list = bkEarnedList().slice();
+  let changed = false;
+  for (let w = 1; w <= currentWeek(); w++) {
+    if (!list.includes(w) && bkTreatForWeek(w) && bkWeekComplete(w)) { list.push(w); changed = true; }
+  }
+  if (!changed) return;
+  settings.treatsEarned[currentChild] = list;
+  apiPost("saveSetting", { key: `${currentChild}_treats_earned`, value: list.join(",") }).catch(() => {});
+}
 function bkTreatsCollected() { return (typeof BK_TREATS !== "undefined" ? BK_TREATS : []).filter(t => bkTreatUnlocked(t.week)).length; }
 function bkTreatsTotal() { return (typeof BK_TREATS !== "undefined" ? BK_TREATS : []).length; }
 
@@ -747,6 +788,13 @@ function bkTreatPlateSVG(size) {
 }
 const BK_CREMA_ART = `<svg width="100%" height="100%" viewBox="0 0 548 368" preserveAspectRatio="xMidYMid slice" aria-label="Illustration of crema catalana in a terracotta dish" role="img"><rect width="548" height="368" fill="#F4E9DA"/><path d="M0 60H548M0 150H548M0 240H548M0 330H548M70 0V368M190 0V368M310 0V368M430 0V368" stroke="#EBDCC7" stroke-width="18"/><ellipse cx="274" cy="222" rx="206" ry="112" fill="#000" opacity="0.08"/><ellipse cx="274" cy="206" rx="192" ry="104" fill="#A9542E"/><ellipse cx="274" cy="186" rx="192" ry="104" fill="#C8693D"/><ellipse cx="274" cy="182" rx="170" ry="90" fill="#DA8350"/><ellipse cx="274" cy="184" rx="156" ry="80" fill="#E0A04A"/><ellipse cx="226" cy="170" rx="52" ry="22" fill="#EFBE62"/><ellipse cx="324" cy="198" rx="46" ry="18" fill="#EFBE62"/><ellipse cx="300" cy="150" rx="30" ry="11" fill="#C07A2E"/><ellipse cx="200" cy="208" rx="26" ry="9" fill="#C07A2E"/><path d="M190 160l30 12 18-8 34 20M280 196l26-10 24 14 30-6M232 214l22-14M312 150l-10 18" stroke="#8F5420" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><rect x="48" y="300" width="150" height="22" rx="11" fill="#9A5B34" transform="rotate(-14 123 311)"/><path d="M392 318c26-22 64-28 96-14c-8 16-44 30-78 30c-8 0-14-6-18-16z" fill="#F4D35E" stroke="#D9B53C" stroke-width="3" stroke-linejoin="round"/></svg>`;
 
+function kidAdvanceWeek() {
+  if (currentView === "parent" || !settings.allowAhead[currentChild] || !allSubjectsServed()) return;
+  bkRecordEarnedTreats();
+  advanceWeek();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 // ---------- Navigation ----------
 function bkOpenPassport(where) {
   bkPassport = where == null ? "case" : where;
@@ -778,11 +826,19 @@ function bkPassportCaseHTML() {
       <h2>Something Delicious Is Hiding Under The Lid</h2><p>Serve all ${keys.length} plates this week to lift the lid and add it to your case.</p>
       <div class="bk-pp-progress"><span class="bk-bar">${keys.map((k, i) => `<span class="bk-seg ${i < doneNow ? "done" : ""}"></span>`).join("")}</span><b>${doneNow} of ${keys.length} plates</b></div></div></div>`;
   }
+  // Keep the newest earned treat on display while this week's lid is still down.
+  const earnedBefore = treats.filter(t => bkTreatUnlocked(t.week) && t.week !== cw).pop();
+  if (earnedBefore && !(cur && bkTreatUnlocked(cw))) {
+    feature += `<div class="bk-pp-feature"><div class="bk-pp-feature-art">${bkTreatPlateSVG(120)}</div><div class="bk-pp-feature-text">
+      <div class="bk-eyebrow">LATEST TREAT · WEEK ${earnedBefore.week} · ${earnedBefore.city.toUpperCase()}, ${earnedBefore.country.toUpperCase()}</div>
+      <h2>${earnedBefore.name}</h2><p>${earnedBefore.tagline}. Still in your case, with its story and recipe.</p>
+      <button class="bk-btn primary" onclick="bkOpenPassport(${earnedBefore.week})">Open the treat card</button></div></div>`;
+  }
   const slot = t => {
     const unlocked = bkTreatUnlocked(t.week), isNow = t.week === cw;
     if (unlocked) {
       return `<button class="bk-slot unlocked" onclick="bkOpenPassport(${t.week})" aria-label="Open ${t.name}">
-        <span class="bk-slot-plate"><img src="images/treats/${t.slug}.jpg" alt="" onerror="this.remove()">${bkTreatPlateSVG(62)}</span>
+        <span class="bk-slot-plate"><img src="images/treats/${t.slug}.jpg" alt="" onerror="this.remove()">${t.slug === "crema-catalana" ? BK_CREMA_ART : bkTreatPlateSVG(62)}</span>
         <span class="bk-slot-name">${t.name}</span><span class="bk-slot-where">Week ${t.week} · ${t.city}</span></button>`;
     }
     return `<div class="bk-slot${isNow ? " now" : ""}">
@@ -906,6 +962,7 @@ window.render = function render() {
   if (pbtn) pbtn.style.display = isParent ? "none" : "";
 
   // Newly served plates → celebrate (only after the first render for this child)
+  if (seeded) bkRecordEarnedTreats();
   const nowComplete = bkWeekComplete(currentWeek());
   const unlockedNow = seeded && nowComplete && bkWeekSeen[wkKey] === false && bkTreatForWeek(currentWeek()) ? currentWeek() : null;
   bkWeekSeen[wkKey] = nowComplete;
@@ -1177,29 +1234,40 @@ function bkAnalyzeWord(word) {
     meaning: null, example: null, tip: null
   };
 }
+// Each kind of word part is a different "ingredient" on the recipe card.
+const BK_PART_STYLE = {
+  Prefix: { cls: "p1", emoji: "🍓", nick: "Flavor on the front" },
+  Root: { cls: "p2", emoji: "🥣", nick: "Main ingredient" },
+  Suffix: { cls: "p3", emoji: "🍬", nick: "Topping on the end" }
+};
 function bkIngredientChip(label, part) {
   if (!part) return "";
-  return `<div class="bk-ingredient"><span class="bk-ingredient-part">${label}</span><span class="bk-ingredient-seg">${part[0]}</span><span class="bk-ingredient-mean">${part[1]}</span></div>`;
+  const st = BK_PART_STYLE[label];
+  return `<div class="bk-ingredient ${st.cls}"><span class="bk-ingredient-emoji" aria-hidden="true">${st.emoji}</span><span class="bk-ingredient-part">${st.nick}</span><span class="bk-ingredient-seg">${part[0]}</span><span class="bk-ingredient-mean">means ${part[1]}</span></div>`;
 }
 function bkWordCardHTML(word) {
   const a = bkAnalyzeWord(word);
   if (!a) return `<div class="bk-recipecard empty">Type a word to see its recipe card.</div>`;
+  const tapes = `<span class="bk-rc-tape l" aria-hidden="true"></span><span class="bk-rc-tape r" aria-hidden="true"></span>`;
   if (a.unknown) {
-    return `<div class="bk-recipecard">
+    return `<div class="bk-recipecard">${tapes}
+      <div class="bk-rc-kicker">🧑‍🍳 Word Recipe Card</div>
       <div class="bk-rc-head"><span class="bk-rc-word">${bkTitle(a.word)}</span></div>
-      <div class="bk-rc-empty">We don’t have a breakdown for this word yet — but you can still look up what it means and add it to the review bank.</div>
+      <div class="bk-rc-empty">This word is a secret family recipe. We don’t have its ingredients yet, but you can still look up what it means and add it to the review bank.</div>
     </div>`;
   }
-  return `<div class="bk-recipecard">
-    <div class="bk-rc-head"><span class="bk-rc-word">${bkTitle(a.word)}</span>${a.origin ? `<span class="bk-rc-origin">${a.origin}</span>` : ""}</div>
-    <div class="bk-rc-ingredients">
-      ${bkIngredientChip("Prefix", a.prefix)}
-      ${bkIngredientChip("Root", a.root)}
-      ${bkIngredientChip("Suffix", a.suffix)}
-    </div>
-    ${a.meaning ? `<div class="bk-rc-block"><div class="bk-field-label">Meaning</div><p>${a.meaning}</p></div>` : ""}
-    ${a.example ? `<div class="bk-rc-block"><div class="bk-field-label">In A Sentence</div><p>${a.example}</p></div>` : ""}
-    ${a.tip ? `<div class="bk-rc-block bk-rc-tip"><div class="bk-field-label">${bkIcon("bulb", 14)}Memory Tip</div><p>${a.tip}</p></div>` : ""}
+  const parts = [["Prefix", a.prefix], ["Root", a.root], ["Suffix", a.suffix]].filter(p => p[1]);
+  const chips = parts.map(p => bkIngredientChip(p[0], p[1])).join('<span class="bk-rc-plus" aria-hidden="true">+</span>');
+  return `<div class="bk-recipecard">${tapes}
+    <div class="bk-rc-kicker">🧑‍🍳 Word Recipe Card${a.origin ? ` <span class="bk-rc-origin">from ${a.origin}</span>` : ""}</div>
+    <div class="bk-rc-head"><span class="bk-rc-word">${bkTitle(a.word)}</span></div>
+    <div class="bk-rc-step"><span class="bk-rc-stepnum">1</span><div class="bk-field-label">Gather your ingredients</div></div>
+    <div class="bk-rc-ingredients">${chips}</div>
+    <div class="bk-rc-step"><span class="bk-rc-stepnum">2</span><div class="bk-field-label">Mix them together</div></div>
+    <div class="bk-rc-mix"><span class="bk-rc-bowl" aria-hidden="true">🥣</span><span class="bk-rc-mixarrow" aria-hidden="true">✨ stir, stir, stir ✨</span><span class="bk-rc-result">${bkTitle(a.word)}</span></div>
+    ${a.meaning ? `<div class="bk-rc-block"><div class="bk-rc-step"><span class="bk-rc-stepnum">3</span><div class="bk-field-label">Taste test (what it means)</div></div><p>${a.meaning}</p></div>` : ""}
+    ${a.example ? `<div class="bk-rc-block"><div class="bk-rc-step"><span class="bk-rc-stepnum">4</span><div class="bk-field-label">Serve it in a sentence</div></div><p>${a.example}</p></div>` : ""}
+    ${a.tip ? `<div class="bk-rc-block bk-rc-tip"><div class="bk-field-label">${bkIcon("bulb", 14)}Chef’s tip</div><p>${a.tip}</p></div>` : ""}
   </div>`;
 }
 

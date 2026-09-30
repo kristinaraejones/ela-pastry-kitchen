@@ -627,19 +627,39 @@ body[data-view!="parent"][data-bk-pattern="sprinkles"] .bk-hero{background-image
 .bk-word-chip{padding:10px 16px;border:1.5px solid var(--bk-border);border-radius:14px;background:#fff;font:800 15px 'Nunito',sans-serif;color:var(--bk-muted);cursor:pointer;text-align:left;}
 .bk-word-chip.active{border-color:var(--bk-accent);background:var(--bk-soft);color:var(--bk-accent-ink);}
 .bk-recipebox-card{flex:1;min-width:280px;}
-.bk-recipecard{padding:26px 28px;background:#fff;border:1px solid var(--bk-border);border-radius:26px;display:flex;flex-direction:column;gap:16px;}
+.bk-recipecard{position:relative;padding:34px 30px 26px;background:#FFFDF6;background-image:repeating-linear-gradient(transparent 0 31px,#F1E6D4 31px 32px);border:2.5px dashed var(--bk-bar);border-radius:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 6px 0 var(--bk-soft),0 10px 22px rgba(0,0,0,.06);animation:bkRcPop .35s ease-out;}
+.bk-rc-tape{position:absolute;top:-11px;width:76px;height:22px;background:var(--bk-aw1);opacity:.85;border-radius:3px;box-shadow:0 1px 2px rgba(0,0,0,.12);}
+.bk-rc-tape.l{left:22px;transform:rotate(-5deg);}
+.bk-rc-tape.r{right:22px;background:var(--bk-aw2);transform:rotate(4deg);}
+.bk-rc-kicker{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--bk-accent);}
 .bk-rc-head{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.bk-rc-word{font-family:'Fredoka',sans-serif;font-weight:600;font-size:30px;color:var(--bk-accent-ink);}
-.bk-rc-origin{padding:4px 12px;border-radius:999px;background:var(--bk-soft);color:var(--bk-accent-ink);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}
-.bk-rc-ingredients{display:flex;gap:12px;flex-wrap:wrap;}
-.bk-ingredient{display:flex;flex-direction:column;gap:2px;padding:12px 16px;border-radius:16px;background:var(--bk-ground);border:1px solid var(--bk-border);min-width:110px;}
-.bk-ingredient-part{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bk-muted);}
-.bk-ingredient-seg{font-family:'Fredoka',sans-serif;font-weight:600;font-size:20px;color:var(--bk-accent-ink);}
-.bk-ingredient-mean{font-size:13px;font-weight:600;color:var(--bk-muted);}
-.bk-rc-block p{margin:4px 0 0;font-size:15px;line-height:1.5;color:var(--bk-ink);}
-.bk-rc-tip{background:var(--bk-note-bg);border-radius:16px;padding:14px 16px;}
+.bk-rc-word{font-family:'Fredoka',sans-serif;font-weight:600;font-size:36px;line-height:1.1;color:var(--bk-accent-ink);}
+.bk-rc-origin{padding:3px 10px;border-radius:999px;background:var(--bk-soft);color:var(--bk-accent-ink);font-size:11px;font-weight:800;letter-spacing:.05em;}
+.bk-rc-step{display:flex;align-items:center;gap:8px;margin-top:4px;}
+.bk-rc-stepnum{width:24px;height:24px;border-radius:50%;background:var(--bk-accent);color:#fff;font-family:'Fredoka',sans-serif;font-weight:600;font-size:14px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.bk-rc-ingredients{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;}
+.bk-rc-plus{align-self:center;font-family:'Fredoka',sans-serif;font-size:28px;font-weight:600;color:var(--bk-accent);}
+.bk-ingredient{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:12px 14px;border-radius:16px;border:2px solid rgba(0,0,0,.06);min-width:118px;flex:1 1 118px;max-width:200px;animation:bkRcBounce .5s ease-out both;}
+.bk-ingredient.p1{background:var(--bk-aw1);}
+.bk-ingredient.p2{background:var(--bk-aw2);animation-delay:.12s;}
+.bk-ingredient.p3{background:var(--bk-aw3);animation-delay:.24s;}
+.bk-ingredient-emoji{font-size:26px;line-height:1;}
+.bk-ingredient-part{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--bk-ink);opacity:.75;}
+.bk-ingredient-seg{font-family:'Fredoka',sans-serif;font-weight:600;font-size:26px;color:var(--bk-accent-ink);}
+.bk-ingredient-mean{font-size:13px;font-weight:700;color:var(--bk-ink);}
+.bk-rc-mix{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;background:#fff;border:2px solid var(--bk-bar);border-radius:16px;}
+.bk-rc-bowl{font-size:34px;display:inline-block;animation:bkRcStir 1.6s ease-in-out 1;}
+.bk-rc-mixarrow{font-size:13px;font-weight:800;color:var(--bk-muted);}
+.bk-rc-result{margin-left:auto;padding:6px 18px;border-radius:999px;background:var(--bk-accent);color:#fff;font-family:'Fredoka',sans-serif;font-weight:600;font-size:24px;}
+.bk-rc-block p{margin:4px 0 0;font-size:16px;line-height:1.55;color:var(--bk-ink);font-weight:600;}
+.bk-rc-tip{background:var(--bk-note-bg);border-radius:14px;padding:12px 16px;border:1.5px dashed var(--bk-note-ink);}
 .bk-rc-tip .bk-field-label{color:var(--bk-note-ink);}
-.bk-rc-empty{font-size:14px;font-weight:600;color:var(--bk-muted);padding:10px 0;}
+.bk-rc-empty{font-size:15px;font-weight:600;color:var(--bk-muted);padding:10px 0;}
+@keyframes bkRcPop{from{transform:scale(.97) rotate(-.6deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes bkRcBounce{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
+@keyframes bkRcStir{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+@media (prefers-reduced-motion:reduce){.bk-recipecard,.bk-ingredient,.bk-rc-bowl{animation:none;}}
+.extra-review{margin-top:14px;padding-top:12px;border-top:2px dashed var(--bk-border);}
 .bk-recipecard.empty{color:var(--bk-muted);font-weight:700;}
 body[data-view!="parent"][data-bk-style="pro"] .bk-hero .bk-sprinkle{display:none;}
 .bk-cel-spr.shape{background:none !important;display:flex;align-items:center;justify-content:center;width:16px;height:16px;margin:-8px 0 0 -8px;}
@@ -684,3 +704,4 @@ body[data-view!="parent"][data-bk-style="pro"] .bk-hero .bk-sprinkle{display:non
 .chef-note-card-sub{font-size:13px;font-weight:700;color:var(--bk-muted);margin-top:2px;}
 .chef-note-card-body{background:var(--bk-note-row);border-radius:16px;padding:14px 16px;font-size:15px;line-height:1.55;color:var(--bk-ink);}
 .chef-note-card-actions{display:flex;justify-content:flex-end;gap:10px;}
+.bk-alldone .bk-btn{margin-top:10px;}

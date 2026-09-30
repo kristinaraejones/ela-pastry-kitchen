@@ -28,7 +28,7 @@ let chefNoteOpen = null;       // { key, id } — the read-and-acknowledge overl
 
 let DATA = null;   // current child's { subjectKey: {name, tag, tasks:[...]} }
 let state = null;  // current child's { subjectKey: { tasks: { taskId: {...} } } }
-let settings = { weeks: { kenley: 1, adelyn: 1 }, termFinalsUnlocked: false, monthlyTestOverride: null, vocabGameSynced: { kenley: "", adelyn: "" }, allowAhead: { kenley: false, adelyn: false } };
+let settings = { weeks: { kenley: 1, adelyn: 1 }, termFinalsUnlocked: false, monthlyTestOverride: null, vocabGameSynced: { kenley: "", adelyn: "" }, allowAhead: { kenley: false, adelyn: false }, treatsEarned: { kenley: [], adelyn: [] } };
 
 const childrenCache = {};   // { kenley: {DATA, state} }
 const reviewPoolCache = {}; // { kenley: [ {word,timesMissed,...} ] }
@@ -275,7 +275,9 @@ function parseSettings(raw) {
   const weeks = {};
   const vocabGameSynced = {};
   const allowAhead = {};
+  const treatsEarned = {};
   Object.keys(CHILD_META).forEach(id => {
+    treatsEarned[id] = String(raw[`${id}_treats_earned`] || "").split(",").map(Number).filter(Boolean);
     weeks[id] = Number(raw[`${id}_current_week`]) || 1;
     vocabGameSynced[id] = raw[`${id}_vocabgame_synced_ts`] || "";
     allowAhead[id] = raw[`${id}_allow_ahead`] === "true" || raw[`${id}_allow_ahead`] === true;
@@ -285,7 +287,8 @@ function parseSettings(raw) {
     termFinalsUnlocked: raw.termFinalsUnlocked === "true" || raw.termFinalsUnlocked === true,
     monthlyTestOverride: override,
     vocabGameSynced,
-    allowAhead
+    allowAhead,
+    treatsEarned
   };
 }
 
@@ -318,6 +321,12 @@ function buildChildFromBootstrap(resp, week, student) {
   const state = {};
   Object.keys(DATA).forEach(key => {
     state[key] = { tasks: {} };
+    // A task id that repeats across weeks (Adelyn's "Play in the Word Bakery" is avwb
+    // in all 36 weeks) or the standing review drill shares ONE submission/state, so
+    // it has to be re-earned each week instead of staying done forever.
+    const idCounts = {};
+    DATA[key].tasks.forEach(t => { idCounts[t.id] = (idCounts[t.id] || 0) + 1; });
+    DATA[key].tasks.forEach(t => { t.recurring = t.dynamic === "reviewPool" || idCounts[t.id] > 1; });
     DATA[key].tasks.forEach(t => {
       const sub = subMap[t.id];
       const a = (sub && sub.answers) || {};
@@ -330,7 +339,7 @@ function buildChildFromBootstrap(resp, week, student) {
       // recorded week doesn't match the week actually being viewed; the
       // underlying missed-word pool itself (reviewPoolCache/ReviewPool sheet)
       // is unaffected — only this per-attempt submission record resets.
-      const stale = t.dynamic === "reviewPool" && sub && Number(a.completedWeek) !== week;
+      const stale = t.recurring && sub && Number(a.completedWeek) !== week;
       const effSub = stale ? null : sub;
       const effA = stale ? {} : a;
       const base = {
@@ -348,7 +357,7 @@ function buildChildFromBootstrap(resp, week, student) {
         commentAcked: !!effA.commentAcked,
         results: effA.results || null,
         history: a.history || [],
-        completedWeek: a.completedWeek || null
+        completedWeek: effA.completedWeek || null
       };
       if (t.type === "pos-tagger") base.labels = a.labels || new Array(t.sentence.length).fill(null);
       if (t.type === "phrase-tagger") base.selections = a.selections || [];
@@ -386,6 +395,9 @@ function statusLabel(s) {
 }
 
 function persistTaskFor(student, s, id) {
+  // Stamp which week this was finished in, so a task that repeats every week
+  // (see `recurring` in buildChildFromBootstrap) can tell last week's "done" from this week's.
+  s.completedWeek = s.done ? (settings.weeks[student] || 1) : null;
   apiPost("saveSubmission", {
     student,
     task_id: id,
@@ -448,6 +460,10 @@ function advanceAnyway() {
 }
 function advanceWeek() {
   settings.weeks[currentChild] = currentWeek() + 1;
+  // Repeating tasks (Word Bakery, review drill) start the new week fresh.
+  Object.keys(DATA).forEach(key => DATA[key].tasks.forEach(t => {
+    if (t.recurring && state[key].tasks[t.id].completedWeek !== currentWeek()) state[key].tasks[t.id] = freshTaskState(t);
+  }));
   apiPost("saveSetting", { key: `${currentChild}_current_week`, value: String(settings.weeks[currentChild]) }).catch(() => {});
   render();
 }
@@ -798,10 +814,60 @@ function submitReflection(key, id) {
 // ---------- Review pool (missed-word bank) ----------
 
 function loadPool() { return reviewPoolCache[currentChild] || []; }
-function getReviewWords(n) {
+const REVIEW_WORDS_PER_ROUND = 5;
+// `round` moves the window along the (most-missed-first) pool, wrapping around, so
+// "refresh" / "review more" hands out different words instead of the same top few.
+function getReviewWords(n, round) {
   const pool = loadPool().filter(p => p.status === "active");
   pool.sort((a, b) => b.timesMissed - a.timesMissed);
-  return pool.slice(0, n).map(p => ({ answer: p.word, kind: "word", context: p.context || null }));
+  if (!pool.length) return [];
+  const start = ((round || 0) * n) % pool.length;
+  const picked = [];
+  for (let i = 0; i < Math.min(n, pool.length); i++) picked.push(pool[(start + i) % pool.length]);
+  return picked.map(p => ({ answer: p.word, kind: "word", context: p.context || null }));
+}
+function reviewPoolHasMore(round) { return loadPool().filter(p => p.status === "active").length > REVIEW_WORDS_PER_ROUND || (round || 0) > 0; }
+function refreshReviewWords(key, id) {
+  const s = state[key].tasks[id];
+  s._reviewRound = (s._reviewRound || 0) + 1;
+  render();
+}
+// Optional extra practice after the week's review is done. Not graded and not saved
+// as the task's submission, but each word still updates the missed-word pool.
+function startExtraReview(key, id) {
+  const s = state[key].tasks[id];
+  s._extraRound = (s._extraRound || 0) + 1;
+  s._extraWords = getReviewWords(REVIEW_WORDS_PER_ROUND, (s._reviewRound || 0) + s._extraRound);
+  s._extraResults = null;
+  render();
+}
+function checkExtraReview(key, id) {
+  const s = state[key].tasks[id];
+  s._extraResults = (s._extraWords || []).map((w, i) => {
+    const typed = (document.getElementById(`xdict-${key}-${id}-${i}`).value || "").trim();
+    const ok = typed.toLowerCase() === w.answer.toLowerCase();
+    logReviewResult(w.answer, ok);
+    return { typed, answer: w.answer, correct: ok };
+  });
+  render();
+}
+function extraReviewHTML(key, id, s) {
+  const round = s._reviewRound || 0;
+  if (!s._extraWords) {
+    if (!loadPool().some(p => p.status === "active")) return "";
+    return `<div class="extra-review"><button class="btn" onclick="startExtraReview('${key}','${id}')">🔁 Review ${REVIEW_WORDS_PER_ROUND} more words</button></div>`;
+  }
+  let html = `<div class="extra-review"><div class="lesson-text"><b>Bonus review round ${s._extraRound}</b> (extra practice, just for you)</div>`;
+  if (s._extraResults) {
+    html += s._extraResults.map(r => `<div class="dict-result ${r.correct ? "correct" : "incorrect"}"><div class="dict-result-typed"><span class="dict-icon">${r.correct ? "✓" : "✗"}</span> You wrote: <b>${r.typed || "(blank)"}</b></div>${r.correct ? "" : `<div class="dict-result-answer">Correct spelling: <b>${r.answer}</b></div>`}</div>`).join("");
+    html += `<button class="btn primary" onclick="startExtraReview('${key}','${id}')">🔁 Review ${REVIEW_WORDS_PER_ROUND} more words</button>`;
+  } else if (s._extraWords.length === 0) {
+    html += `<div class="empty-note">No more review words right now. Nice!</div>`;
+  } else {
+    html += s._extraWords.map((w, i) => `<div class="word-row" style="align-items:center;"><button class="btn" style="margin-top:0;flex-shrink:0;" onclick="speakWord('${w.answer.replace(/'/g, "\\'")}')">🔊 Play word ${i + 1}</button><input type="text" id="xdict-${key}-${id}-${i}" placeholder="Type what you hear"></div>`).join("");
+    html += `<button class="btn primary" onclick="checkExtraReview('${key}','${id}')">Check my spelling</button>`;
+  }
+  return html + `</div>`;
 }
 function persistReviewWord(entry) {
   apiPost("saveReviewWord", {
@@ -1923,7 +1989,7 @@ function taskBodyHTML(key, t) {
     let words = t.words;
     const banks = banksCache[currentChild] || {};
     if (t.dynamic === "reviewPool") {
-      words = getReviewWords(2);
+      words = getReviewWords(REVIEW_WORDS_PER_ROUND, s._reviewRound || 0);
       state[key].tasks[t.id]._reviewWords = words;
     } else if (t.dynamic === "spellingMonthBank") {
       if (!s.done) { words = sampleSpellingWords(banks.spelling || [], Math.min(15, (banks.spelling || []).length)); state[key].tasks[t.id]._reviewWords = words; }
@@ -1982,7 +2048,11 @@ function taskBodyHTML(key, t) {
         </div>`;
       });
       inner += `<button class="btn primary" onclick="checkDictation('${key}','${t.id}')">Check my spelling</button>`;
+      if (t.dynamic === "reviewPool" && reviewPoolHasMore(s._reviewRound)) {
+        inner += ` <button class="btn" onclick="refreshReviewWords('${key}','${t.id}')">🔄 Different words</button>`;
+      }
     }
+    if (t.dynamic === "reviewPool" && s.done && allCorrectionsConfirmed(s.results || [])) inner += extraReviewHTML(key, t.id, s);
   } else if (t.type === "fluency-read") {
     const fluencyPromptId = `fluency-prompt-${key}-${t.id}`;
     inner = `${trimReadAloud ? "" : readAloudButton(fluencyPromptId, "Read the instructions to me")}<div class="lesson-text" id="${fluencyPromptId}"><p>${t.prompt}</p></div>`;

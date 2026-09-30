@@ -17,15 +17,45 @@ const BK_TREATS = [
       "The sugar on top was traditionally burnt with a <b>round iron</b> heated on the stove. Today most cooks use a kitchen torch."
     ],
     recipe: {
-      serves: "Serves 4", time: "20 min + 2 hr chilling", tools: "Whisk · saucepan · kitchen torch",
-      ingredients: ["500 ml (2 cups) whole milk", "Peel of 1 lemon, in wide strips", "1 cinnamon stick", "4 egg yolks", "100 g (½ cup) sugar, plus extra for the tops", "2 tbsp cornstarch"],
-      steps: [
-        ["Warm the milk with the lemon peel and cinnamon until it steams. Turn off the heat, let it rest 10 minutes, then fish out the peel and cinnamon.", "together"],
-        ["Whisk the yolks, sugar and cornstarch in a bowl until pale and smooth.", "kid"],
-        ["Slowly whisk the warm milk into the yolks. Pour it all back into the pot and stir over low heat until thick like pudding, 5–8 minutes.", "together"],
-        ["Pour into shallow dishes, let cool, then chill for at least 2 hours.", "kid"],
-        ["Sprinkle a thin layer of sugar on top and torch it until it turns amber and glassy.", "grown"],
-        ["Tap the top with a spoon. Crack! Now it’s ready to eat.", "kid"]
+      "serves": "Serves 4",
+      "time": "20 min + 2 hr chilling",
+      "tools": "Whisk · saucepan · kitchen torch",
+      "note": "Whole-food plant-based: no eggs or dairy. Cornstarch thickens it and a pinch of turmeric gives the golden color.",
+      "ingredients": [
+            "500 ml (2 cups) unsweetened soy or oat milk",
+            "Peel of 1 lemon, in wide strips",
+            "1 cinnamon stick",
+            "4 tbsp cornstarch",
+            "3 tbsp maple syrup",
+            "1 tsp vanilla",
+            "Pinch of turmeric (for color)",
+            "Coconut sugar for the tops"
+      ],
+      "steps": [
+            [
+                  "Warm 400 ml (1¾ cups) of the milk with the lemon peel and cinnamon until it steams. Turn off the heat, let it rest 10 minutes, then fish out the peel and cinnamon.",
+                  "together"
+            ],
+            [
+                  "Whisk the cornstarch, maple syrup, vanilla, turmeric and the remaining cold milk in a bowl until smooth.",
+                  "kid"
+            ],
+            [
+                  "Slowly whisk the warm milk into the bowl. Pour it all back into the pot and stir over low heat until thick like pudding, 3–5 minutes.",
+                  "together"
+            ],
+            [
+                  "Pour into shallow dishes, let cool, then chill for at least 2 hours.",
+                  "kid"
+            ],
+            [
+                  "Sprinkle a thin layer of coconut sugar on top and torch it until it darkens and turns glassy.",
+                  "grown"
+            ],
+            [
+                  "Tap the top with a spoon. Crack! Now it’s ready to eat.",
+                  "kid"
+            ]
       ]
     }
   },
@@ -42,15 +72,48 @@ const BK_TREATS = [
       "Many families eat pan dulce with <b>hot chocolate or café de olla</b> for breakfast or an afternoon snack."
     ],
     recipe: {
-      serves: "Makes 12", time: "30 min + about 2½ hr rising", tools: "Big bowl · baking sheet · butter knife",
-      ingredients: ["Dough: 500 g (4 cups) all-purpose flour", "100 g (½ cup) sugar", "1 packet (2¼ tsp) instant yeast", "1 tsp salt", "2 eggs", "180 ml (¾ cup) warm milk", "115 g (½ cup) soft butter", "Topping: 65 g (½ cup) flour", "60 g (½ cup) powdered sugar", "55 g (¼ cup) soft butter", "1 tsp vanilla, or 1 tbsp cocoa for chocolate conchas"],
-      steps: [
-        ["Mix the flour, sugar, yeast and salt. Add the eggs, warm milk and butter, and knead until smooth and stretchy, about 10 minutes.", "together"],
-        ["Cover the bowl and let the dough rise until doubled, about 1½ hours.", "kid"],
-        ["Divide into 12 balls and set them on a lined baking sheet.", "kid"],
-        ["Mix the topping ingredients into a soft paste. Flatten 12 little discs and press one onto each ball.", "kid"],
-        ["Score shell lines into the topping with a butter knife. Let the rolls rise 45 minutes.", "kid"],
-        ["Bake at 175 °C / 350 °F for 18–20 minutes, until puffed and lightly golden underneath.", "grown"]
+      "serves": "Makes 12",
+      "time": "30 min + about 2½ hr rising",
+      "tools": "Big bowl · baking sheet · butter knife",
+      "note": "Whole-food plant-based: whole wheat flour, oat milk, and a coconut-oil topping instead of butter and eggs.",
+      "ingredients": [
+            "Dough: 500 g (4 cups) whole wheat pastry flour (or half whole wheat, half all-purpose)",
+            "60 g (¼ cup) maple syrup or date syrup",
+            "1 packet (2¼ tsp) instant yeast",
+            "1 tsp salt",
+            "1 tbsp ground flax mixed with 3 tbsp water (let it gel 5 min)",
+            "200 ml (¾ cup + 1 tbsp) warm oat milk",
+            "60 ml (¼ cup) melted coconut oil or mashed ripe banana",
+            "Topping: 65 g (½ cup) whole wheat flour",
+            "3 tbsp maple sugar or coconut sugar",
+            "3 tbsp soft coconut oil",
+            "1 tsp vanilla, or 1 tbsp cocoa for chocolate conchas"
+      ],
+      "steps": [
+            [
+                  "Mix the flour, yeast and salt. Add the flax gel, maple syrup, warm milk and coconut oil, and knead until smooth and stretchy, about 10 minutes.",
+                  "together"
+            ],
+            [
+                  "Cover the bowl and let the dough rise until doubled, about 1½ hours.",
+                  "kid"
+            ],
+            [
+                  "Divide into 12 balls and set them on a lined baking sheet.",
+                  "kid"
+            ],
+            [
+                  "Mix the topping ingredients into a soft paste. Flatten 12 little discs and press one onto each ball.",
+                  "kid"
+            ],
+            [
+                  "Score shell lines into the topping with a butter knife. Let the rolls rise 45 minutes.",
+                  "kid"
+            ],
+            [
+                  "Bake at 175 °C / 350 °F for 18–20 minutes, until puffed and lightly golden underneath.",
+                  "grown"
+            ]
       ]
     }
   },
@@ -67,15 +130,38 @@ const BK_TREATS = [
       "A proper bakery croissant takes about <b>two days</b> from start to finish."
     ],
     recipe: {
-      serves: "Makes 8 (shortcut version)", time: "15 min + 18 min baking", tools: "Rolling pin · knife · baking sheet",
-      note: "Real croissants take two days. This shortcut gets the flaky layers from ready-made puff pastry.",
-      ingredients: ["1 sheet store-bought puff pastry, thawed", "8 small squares of chocolate or 2 tbsp jam (optional)", "1 egg, beaten", "1 tbsp sugar"],
-      steps: [
-        ["Unroll the pastry and cut it into 8 long triangles.", "together"],
-        ["Put a little chocolate or jam at the wide end of each triangle.", "kid"],
-        ["Roll each one up from the wide end to the point, then curve the ends into a crescent.", "kid"],
-        ["Brush with beaten egg and sprinkle with sugar.", "kid"],
-        ["Bake at 200 °C / 400 °F for 15–18 minutes until puffed and golden.", "grown"]
+      "serves": "Makes 8 (shortcut version)",
+      "time": "15 min + 18 min baking",
+      "tools": "Rolling pin · knife · baking sheet",
+      "note": "Real croissants take two days. This shortcut uses a vegan puff pastry. Check the label: many store brands are made with oil instead of butter. Whole-food plant-based: a date-and-cocoa filling replaces chocolate bars.",
+      "ingredients": [
+            "1 sheet vegan puff pastry (oil-based, no butter), thawed",
+            "8 pitted dates, soaked in hot water 10 minutes and mashed",
+            "1 tbsp cocoa powder (optional)",
+            "2 tbsp oat milk, for brushing",
+            "1 tbsp coconut sugar"
+      ],
+      "steps": [
+            [
+                  "Unroll the pastry and cut it into 8 long triangles.",
+                  "together"
+            ],
+            [
+                  "Mash the soaked dates with the cocoa into a thick paste. Put a little at the wide end of each triangle.",
+                  "kid"
+            ],
+            [
+                  "Roll each one up from the wide end to the point, then curve the ends into a crescent.",
+                  "kid"
+            ],
+            [
+                  "Brush with oat milk and sprinkle with coconut sugar.",
+                  "kid"
+            ],
+            [
+                  "Bake at 200 °C / 400 °F for 15–18 minutes until puffed and golden.",
+                  "grown"
+            ]
       ]
     }
   },
@@ -92,14 +178,45 @@ const BK_TREATS = [
       "Some shops split it open and fill it with <b>ice cream</b>."
     ],
     recipe: {
-      serves: "Makes 8", time: "40 min + 1½ hr rising", tools: "Bowls · baking sheet · butter knife",
-      ingredients: ["Bun: 250 g (2 cups) bread flour", "3 tbsp sugar", "1½ tsp instant yeast", "½ tsp salt", "150 ml (⅔ cup) warm milk", "1 egg", "2 tbsp soft butter", "Cookie crust: 55 g (¼ cup) soft butter", "65 g (⅓ cup) sugar, plus extra for rolling", "½ beaten egg", "130 g (1 cup) flour", "½ tsp baking powder"],
-      steps: [
-        ["Mix and knead the bun ingredients until smooth, about 10 minutes. Let it rise 1 hour.", "together"],
-        ["Beat the butter and sugar for the crust, add the egg, then mix in the flour and baking powder. Chill 20 minutes.", "kid"],
-        ["Divide the bun dough into 8 balls. Divide the cookie dough into 8 and flatten each into a thin disc.", "kid"],
-        ["Drape a cookie disc over each bun, roll the top in sugar, and score a crisscross pattern.", "kid"],
-        ["Let rise 30–40 minutes, then bake at 180 °C / 350 °F for 13–15 minutes.", "grown"]
+      "serves": "Makes 8",
+      "time": "40 min + 1½ hr rising",
+      "tools": "Bowls · baking sheet · butter knife",
+      "note": "Whole-food plant-based: whole wheat flour, oat milk and coconut oil, with a flax “egg” in the dough and the cookie crust.",
+      "ingredients": [
+            "Bun: 250 g (2 cups) whole wheat bread flour (or half whole wheat, half bread flour)",
+            "2 tbsp maple syrup",
+            "1½ tsp instant yeast",
+            "½ tsp salt",
+            "150 ml (⅔ cup) warm oat milk",
+            "1 tbsp ground flax mixed with 3 tbsp water",
+            "2 tbsp melted coconut oil",
+            "Cookie crust: 3 tbsp soft coconut oil",
+            "4 tbsp maple sugar or coconut sugar, plus extra for rolling",
+            "1 tbsp ground flax mixed with 3 tbsp water",
+            "130 g (1 cup) whole wheat pastry flour",
+            "½ tsp baking powder"
+      ],
+      "steps": [
+            [
+                  "Mix and knead the bun ingredients until smooth, about 10 minutes. Let it rise 1 hour.",
+                  "together"
+            ],
+            [
+                  "Beat the coconut oil and sugar for the crust, add the flax gel, then mix in the flour and baking powder. Chill 20 minutes.",
+                  "kid"
+            ],
+            [
+                  "Divide the bun dough into 8 balls. Divide the cookie dough into 8 and flatten each into a thin disc.",
+                  "kid"
+            ],
+            [
+                  "Drape a cookie disc over each bun, roll the top in sugar, and score a crisscross pattern.",
+                  "kid"
+            ],
+            [
+                  "Let rise 30–40 minutes, then bake at 180 °C / 350 °F for 13–15 minutes.",
+                  "grown"
+            ]
       ]
     }
   },
@@ -116,16 +233,49 @@ const BK_TREATS = [
       "It’s a favorite at <b>Christmas</b>, which is in summer there!"
     ],
     recipe: {
-      serves: "Serves 8", time: "20 min + 3 hr baking and cooling", tools: "Electric mixer · baking sheet · parchment paper",
-      ingredients: ["4 egg whites, at room temperature", "200 g (1 cup) superfine sugar", "1 tsp cornstarch", "1 tsp white vinegar", "1 tsp vanilla", "Topping: 240 ml (1 cup) cream, whipped", "2 kiwifruit and a handful of berries"],
-      steps: [
-        ["Heat the oven to 120 °C / 250 °F and line a baking sheet.", "grown"],
-        ["Whip the egg whites until soft peaks form.", "together"],
-        ["Add the sugar one spoonful at a time, whipping until thick and glossy.", "kid"],
-        ["Gently fold in the cornstarch, vinegar and vanilla.", "kid"],
-        ["Spoon it into a 20 cm (8 in) circle on the parchment, a little higher around the edge.", "kid"],
-        ["Bake 1 hour 15 minutes, then turn off the oven and let it cool inside with the door closed.", "grown"],
-        ["Just before serving, top with whipped cream and fruit.", "kid"]
+      "serves": "Serves 8",
+      "time": "20 min + 3 hr baking and cooling",
+      "tools": "Electric mixer · baking sheet · parchment paper",
+      "note": "Whole-food plant-based: whipped chickpea water (aquafaba) makes the meringue, and coconut cream makes the topping.",
+      "ingredients": [
+            "120 ml (½ cup) aquafaba (the liquid from a can of unsalted chickpeas)",
+            "150 g (¾ cup) coconut sugar or maple sugar, finely ground",
+            "1 tsp cornstarch",
+            "1 tsp apple cider vinegar",
+            "1 tsp vanilla",
+            "Topping: 1 can (400 ml) full-fat coconut milk, chilled overnight",
+            "1 tbsp maple syrup",
+            "2 kiwifruit and a handful of berries"
+      ],
+      "steps": [
+            [
+                  "Heat the oven to 120 °C / 250 °F and line a baking sheet.",
+                  "grown"
+            ],
+            [
+                  "Whip the aquafaba with the vinegar until stiff peaks form, about 8–10 minutes.",
+                  "together"
+            ],
+            [
+                  "Add the sugar one spoonful at a time, whipping until thick and glossy.",
+                  "kid"
+            ],
+            [
+                  "Gently fold in the cornstarch and vanilla.",
+                  "kid"
+            ],
+            [
+                  "Spoon it into a 20 cm (8 in) circle on the parchment, a little higher around the edge.",
+                  "kid"
+            ],
+            [
+                  "Bake 1 hour 30 minutes, then turn off the oven and let it cool inside with the door closed.",
+                  "grown"
+            ],
+            [
+                  "Scoop the thick coconut cream from the top of the chilled can and whip it with the maple syrup. Just before serving, top with the cream and fruit.",
+                  "kid"
+            ]
       ]
     }
   },
@@ -142,16 +292,51 @@ const BK_TREATS = [
       "The dark, spotty tops come from a <b>very hot oven</b>."
     ],
     recipe: {
-      serves: "Makes 12", time: "30 min + 15 min baking", tools: "Muffin tin · saucepans · whisk",
-      ingredients: ["1 sheet store-bought puff pastry", "240 ml (1 cup) whole milk", "3 tbsp flour", "130 g (⅔ cup) sugar", "80 ml (⅓ cup) water", "1 cinnamon stick", "1 strip of lemon peel", "5 egg yolks", "Cinnamon and powdered sugar for dusting"],
-      steps: [
-        ["Heat the oven as hot as it goes (about 245 °C / 475 °F) and grease a muffin tin.", "grown"],
-        ["Roll the pastry into a tight log, cut it into 12 slices, and press each slice into a cup with your thumbs.", "kid"],
-        ["Whisk the flour into a quarter of the milk. Heat the rest of the milk, then whisk the two together until thick.", "together"],
-        ["Boil the sugar, water, cinnamon and lemon peel for 3 minutes to make a syrup.", "grown"],
-        ["Whisk the syrup into the milk mix and let it cool a little, then whisk in the yolks.", "together"],
-        ["Fill each pastry cup three-quarters full.", "kid"],
-        ["Bake 12–15 minutes until the tops have dark spots. Dust with cinnamon.", "grown"]
+      "serves": "Makes 12",
+      "time": "30 min + 20 min baking",
+      "tools": "Muffin tin · blender · saucepan",
+      "note": "Whole-food plant-based: a cashew custard colored with turmeric takes the place of the egg yolks. Use a vegan puff pastry and check the label for butter.",
+      "ingredients": [
+            "1 sheet vegan puff pastry (oil-based, no butter)",
+            "240 ml (1 cup) unsweetened oat or soy milk",
+            "80 g (½ cup) raw cashews, soaked 2 hours and drained",
+            "3 tbsp cornstarch",
+            "80 ml (⅓ cup) maple syrup",
+            "1 tsp vanilla",
+            "¼ tsp turmeric",
+            "1 cinnamon stick",
+            "1 strip of lemon peel",
+            "Cinnamon for dusting"
+      ],
+      "steps": [
+            [
+                  "Heat the oven as hot as it goes (about 245 °C / 475 °F) and grease a muffin tin.",
+                  "grown"
+            ],
+            [
+                  "Roll the pastry into a tight log, cut it into 12 slices, and press each slice into a cup with your thumbs.",
+                  "kid"
+            ],
+            [
+                  "Simmer the cinnamon stick and lemon peel in 80 ml (⅓ cup) water for 3 minutes, then remove them.",
+                  "grown"
+            ],
+            [
+                  "Blend the soaked cashews with the milk, cornstarch, maple syrup, vanilla, turmeric and the flavored water until completely smooth.",
+                  "together"
+            ],
+            [
+                  "Cook the blended custard in a saucepan, whisking, until thick like pudding. Let it cool a little.",
+                  "together"
+            ],
+            [
+                  "Fill each pastry cup three-quarters full.",
+                  "kid"
+            ],
+            [
+                  "Bake 12–15 minutes until the tops have dark spots. Dust with cinnamon.",
+                  "grown"
+            ]
       ]
     }
   },
@@ -168,16 +353,49 @@ const BK_TREATS = [
       "In Vienna it’s served with <b>unsweetened whipped cream</b>."
     ],
     recipe: {
-      serves: "Serves 10", time: "45 min + 1 hr baking and cooling", tools: "20 cm (8 in) cake pan · mixer · saucepan",
-      ingredients: ["115 g (½ cup) soft butter", "100 g (½ cup) sugar, divided", "4 eggs, separated", "115 g (4 oz) dark chocolate, melted", "95 g (¾ cup) flour", "Pinch of salt", "160 g (½ cup) apricot jam, warmed", "Glaze: 115 g (4 oz) dark chocolate and 120 ml (½ cup) cream"],
-      steps: [
-        ["Heat the oven to 175 °C / 350 °F and grease the pan.", "grown"],
-        ["Beat the butter with half the sugar, then beat in the yolks and melted chocolate.", "together"],
-        ["Whip the egg whites with the rest of the sugar until they hold soft peaks.", "together"],
-        ["Gently fold the whites and the flour into the chocolate mix.", "kid"],
-        ["Bake 40–45 minutes, then let it cool completely.", "grown"],
-        ["Spread the warm apricot jam over the top.", "kid"],
-        ["Heat the cream, stir in the chocolate until smooth, and pour it over the cake.", "together"]
+      "serves": "Serves 10",
+      "time": "45 min + 1 hr baking and cooling",
+      "tools": "20 cm (8 in) cake pan · saucepan",
+      "note": "Whole-food plant-based: applesauce and flax replace the butter and eggs, and the glaze is made from dark chocolate and coconut milk. Check that your dark chocolate has no milk in it.",
+      "ingredients": [
+            "95 g (¾ cup) whole wheat pastry flour",
+            "35 g (⅓ cup) cocoa powder",
+            "1½ tsp baking powder",
+            "Pinch of salt",
+            "2 tbsp ground flax mixed with 6 tbsp water",
+            "125 g (½ cup) unsweetened applesauce",
+            "80 ml (⅓ cup) maple syrup",
+            "60 ml (¼ cup) oat milk",
+            "2 tbsp melted coconut oil",
+            "1 tsp vanilla",
+            "160 g (½ cup) apricot jam, warmed (fruit-sweetened if you can find it)",
+            "Glaze: 115 g (4 oz) dark chocolate and 120 ml (½ cup) full-fat coconut milk"
+      ],
+      "steps": [
+            [
+                  "Heat the oven to 175 °C / 350 °F and grease the pan.",
+                  "grown"
+            ],
+            [
+                  "Whisk the flour, cocoa, baking powder and salt together.",
+                  "kid"
+            ],
+            [
+                  "Mix the flax gel, applesauce, maple syrup, milk, coconut oil and vanilla, then stir it into the dry ingredients until just combined.",
+                  "together"
+            ],
+            [
+                  "Pour into the pan and bake 30–35 minutes, then let it cool completely.",
+                  "grown"
+            ],
+            [
+                  "Spread the warm apricot jam over the top.",
+                  "kid"
+            ],
+            [
+                  "Heat the coconut milk, stir in the chocolate until smooth, let it thicken slightly, and pour it over the cake.",
+                  "together"
+            ]
       ]
     }
   },
@@ -194,15 +412,42 @@ const BK_TREATS = [
       "Fill them <b>right before eating</b> so the shells stay crunchy."
     ],
     recipe: {
-      serves: "Makes 12", time: "20 min + draining the ricotta", tools: "Strainer · bowl · piping bag or zip-top bag",
-      note: "Frying the shells is hot, tricky work, so this version uses store-bought shells.",
-      ingredients: ["500 g (2 cups) whole-milk ricotta", "90 g (¾ cup) powdered sugar, plus extra for dusting", "1 tsp vanilla", "Zest of 1 orange", "½ cup mini chocolate chips", "12 store-bought cannoli shells", "Chopped pistachios (optional)"],
-      steps: [
-        ["Drain the ricotta in a strainer for at least an hour so the filling is thick.", "together"],
-        ["Mix the ricotta, powdered sugar, vanilla and orange zest until smooth.", "kid"],
-        ["Stir in the chocolate chips.", "kid"],
-        ["Spoon the filling into a piping bag or zip-top bag and snip off a corner.", "together"],
-        ["Fill each shell from both ends, dip the ends in pistachios, and dust with powdered sugar.", "kid"]
+      "serves": "Makes 12",
+      "time": "20 min + chilling",
+      "tools": "Blender or food processor · bowl · piping bag or zip-top bag",
+      "note": "Frying the shells is hot, tricky work, so this version uses store-bought shells (check the label for butter, lard and egg; some are vegan). Whole-food plant-based: the filling is a tofu-cashew “ricotta.”",
+      "ingredients": [
+            "1 block (400 g) firm tofu, pressed 30 minutes",
+            "80 g (½ cup) raw cashews, soaked 2 hours and drained",
+            "60 ml (¼ cup) maple syrup",
+            "1 tsp vanilla",
+            "Zest of 1 orange",
+            "2 tbsp lemon juice",
+            "½ cup dairy-free mini chocolate chips",
+            "12 store-bought cannoli shells (vegan)",
+            "Chopped pistachios (optional)"
+      ],
+      "steps": [
+            [
+                  "Press the tofu for at least 30 minutes so the filling is thick.",
+                  "together"
+            ],
+            [
+                  "Blend the tofu, cashews, maple syrup, vanilla, orange zest and lemon juice until very smooth. Chill 30 minutes.",
+                  "together"
+            ],
+            [
+                  "Stir in the chocolate chips.",
+                  "kid"
+            ],
+            [
+                  "Spoon the filling into a piping bag or zip-top bag and snip off a corner.",
+                  "together"
+            ],
+            [
+                  "Fill each shell from both ends and dip the ends in pistachios.",
+                  "kid"
+            ]
       ]
     }
   },
@@ -219,16 +464,52 @@ const BK_TREATS = [
       "<b>Pearl sugar</b> is little white nuggets of sugar that don’t melt in the oven."
     ],
     recipe: {
-      serves: "Makes 16", time: "40 min + 1½ hr rising", tools: "Rolling pin · knife · muffin tin or paper cups",
-      ingredients: ["Dough: 240 ml (1 cup) warm milk", "1 packet (2¼ tsp) instant yeast", "65 g (⅓ cup) sugar", "1 tsp ground cardamom", "½ tsp salt", "85 g (6 tbsp) soft butter", "440 g (3½ cups) flour", "Filling: 115 g (½ cup) soft butter", "100 g (½ cup) brown sugar", "1 tbsp cinnamon", "1 egg, beaten, and pearl sugar (or crushed sugar cubes)"],
-      steps: [
-        ["Mix the dough ingredients and knead about 8 minutes. Let it rise 1 hour.", "together"],
-        ["Roll the dough into a big rectangle, about 30 × 40 cm (12 × 16 in).", "together"],
-        ["Spread the filling all over the dough.", "kid"],
-        ["Roll it up tightly from the long side and cut into 16 slices.", "together"],
-        ["Set each slice in a paper cup or muffin tin and let rise 30 minutes.", "kid"],
-        ["Brush with egg and sprinkle with pearl sugar.", "kid"],
-        ["Bake at 220 °C / 425 °F for 8–10 minutes until golden.", "grown"]
+      "serves": "Makes 16",
+      "time": "40 min + 1½ hr rising",
+      "tools": "Rolling pin · knife · muffin tin or paper cups",
+      "note": "Whole-food plant-based: whole wheat flour, oat milk and coconut oil, with a date-cinnamon filling.",
+      "ingredients": [
+            "Dough: 240 ml (1 cup) warm oat milk",
+            "1 packet (2¼ tsp) instant yeast",
+            "3 tbsp maple syrup",
+            "1 tsp ground cardamom",
+            "½ tsp salt",
+            "4 tbsp melted coconut oil",
+            "440 g (3½ cups) whole wheat pastry flour (or half whole wheat, half all-purpose)",
+            "Filling: 12 pitted dates, soaked in hot water 10 minutes and mashed to a paste",
+            "3 tbsp soft coconut oil",
+            "1 tbsp cinnamon",
+            "Brushing: 2 tbsp oat milk mixed with 1 tbsp maple syrup, plus pearl sugar (or crushed coconut sugar)"
+      ],
+      "steps": [
+            [
+                  "Mix the dough ingredients and knead about 8 minutes. Let it rise 1 hour.",
+                  "together"
+            ],
+            [
+                  "Roll the dough into a big rectangle, about 30 × 40 cm (12 × 16 in).",
+                  "together"
+            ],
+            [
+                  "Mix the date paste, coconut oil and cinnamon, then spread it all over the dough.",
+                  "kid"
+            ],
+            [
+                  "Roll it up tightly from the long side and cut into 16 slices.",
+                  "together"
+            ],
+            [
+                  "Set each slice in a paper cup or muffin tin and let rise 30 minutes.",
+                  "kid"
+            ],
+            [
+                  "Brush with the oat milk and maple mix and sprinkle with sugar.",
+                  "kid"
+            ],
+            [
+                  "Bake at 220 °C / 425 °F for 8–10 minutes until golden.",
+                  "grown"
+            ]
       ]
     }
   },
@@ -245,16 +526,49 @@ const BK_TREATS = [
       "Many countries, from <b>Greece to the Middle East</b>, have their own version."
     ],
     recipe: {
-      serves: "Makes about 24 small pieces", time: "45 min + 45 min baking + 4 hr resting", tools: "20 cm (8 in) square pan · pastry brush · saucepan",
-      ingredients: ["1 package phyllo dough, thawed", "115 g (½ cup) butter, melted", "180 g (1½ cups) walnuts or pistachios, finely chopped", "1 tsp cinnamon", "Syrup: 150 g (¾ cup) sugar", "120 ml (½ cup) water", "1 tbsp honey", "1 tsp lemon juice"],
-      steps: [
-        ["Simmer the syrup ingredients for 10 minutes, then let it cool.", "grown"],
-        ["Mix the nuts and cinnamon.", "kid"],
-        ["Heat the oven to 175 °C / 350 °F. Keep the phyllo covered with a damp towel so it doesn’t dry out.", "grown"],
-        ["Layer 8 sheets in the pan, brushing each with butter. Sprinkle half the nuts, add 4 more buttered sheets, then the rest of the nuts.", "together"],
-        ["Finish with 8 more buttered sheets on top.", "kid"],
-        ["Cut into diamonds before baking, then bake 40–45 minutes until golden.", "grown"],
-        ["Pour the cool syrup over the hot baklava. Then comes the hardest part: waiting 4 hours!", "kid"]
+      "serves": "Makes about 24 small pieces",
+      "time": "45 min + 45 min baking + 4 hr resting",
+      "tools": "20 cm (8 in) square pan · pastry brush · saucepan",
+      "note": "Whole-food plant-based: melted coconut oil replaces butter and the syrup is sweetened with maple instead of white sugar. Most phyllo is already vegan, but check the label.",
+      "ingredients": [
+            "1 package phyllo dough (vegan), thawed",
+            "80 ml (⅓ cup) melted coconut oil",
+            "180 g (1½ cups) walnuts or pistachios, finely chopped",
+            "1 tsp cinnamon",
+            "Syrup: 120 ml (½ cup) maple syrup",
+            "60 ml (¼ cup) water",
+            "1 tsp lemon juice",
+            "1 cinnamon stick"
+      ],
+      "steps": [
+            [
+                  "Simmer the syrup ingredients for 10 minutes, then let it cool.",
+                  "grown"
+            ],
+            [
+                  "Mix the nuts and cinnamon.",
+                  "kid"
+            ],
+            [
+                  "Heat the oven to 175 °C / 350 °F. Keep the phyllo covered with a damp towel so it doesn’t dry out.",
+                  "grown"
+            ],
+            [
+                  "Layer 8 sheets in the pan, brushing each with coconut oil. Sprinkle half the nuts, add 4 more oiled sheets, then the rest of the nuts.",
+                  "together"
+            ],
+            [
+                  "Finish with 8 more oiled sheets on top.",
+                  "kid"
+            ],
+            [
+                  "Cut into diamonds before baking, then bake 40–45 minutes until golden.",
+                  "grown"
+            ],
+            [
+                  "Pour the cool syrup over the hot baklava. Then comes the hardest part: waiting 4 hours!",
+                  "kid"
+            ]
       ]
     }
   },
@@ -271,15 +585,53 @@ const BK_TREATS = [
       "<b>Dulce de leche</b> means “sweet made from milk.”"
     ],
     recipe: {
-      serves: "Makes about 15 sandwiches", time: "40 min + 30 min chilling", tools: "Mixer · rolling pin · round cutter",
-      ingredients: ["130 g (1 cup) flour", "150 g (1¼ cups) cornstarch", "1 tsp baking powder", "115 g (½ cup) soft butter", "65 g (⅓ cup) sugar", "2 egg yolks", "1 tsp vanilla", "Zest of ½ lemon", "1 cup dulce de leche", "½ cup shredded coconut"],
-      steps: [
-        ["Beat the butter and sugar, then add the yolks, vanilla and lemon zest.", "kid"],
-        ["Mix in the flour, cornstarch and baking powder. Chill the dough 30 minutes.", "kid"],
-        ["Roll it out about 6 mm (¼ in) thick and cut small circles.", "kid"],
-        ["Bake at 175 °C / 350 °F for 10–12 minutes, until set but still pale.", "grown"],
-        ["When cool, sandwich two cookies with a spoonful of dulce de leche.", "kid"],
-        ["Roll the edges in coconut.", "kid"]
+      "serves": "Makes about 15 sandwiches",
+      "time": "40 min + 30 min chilling",
+      "tools": "Mixer · rolling pin · round cutter",
+      "note": "Whole-food plant-based: a simple date-and-coconut-milk caramel stands in for dulce de leche, and coconut oil replaces butter.",
+      "ingredients": [
+            "130 g (1 cup) whole wheat pastry flour",
+            "150 g (1¼ cups) cornstarch",
+            "1 tsp baking powder",
+            "5 tbsp soft coconut oil",
+            "3 tbsp maple sugar or coconut sugar",
+            "2 tbsp cold oat milk",
+            "1 tsp vanilla",
+            "Zest of ½ lemon",
+            "Caramel: 12 pitted dates, soaked in hot water 10 minutes",
+            "80 ml (⅓ cup) full-fat coconut milk",
+            "1 tsp vanilla and a pinch of salt",
+            "½ cup shredded coconut"
+      ],
+      "steps": [
+            [
+                  "Blend the soaked dates, coconut milk, vanilla and salt into a thick, smooth caramel. Chill it.",
+                  "together"
+            ],
+            [
+                  "Beat the coconut oil and sugar, then add the milk, vanilla and lemon zest.",
+                  "kid"
+            ],
+            [
+                  "Mix in the flour, cornstarch and baking powder. Chill the dough 30 minutes.",
+                  "kid"
+            ],
+            [
+                  "Roll it out about 6 mm (¼ in) thick and cut small circles.",
+                  "kid"
+            ],
+            [
+                  "Bake at 175 °C / 350 °F for 10–12 minutes, until set but still pale.",
+                  "grown"
+            ],
+            [
+                  "When cool, sandwich two cookies with a spoonful of date caramel.",
+                  "kid"
+            ],
+            [
+                  "Roll the edges in coconut.",
+                  "kid"
+            ]
       ]
     }
   },
@@ -296,15 +648,47 @@ const BK_TREATS = [
       "The custard stays put because you press a <b>deep dent</b> into each bun before baking."
     ],
     recipe: {
-      serves: "Makes 12", time: "1 hr + 1½ hr rising", tools: "Saucepan · whisk · baking sheet",
-      ingredients: ["Dough: 240 ml (1 cup) warm milk", "1 packet (2¼ tsp) instant yeast", "65 g (⅓ cup) sugar", "1 tsp ground cardamom", "½ tsp salt", "85 g (6 tbsp) soft butter", "440 g (3½ cups) flour", "Custard: 240 ml (1 cup) milk, 3 egg yolks, 50 g (¼ cup) sugar, 2 tbsp cornstarch, 1 tsp vanilla", "Icing: 120 g (1 cup) powdered sugar and 1–2 tbsp water", "½ cup shredded coconut"],
-      steps: [
-        ["Cook the custard ingredients over low heat, whisking, until thick. Chill it.", "together"],
-        ["Mix and knead the dough, then let it rise 1 hour.", "together"],
-        ["Shape 12 balls and let them rise 30 minutes.", "kid"],
-        ["Press a deep dent into each bun and fill it with custard.", "kid"],
-        ["Bake at 220 °C / 425 °F for 10–12 minutes.", "grown"],
-        ["When cool, spread icing around the custard and dip in coconut.", "kid"]
+      "serves": "Makes 12",
+      "time": "1 hr + 1½ hr rising",
+      "tools": "Saucepan · whisk · baking sheet",
+      "note": "Whole-food plant-based: whole wheat flour, oat milk and coconut oil in the buns, and a turmeric-tinted cornstarch custard in the middle.",
+      "ingredients": [
+            "Dough: 240 ml (1 cup) warm oat milk",
+            "1 packet (2¼ tsp) instant yeast",
+            "3 tbsp maple syrup",
+            "1 tsp ground cardamom",
+            "½ tsp salt",
+            "4 tbsp melted coconut oil",
+            "440 g (3½ cups) whole wheat pastry flour (or half whole wheat, half all-purpose)",
+            "Custard: 240 ml (1 cup) oat milk, 3 tbsp cornstarch, 3 tbsp maple syrup, 1 tsp vanilla, pinch of turmeric",
+            "Icing: 4 tbsp powdered coconut sugar or maple sugar and 1–2 tbsp water",
+            "½ cup shredded coconut"
+      ],
+      "steps": [
+            [
+                  "Cook the custard ingredients over low heat, whisking, until thick. Chill it.",
+                  "together"
+            ],
+            [
+                  "Mix and knead the dough, then let it rise 1 hour.",
+                  "together"
+            ],
+            [
+                  "Shape 12 balls and let them rise 30 minutes.",
+                  "kid"
+            ],
+            [
+                  "Press a deep dent into each bun and fill it with custard.",
+                  "kid"
+            ],
+            [
+                  "Bake at 220 °C / 425 °F for 10–12 minutes.",
+                  "grown"
+            ],
+            [
+                  "When cool, spread a little icing around the custard and dip in coconut.",
+                  "kid"
+            ]
       ]
     }
   }
