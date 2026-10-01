@@ -1084,6 +1084,14 @@ function checkFlashcardSpelling(key, id) {
 // week advances: playing once credits THIS week only, next week needs new
 // play to auto-credit again.
 const VOCAB_GAME_RE = /case files|word bakery/i;
+// The vocab games get this page's address (?kitchen=...) so their "Back to my kitchen"
+// button returns to whichever version of the kitchen (beta or regular) opened them.
+function gameLinkHref(t) {
+  const url = t.url || "#";
+  if (!/case-files|word-bakery/i.test(url)) return url;
+  const kitchen = encodeURIComponent(location.origin + location.pathname);
+  return url + (url.includes("?") ? "&" : "?") + "kitchen=" + kitchen;
+}
 function isVocabGameTask(t) {
   return t.type === "external" && /case-files|word-bakery/i.test(t.url || "");
 }
@@ -1980,7 +1988,7 @@ function taskBodyHTML(key, t) {
   } else if (t.type === "external") {
     const noteId = `ext-note-${key}-${t.id}`;
     inner = `${trimReadAloud ? "" : readAloudButton(noteId)}
-      <a class="ext-link" href="${t.url || '#'}" target="_blank" rel="noopener">${t.linkText} ↗</a>
+      <a class="ext-link" href="${gameLinkHref(t)}" target="_blank" rel="noopener">${t.linkText} ↗</a>
       <div class="lesson-text" id="${noteId}" style="opacity:.75;font-size:0.78rem;">${t.note}</div>
       <label style="font-size:0.82rem;display:flex;align-items:center;gap:8px;">
         <input type="checkbox" ${s.done ? "checked" : ""} onchange="markExternal('${key}','${t.id}',this.checked)"> Mark complete
