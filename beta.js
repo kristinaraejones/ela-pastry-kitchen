@@ -1208,6 +1208,13 @@ const BK_WORD_CARDS = {
 function bkAnalyzeWord(word) {
   const w = String(word || "").toLowerCase().trim();
   if (!w) return null;
+  // Adelyn's cards come straight from the breakdowns her lessons teach (adelyn-word-cards.js),
+  // never from the rough generic guesser below, which split words like "photograph" wrongly.
+  if (currentChild === "adelyn" && typeof BK_ADELYN_CARDS !== "undefined") {
+    const c = BK_ADELYN_CARDS[w];
+    return c ? { word: w, adelyn: true, parts: c.parts, meaning: c.meaning, example: c.example, origin: null, tip: null }
+             : { word: w, unknown: true };
+  }
   if (BK_WORD_CARDS[w]) return Object.assign({ word: w }, BK_WORD_CARDS[w]);
   const findSeg = (list, fromStart) => {
     let best = null;
@@ -1238,12 +1245,13 @@ function bkAnalyzeWord(word) {
 const BK_PART_STYLE = {
   Prefix: { cls: "p1", emoji: "🍓", nick: "Flavor on the front" },
   Root: { cls: "p2", emoji: "🥣", nick: "Main ingredient" },
-  Suffix: { cls: "p3", emoji: "🍬", nick: "Topping on the end" }
+  Suffix: { cls: "p3", emoji: "🍬", nick: "Topping on the end" },
+  Base: { cls: "p2", emoji: "🍞", nick: "A word you know" }
 };
 function bkIngredientChip(label, part) {
   if (!part) return "";
   const st = BK_PART_STYLE[label];
-  return `<div class="bk-ingredient ${st.cls}"><span class="bk-ingredient-emoji" aria-hidden="true">${st.emoji}</span><span class="bk-ingredient-part">${st.nick}</span><span class="bk-ingredient-seg">${part[0]}</span><span class="bk-ingredient-mean">means ${part[1]}</span></div>`;
+  return `<div class="bk-ingredient ${st.cls}"><span class="bk-ingredient-emoji" aria-hidden="true">${st.emoji}</span><span class="bk-ingredient-part">${st.nick}</span><span class="bk-ingredient-seg">${part[0]}</span><span class="bk-ingredient-mean">${label === "Base" ? "" : "means "}${part[1]}</span></div>`;
 }
 function bkWordCardHTML(word) {
   const a = bkAnalyzeWord(word);
@@ -1256,7 +1264,19 @@ function bkWordCardHTML(word) {
       <div class="bk-rc-empty">This word is a secret family recipe. We don’t have its ingredients yet, but you can still look up what it means and add it to the review bank.</div>
     </div>`;
   }
-  const parts = [["Prefix", a.prefix], ["Root", a.root], ["Suffix", a.suffix]].filter(p => p[1]);
+  if (a.adelyn && !a.parts) {
+    // Everyday word: nothing to mix, so the card just serves the meaning and a sentence.
+    return `<div class="bk-recipecard">${tapes}
+    <div class="bk-rc-kicker">🧑‍🍳 Word Recipe Card <span class="bk-rc-origin">everyday word</span></div>
+    <div class="bk-rc-head"><span class="bk-rc-word">${bkTitle(a.word)}</span></div>
+    <div class="bk-rc-block"><div class="bk-rc-step"><span class="bk-rc-stepnum">1</span><div class="bk-field-label">Taste test (what it means)</div></div><p>${a.meaning}</p></div>
+    ${a.example ? `<div class="bk-rc-block"><div class="bk-rc-step"><span class="bk-rc-stepnum">2</span><div class="bk-field-label">Serve it in a sentence</div></div><p>${a.example}</p></div>` : ""}
+    <div class="bk-rc-block bk-rc-tip"><div class="bk-field-label">${bkIcon("bulb", 14)}Chef’s tip</div><p>This one has no word parts to mix. It’s a basic ingredient you just have to know by heart!</p></div>
+  </div>`;
+  }
+  const parts = a.parts
+    ? a.parts.map(([text, mean, kind]) => [kind === "prefix" ? "Prefix" : kind === "suffix" ? "Suffix" : kind === "base" ? "Base" : "Root", [text, mean || "the word you already know"]])
+    : [["Prefix", a.prefix], ["Root", a.root], ["Suffix", a.suffix]].filter(p => p[1]);
   const chips = parts.map(p => bkIngredientChip(p[0], p[1])).join('<span class="bk-rc-plus" aria-hidden="true">+</span>');
   return `<div class="bk-recipecard">${tapes}
     <div class="bk-rc-kicker">🧑‍🍳 Word Recipe Card${a.origin ? ` <span class="bk-rc-origin">from ${a.origin}</span>` : ""}</div>
