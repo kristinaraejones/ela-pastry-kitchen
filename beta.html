@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="beta.css?v=10">
+<link rel="stylesheet" href="beta.css?v=11">
 </head>
 <body class="bk">
 
@@ -30,7 +30,7 @@
     </div>
     <div class="bk-top-right">
       <button class="bk-passport-btn" id="bkPassportBtn" onclick="bkOpenPassport('case')"><svg class="bk-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="10" r="3.5"/><path d="M8.5 10h7M9 17h6"/></svg>My Passport</button>
-      <span class="bk-who">Whoâ€™s baking?</span>
+      <span class="bk-who">Who’s baking?</span>
       <div class="bk-switcher" id="childSwitcher"></div>
       <button class="bk-view-toggle" id="viewToggle" onclick="toggleView()" aria-pressed="false"><span id="toggleKnob">Parent view</span><span class="bk-switch" aria-hidden="true"><span></span></span></button>
     </div>
@@ -78,7 +78,7 @@
   <!-- Kid-only: stations -->
   <section class="bk-stations-wrap" id="bkStationsWrap">
     <div class="bk-section-head">
-      <h2>This Weekâ€™s Stations</h2>
+      <h2>This Week’s Stations</h2>
       <span class="bk-section-meta" id="bkWeekMeta"></span>
     </div>
     <div class="stations bk-stations" id="stationsGrid"></div>
@@ -95,10 +95,13 @@
 
   <div id="projectsPanel"></div>
 
+  <!-- Parent-only: reading log (kids reach it from the Reading Log station) -->
+  <section class="detail open bk-detail rl-detail" id="rlParentBox" style="display:none;"></section>
+
   <div class="review-queue bk-bank" id="reviewQueue" style="display:none;">
     <h3>Review Bank</h3>
     <div id="reviewBank" style="margin-bottom:20px;"></div>
-    <h3>Redo Log â€” Sections Redone</h3>
+    <h3>Redo Log — Sections Redone</h3>
     <div id="burnLogList"></div>
   </div>
 
@@ -108,12 +111,12 @@
 
 <div class="chef-note-overlay" id="chefNoteOverlay" style="display:none;"></div>
 
-<div class="loading-note" id="loadingNote">Loading the kitchenâ€¦</div>
+<div class="loading-note" id="loadingNote">Loading the kitchen…</div>
 
 <div class="setup-overlay" id="setupOverlay" style="display:none;">
   <div class="setup-card">
     <h2>Connect the Kitchen</h2>
-    <p>This device needs the Apps Script Web App URL for your Google Sheet backend. You only have to do this once per device â€” see <code>DEPLOY.md</code> in the repo for how to get this URL.</p>
+    <p>This device needs the Apps Script Web App URL for your Google Sheet backend. You only have to do this once per device — see <code>DEPLOY.md</code> in the repo for how to get this URL.</p>
     <div class="setup-error" id="setupError" style="display:none;"></div>
     <input type="text" id="setupUrlInput" placeholder="https://script.google.com/macros/s/XXXX/exec">
     <button class="btn primary" onclick="submitSetupUrl()">Connect</button>
@@ -134,5 +137,6 @@
 <script src="treats.js?v=8"></script>
 <script src="adelyn-word-cards.js?v=1"></script>
 <script src="beta.js?v=12"></script>
+<script src="readinglog.js?v=1"></script>
 </body>
 </html>
