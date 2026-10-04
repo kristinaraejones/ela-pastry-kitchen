@@ -95,4 +95,47 @@ body[data-view!="parent"][data-bk-pattern="horseshoes"] .bk-hero{background-imag
       sp.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24">${SHOE(colors[i % colors.length])}</svg>`;
     });
   };
+
+  // ---------- Horse mottos (tap to use) ----------
+  const MOTTOS = ["Saddle up and bake!", "Hay, let’s bake something wonderful", "Gallop to greatness, one plate at a time", "Whisk, trot, bake, repeat", "Steady, stable and sweet", "Neigh-ver give up, always bake it up"];
+  const origCustomize = window.bkCustomizeHTML;
+  window.bkCustomizeHTML = function () {
+    const html = origCustomize();
+    const marker = "oninput=\"bkSubmitKitchenMotto(this)\">";
+    const i = html.indexOf(marker);
+    if (i < 0) return html;
+    const chips = `<div class="hz-mottos"><span class="hz-mottos-label">Try a horse motto</span>${MOTTOS.map((m, n) => `<button type="button" class="hz-motto" onclick="hzUseMotto(${n})">${m}</button>`).join("")}</div>`;
+    return html.slice(0, i + marker.length) + chips + html.slice(i + marker.length);
+  };
+  window.hzUseMotto = function (n) {
+    const nameEl = document.getElementById("bkKitchenNameInput");
+    if (nameEl) bkKitchenDraft.name = nameEl.value;
+    bkSetDraft("motto", MOTTOS[n]);
+  };
+
+  // ---------- Blue-ribbon rosette on Perfected stations ----------
+  function rosette(size) {
+    const petals = Array.from({ length: 12 }, (_, i) => `<circle cx="${32 + 17 * Math.cos(i * Math.PI / 6)}" cy="${28 + 17 * Math.sin(i * Math.PI / 6)}" r="7.5" fill="#5B8DEF"/>`).join("");
+    return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M22 40L16 61L25 56L30 62L33 42Z" fill="#3D6FD1" stroke="#2C57AD" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M42 40L48 61L39 56L34 62L31 42Z" fill="#5B8DEF" stroke="#2C57AD" stroke-width="1.5" stroke-linejoin="round"/>
+      ${petals}<circle cx="32" cy="28" r="17" fill="#7FA7F5" stroke="#2C57AD" stroke-width="1.5"/>
+      <circle cx="32" cy="28" r="12" fill="#5B8DEF" stroke="#FFFFFF" stroke-width="1.5" stroke-dasharray="2 2.6"/>
+      <path d="M32 19.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" fill="#FFFFFF"/></svg>`;
+  }
+  const origStationCard = window.bkStationCardHTML;
+  window.bkStationCardHTML = function (key, idx) {
+    const html = origStationCard(key, idx);
+    return typeof bkPerfected === "function" && bkPerfected(key)
+      ? html + `<span class="hz-ribbon" title="Perfected: you fixed it up after a chef’s note">${rosette(46)}</span>` : html;
+  };
+  const css2 = document.createElement("style");
+  css2.textContent = `
+.bk .station.bk-station.perfected{position:relative;}
+.hz-ribbon{position:absolute;right:14px;bottom:8px;line-height:0;filter:drop-shadow(0 2px 0 rgba(44,87,173,.25));transform:rotate(8deg);}
+.hz-mottos{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;}
+.hz-mottos-label{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--bk-muted);width:100%;}
+.hz-motto{padding:8px 14px;min-height:40px;border:1.5px solid var(--bk-border);border-radius:999px;background:#fff;color:var(--bk-accent-ink);font:700 14px Nunito,sans-serif;cursor:pointer;}
+.hz-motto:hover{border-color:var(--bk-accent);background:var(--bk-soft);}`;
+  document.head.appendChild(css2);
 })();
