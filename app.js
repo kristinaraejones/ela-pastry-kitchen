@@ -230,6 +230,18 @@ function submitSetupUrl() {
 
 // ---------- Boot ----------
 
+// Which kid's kitchen to open first: ?kid=adelyn (or #adelyn) in the link wins,
+// otherwise whoever was last open on this device, otherwise Kenley.
+function pickStartChild() {
+  try {
+    const fromUrl = (new URLSearchParams(location.search).get("kid") || location.hash.replace("#", "")).toLowerCase();
+    if (CHILD_META[fromUrl]) return fromUrl;
+    const last = localStorage.getItem("elaLastChild");
+    if (CHILD_META[last]) return last;
+  } catch (e) {}
+  return "kenley";
+}
+
 async function init() {
   API_URL = resolveApiUrl();
   if (!API_URL) {
@@ -237,12 +249,13 @@ async function init() {
     return;
   }
   try {
-    await loadChild("kenley");
+    const startChild = pickStartChild();
+    await loadChild(startChild);
     settings = parseSettings(childrenCache._settings);
-    autoMarkVocabGamePlayed("kenley");
-    currentChild = "kenley";
-    DATA = childrenCache.kenley.DATA;
-    state = childrenCache.kenley.state;
+    autoMarkVocabGamePlayed(startChild);
+    currentChild = startChild;
+    DATA = childrenCache[startChild].DATA;
+    state = childrenCache[startChild].state;
     document.getElementById("loadingNote").style.display = "none";
     document.getElementById("board").style.display = "block";
     render();
@@ -414,6 +427,7 @@ function persistTask(key, id) {
 async function switchChild(id) {
   if (id === currentChild) return;
   currentChild = id;
+  try { localStorage.setItem("elaLastChild", id); } catch (e) {}
   if (!childrenCache[id]) {
     document.getElementById("loadingNote").style.display = "block";
     document.getElementById("board").style.display = "none";
