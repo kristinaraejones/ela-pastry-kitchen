@@ -769,3 +769,6 @@ body[data-view="parent"] .bk-st-tile svg{width:30px;height:30px;}
 body[data-view="parent"] .bk-st-title{font-size:19px;}
 body[data-view="parent"] .bk-st-tag{font-size:13px;margin-top:-3px;}
 body[data-view="parent"] .bk-seg{height:6px;}
+body[data-view="parent"] .bk-stations-wrap{margin-bottom:26px;}
+body[data-view="parent"] .bk-stations{align-items:stretch;}
+body[data-view="parent"] .bk-stations-wrap .bk-section-head{margin-bottom:10px;}
