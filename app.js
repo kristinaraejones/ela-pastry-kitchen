@@ -9,7 +9,7 @@ const CHILD_META = {
   adelyn: { name: "Adelyn", subtitle: "GRADE 4 · ELA · FALL TERM" }
 };
 const TAG_ABBREV = {
-  "Prepositional": "PREP", "Appositive": "APP",
+  "Prepositional": "PREP", "Appositive": "APP", "Participial": "PART",
   "Subject": "S", "Verb": "V", "Direct Object": "DO", "Indirect Object": "IO", "Subject Complement": "SC",
   "Action Verb": "AV", "Linking Verb": "LV"
 };
@@ -1684,11 +1684,12 @@ function choosePhraseType(type) {
 }
 function cancelPhraseRange() { pendingPhraseRange = null; render(); }
 function clearPhraseSelections(key, id) { state[key].tasks[id].selections = []; render(); }
-// A direct/indirect object may be tagged as the whole noun phrase ("the flashlight")
-// or as just the noun ("flashlight") — both are correct grammar, so both count.
+// Level 2 convention: Subject, Direct Object, Indirect Object and Subject Complement
+// are just the single head noun/pronoun/adjective ("pizza", not "an entire pizza").
+// Articles and modifiers are tagged separately at Level 1. So a span only counts
+// when it matches the answer key exactly.
 function spanHit(p, sel) {
-  if (p.start === sel.start && p.end === sel.end) return true;
-  return (p.type === "Direct Object" || p.type === "Indirect Object") && p.end > p.start && sel.start === p.end && sel.end === p.end;
+  return p.start === sel.start && p.end === sel.end;
 }
 function phraseHit(p, sel) { return p.type === sel.type && spanHit(p, sel); }
 

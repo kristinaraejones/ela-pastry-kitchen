@@ -56,19 +56,28 @@ function getHeaders_(sheet) {
   return sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
 }
 
-/** Finds a row matching all keyVals; updates it in place, or appends a new row. */
-function upsertRow_(sheet, keyCols, obj) {
+/**
+ * Finds a row matching all keyVals; updates it in place, or appends a new row.
+ *
+ * textCols (optional): header names whose cells must be stored as literal
+ * text (e.g. ['score']). Without this, Sheets auto-detects "3/6" as a date
+ * on write. We set the cell's number format to Plain Text BEFORE writing the
+ * value, for both the update and the append paths, so it can't be converted
+ * no matter what the column's existing format is.
+ */
+function upsertRow_(sheet, keyCols, obj, textCols) {
   var headers = getHeaders_(sheet);
   var rows = sheetToObjects_(sheet);
   var match = rows.find(function (r) {
     return keyCols.every(function (k) { return String(r[k]) === String(obj[k]); });
   });
   var rowValues = headers.map(function (h) { return obj[h] !== undefined ? obj[h] : ''; });
-  if (match) {
-    sheet.getRange(match._row, 1, 1, headers.length).setValues([rowValues]);
-  } else {
-    sheet.appendRow(rowValues);
-  }
+  var targetRow = match ? match._row : sheet.getLastRow() + 1;
+  (textCols || []).forEach(function (h) {
+    var col = headers.indexOf(h) + 1;
+    if (col > 0) sheet.getRange(targetRow, col).setNumberFormat('@');
+  });
+  sheet.getRange(targetRow, 1, 1, headers.length).setValues([rowValues]);
 }
 
 function safeParse_(json, fallback) {
@@ -124,8 +133,14 @@ function readSubmissions_(student) {
 // the Submissions sheet's score column. Reconstruct the fraction from the
 // date parts (month/day map back to correct/total) rather than showing a
 // raw timestamp.
+//
+// IMPORTANT: format the Date in the SPREADSHEET's time zone, not the script's
+// (appsscript.json says Africa/Abidjan = UTC). Sheets stores a date-only cell
+// as midnight in the spreadsheet's zone, so reading it back with
+// getMonth()/getDate() in a different zone can land on the previous day and
+// turn "3/6" into "3/5" whenever the sheet's zone is east of UTC.
 function normalizeScore_(v) {
-  if (v instanceof Date) return (v.getMonth() + 1) + '/' + v.getDate();
+  if (v instanceof Date) return Utilities.formatDate(v, getSS_().getSpreadsheetTimeZone(), 'M/d');
   return (v === '' || v === undefined || v === null) ? '' : String(v);
 }
 
@@ -261,7 +276,7 @@ function doPost(e) {
         score: body.score || '',
         answers_json: JSON.stringify(body.answers || {}),
         parent_comment: body.parent_comment || ''
-      });
+      }, ['score']);
       return jsonOut_({ ok: true });
     }
 
