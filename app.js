@@ -2422,7 +2422,7 @@ function renderTaskContentBody(t) {
   if (t.type === "reflection") {
     return `<div class="lesson-text"><p>${t.prompt}</p></div>${t.sampleAnswer ? `<div class="sample-answer"><b>Sample answer:</b> ${t.sampleAnswer}</div>` : ""}`;
   }
-  if (t.type === "external") return `<div class="lesson-text">${t.note || ""}</div>`;
+  if (t.type === "external") return (t.url ? `<a class="ext-link" href="${escHtml(gameLinkHref(t))}" target="_blank" rel="noopener">${t.linkText || "Open the link"} ↗</a>` : "") + `<div class="lesson-text">${t.note || ""}</div>`;
   if (t.type === "graded-mc") return renderGradedMcPreview(t);
   if (t.type === "graded-dictation") return renderDictationPreview(t);
   if (t.type === "fluency-read") return renderDictationPreview(t);
