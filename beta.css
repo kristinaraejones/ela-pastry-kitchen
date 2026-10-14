@@ -760,3 +760,12 @@ body[data-view!="parent"][data-bk-style="pro"] .bk-hero .bk-sprinkle{display:non
   .rl-entry-date{width:72px;}
   .rl-form{padding:16px;}
 }
+
+/* Parent view: smaller Kenley station cards (kid view unchanged). */
+body[data-view="parent"] .bk-stations{gap:12px;}
+body[data-view="parent"] .bk .station.bk-station{padding:12px 16px;gap:7px;border-radius:18px;min-height:0;}
+body[data-view="parent"] .bk-st-tile{width:46px;height:46px;border-radius:14px;}
+body[data-view="parent"] .bk-st-tile svg{width:30px;height:30px;}
+body[data-view="parent"] .bk-st-title{font-size:19px;}
+body[data-view="parent"] .bk-st-tag{font-size:13px;margin-top:-3px;}
+body[data-view="parent"] .bk-seg{height:6px;}
