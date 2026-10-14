@@ -76,6 +76,26 @@ Adelyn's Writing Workshop is fundamentally a parent-led, mostly-oral program; th
 
 No new deployment version is needed for this one either — it's a one-time data-loading function, same as 1b/1c/1d/1e.
 
+## 1g. Loading Kenley's Weeks 6–10 content (Month 2, first five weeks)
+
+Same idea as 1b. Kenley only — nothing here touches Adelyn's rows. Adds 89 Schedule rows (74 ELA + 15 Spelling, AAS Steps 12–16), extends her question banks, and optionally rewords a few Week 3–5 tasks. Only needs to run once, after Month 1 (1b) is loaded:
+
+1. In the Apps Script editor, click the **+** next to "Files" and add a new script file named `Month2Weeks6to10`. Copy the full contents of this repo's [`apps-script/Month2Weeks6to10.gs`](apps-script/Month2Weeks6to10.gs) and paste it in. Save.
+2. Select **runSeedMonth2Weeks6to10** in the function dropdown and click **Run**. You'll get a popup confirming how many rows were added. It's idempotent — it stops without adding anything if `ri0` or `g6a` already exist, or any task id collides.
+3. Select **runExtendKenleyBanksMonth1** and click **Run**. It *appends* (never replaces) new Week 2–5 items to her vocab/grammar/reading banks, de-duplicated. **Run this before she takes the Month 1 test** (Week 4).
+4. *(Optional)* Select **runPatchWeeks3to5Lookback** and click **Run**. It rewords "As you read, watch for…" in `r3a`/`r4a`/`r5a` now that the book is finished and adds a "name your source" step to `w3a`/`w4a`.
+5. **Later, after Kenley has taken the Month 1 test:** run **runAppendKenleyBanksMonth2**. It skips any subject whose Month 1 test hasn't been taken, so it's safe, but don't run it earlier — it would put Month 2 questions on the Month 1 test.
+
+No new deployment version is needed for these — they're one-time data-loading functions, same as 1b.
+
+### Other one-time fixes shipped with Weeks 6–10 (run in this order, before the new app files go live)
+
+These need the updated `Code.gs`, `FixScoreColumnFormat.gs`, `FixDirectObjectSpans.gs` and `RegradeKenleyLevel2.gs` pasted into the project first.
+
+1. **`fixDirectObjectSpans`** — narrows Kenley's Direct Object keys on `g3`, `g2b`, `g3b`, `g4b`, `g5b` to the head noun. Run it *before* the new `app.js` is served (the app now accepts only an exact match).
+2. **`fixScoreColumnFormat`** — turns scores that Sheets turned into dates back into text like `3/6`, and locks the score column to plain text. Then **Deploy → Manage deployments → Edit → New version → Deploy** (the `Code.gs` score fix isn't live until you do).
+3. After the seed functions above: **`regradeKenleyLevel2`** — re-scores her Level 2 work against the corrected keys, fixes the `AnswerLog` rows ("the flashlight" → "flashlight", correct), and retires the bogus "the flashlight" Review Pool entry. Read the log (View → Logs) for the old → new score table.
+
 ## 2. Frontend: GitHub Pages
 
 1. On GitHub, go to this repo's **Settings → Pages**.
