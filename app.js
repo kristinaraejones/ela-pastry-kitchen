@@ -2345,7 +2345,16 @@ function taskBodyHTML(key, t) {
   if (canStudentRedo(t, s)) {
     inner += `<button class="btn redo-btn" onclick="redoSection('${key}','${t.id}')">🔄 Redo this section to improve it</button>`;
   }
-  return `<div class="task-body ${s.open ? "open" : ""}">${inner}</div>`;
+  return `<div class="task-body ${s.open ? "open" : ""}">${refLinkHTML(t)}${inner}</div>`;
+}
+// Optional `refLink: { text, url }` on any task's content: a button-style link to outside
+// reading (e.g. the Smithsonian interview), shown at the top of the task card above the
+// question or prompt. Separate from the "external" task type. Link only — never host the text.
+function refLinkHTML(t) {
+  const r = t.refLink;
+  if (!r || !r.url || !/^https?:\/\//i.test(r.url)) return "";
+  const text = String(r.text || "Open the reading").replace(/(^|[\s("\/\-])([a-z])/g, (m, a, b) => a + b.toUpperCase());
+  return `<a class="ext-link ref-link" href="${escHtml(r.url)}" target="_blank" rel="noopener">📄 ${escHtml(text)}</a>`;
 }
 
 // ---------- Past-week report / upcoming-week preview (read-only, no handlers) ----------
