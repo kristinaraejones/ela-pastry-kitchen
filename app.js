@@ -2415,7 +2415,9 @@ function renderGradedMcPreview(t) {
 
 // Shared content renderer used by both the current/past-week report and the upcoming-week
 // preview — the lesson material itself doesn't depend on whether she's done it yet.
-function renderTaskContent(t) {
+// Outside-reading link (refLink) sits above the lesson material, same as on the task card.
+function renderTaskContent(t) { return refLinkHTML(t) + renderTaskContentBody(t); }
+function renderTaskContentBody(t) {
   if (t.type === "read") return t.content + (t.parentNotes ? `<div class="parent-notes"><b>👪 Notes for you</b>${t.parentNotes}</div>` : "");
   if (t.type === "reflection") {
     return `<div class="lesson-text"><p>${t.prompt}</p></div>${t.sampleAnswer ? `<div class="sample-answer"><b>Sample answer:</b> ${t.sampleAnswer}</div>` : ""}`;
