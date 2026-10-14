@@ -341,7 +341,7 @@ window.render = function render() {
     const unread = unreadCommentCount(currentWeek());
     const aheadAllowed = !!settings.allowAhead[kid];
     let text, btn;
-    if (unread > 0) { text = `${name} has ${unread} chef’s ${bkPlural(unread, "note", "notes")} from Week ${currentWeek()} she hasn’t marked as read yet — she needs to read ${unread === 1 ? "it" : "them"} before moving on, no matter the pacing setting below.`; btn = `<button class="bk-btn plain" disabled>Advance to Week ${nextWk}</button>`; }
+    if (unread > 0) { text = `${name} has ${unread} chef’s ${bkPlural(unread, "note", "notes")} (${unreadNoteWeeksText()}) she hasn’t marked as read yet — she needs to read ${unread === 1 ? "it" : "them"} before moving on, no matter the pacing setting below.`; btn = `<button class="bk-btn plain" disabled>Advance to Week ${nextWk}</button>`; }
     else if (served && pending > 0 && !aheadAllowed) { text = `${name} finished every section of Week ${currentWeek()}. ${pending} written ${bkPlural(pending, "answer is", "answers are")} still waiting on your review.`; btn = `<button class="bk-btn plain" disabled>Advance to Week ${nextWk}</button>`; }
     else if (served && pending > 0 && aheadAllowed) { text = `${name} finished every section of Week ${currentWeek()}. ${pending} written ${bkPlural(pending, "answer is", "answers are")} still waiting on your review — but you’ve allowed her to keep working ahead.`; btn = `<button class="bk-btn primary" onclick="advanceWeek()">Advance to Week ${nextWk}</button>`; }
     else if (served) { text = `${name} finished every section of Week ${currentWeek()}.`; btn = `<button class="bk-btn primary" onclick="advanceWeek()">Advance to Week ${nextWk}</button>`; }
@@ -368,28 +368,16 @@ window.render = function render() {
     renderWeekReportPanel();
   } else {
     stationsWrap.style.display = "block";
-    // Approved-but-unread notes on THIS week's tasks — these sit alongside sent-back
-    // tasks in the same "Chef's Notes" section since both need her attention, just
-    // with a different click target (an unread note just needs the read+ack, not a redo).
-    const unreadCurrent = [];
-    keys.forEach(key => activeTasks(key).forEach(t => { if (hasUnreadComment(state[key].tasks[t.id])) unreadCurrent.push({ key, t }); }));
-    // Notes left on weeks she's already moved past (only reachable if "allow ahead
-    // work" let her advance while one was still waiting) — these don't block her,
-    // they just need a way back.
-    const pastUnread = pastUnreadComments();
+    // Approved-but-unread notes — this week's AND any left on earlier weeks (they carry
+    // forward and block advancing until read). They sit alongside sent-back tasks in the
+    // same "Chef's Notes" section; an unread note just needs the read+ack, not a redo.
+    // Sent-back tasks already appear as their own rows, so they're left out here.
+    const unreadCurrent = unreadNotes(currentWeek()).filter(i => !i.s.sentBack);
+    const weekTag = t => (t.week_number && t.week_number < currentWeek() ? `Week ${t.week_number} · ` : "");
     let notesHTML = "";
-    if (pastUnread.length) {
-      notesHTML += `<section class="bk-past-notes">
-        <div class="bk-notes-head"><span class="bk-notes-ico past">${bkIcon("note", 22)}</span><div><h2>Notes From Earlier Weeks</h2><p>Chef left ${pastUnread.length === 1 ? "a note" : `${bkNumWord(pastUnread.length).toLowerCase()} notes`} on work you’ve already moved past. Give ${pastUnread.length === 1 ? "it" : "them"} a read when you get a chance.</p></div></div>
-        <div class="bk-notes-grid">${pastUnread.map(({ key, t }) => `<button class="bk-note-row past" onclick="openChefNote('${key}','${t.id}')">
-            <span class="bk-note-pastry">${bkPastry(bkPastryFor(key), kid, 34)}</span>
-            <span class="bk-note-text"><span class="bk-note-subj">${DATA[key].name} · Week ${t.week_number}</span><span class="bk-note-task">${bkTitle(t.label)}</span></span>
-            ${bkIcon("arrow", 20)}</button>`).join("")}</div>
-      </section>`;
-    }
     if (served) {
       // Mom's "work ahead" toggle lets her move on herself, as long as no chef's note is still unread.
-      const canSelfAdvance = !!settings.allowAhead[kid] && unreadCurrent.length === 0 && sentBackAll.length === 0;
+      const canSelfAdvance = !!settings.allowAhead[kid] && unreadCommentCount(currentWeek()) === 0 && sentBackAll.length === 0;
       notesHTML += canSelfAdvance
         ? `<section class="bk-alldone"><span>${bkPastry(th.emblem, kid, 48)}</span><div><h2>All Done With Week ${currentWeek()}!</h2><p>Nice work! You’re ready for the next week whenever you are.</p><button class="bk-btn primary" onclick="kidAdvanceWeek()">Go to Week ${nextWk}</button></div></section>`
         : `<section class="bk-alldone">${bkPastry(th.emblem, kid, 48)}<div><h2>All Done With Week ${currentWeek()}!</h2><p>Nice work! Waiting for Mom to check everything, then you’ll move on to Week ${nextWk}.</p></div></section>`;
@@ -401,11 +389,11 @@ window.render = function render() {
         <div class="bk-notes-grid">
           ${sentBackAll.map(({ key, t }) => `<button class="bk-note-row" onclick="bkOpenTask('${key}','${t.id}')">
             <span class="bk-note-pastry">${bkPastry(bkPastryFor(key), kid, 34)}</span>
-            <span class="bk-note-text"><span class="bk-note-subj">${DATA[key].name}</span><span class="bk-note-task">${bkTitle(t.label)} · back in the oven</span></span>
+            <span class="bk-note-text"><span class="bk-note-subj">${DATA[key].name}</span><span class="bk-note-task">${weekTag(t)}${bkTitle(t.label)} · back in the oven</span></span>
             ${bkIcon("arrow", 20)}</button>`).join("")}
-          ${unreadCurrent.map(({ key, t }) => `<button class="bk-note-row unread" onclick="bkOpenTask('${key}','${t.id}')">
+          ${unreadCurrent.map(({ key, t }) => `<button class="bk-note-row unread" onclick="${t.week_number < currentWeek() ? `openChefNote('${key}','${t.id}')` : `bkOpenTask('${key}','${t.id}')`}">
             <span class="bk-note-pastry">${bkPastry(bkPastryFor(key), kid, 34)}</span>
-            <span class="bk-note-text"><span class="bk-note-subj">${DATA[key].name}</span><span class="bk-note-task">${bkTitle(t.label)} · new note, unread</span></span>
+            <span class="bk-note-text"><span class="bk-note-subj">${DATA[key].name}</span><span class="bk-note-task">${weekTag(t)}${bkTitle(t.label)} · new note, unread</span></span>
             ${bkIcon("arrow", 20)}</button>`).join("")}
         </div>
       </section>`;
@@ -642,7 +630,7 @@ window.renderPastTaskReport = function renderPastTaskReport(key, t, s) {
     if (showComment) body += bkNoteBubble(s.parentComment);
     if (awaiting) {
       body += `<div class="bk-note-entry"><label for="comment-${key}-${t.id}">${bkIcon("note", 16)}Your note to ${name} <span>· she sees this</span></label>
-        <textarea id="comment-${key}-${t.id}" placeholder="Optional. If you send it back, she’ll read this first."></textarea></div>`;
+        <textarea id="comment-${key}-${t.id}" placeholder="Optional. She’ll see this whether you approve or send back, and she has to mark it read before she moves on." oninput="commentDraft['${key}:${t.id}']=this.value">${escHtml(commentDraft[key + ':' + t.id] || '')}</textarea></div>`;
     }
     if (s.answers && s.answers.text) body += bkGradeEntryHTML(key, t, s);
     if (awaiting) {
@@ -789,7 +777,7 @@ function bkTreatPlateSVG(size) {
 const BK_CREMA_ART = `<svg width="100%" height="100%" viewBox="0 0 548 368" preserveAspectRatio="xMidYMid slice" aria-label="Illustration of crema catalana in a terracotta dish" role="img"><rect width="548" height="368" fill="#F4E9DA"/><path d="M0 60H548M0 150H548M0 240H548M0 330H548M70 0V368M190 0V368M310 0V368M430 0V368" stroke="#EBDCC7" stroke-width="18"/><ellipse cx="274" cy="222" rx="206" ry="112" fill="#000" opacity="0.08"/><ellipse cx="274" cy="206" rx="192" ry="104" fill="#A9542E"/><ellipse cx="274" cy="186" rx="192" ry="104" fill="#C8693D"/><ellipse cx="274" cy="182" rx="170" ry="90" fill="#DA8350"/><ellipse cx="274" cy="184" rx="156" ry="80" fill="#E0A04A"/><ellipse cx="226" cy="170" rx="52" ry="22" fill="#EFBE62"/><ellipse cx="324" cy="198" rx="46" ry="18" fill="#EFBE62"/><ellipse cx="300" cy="150" rx="30" ry="11" fill="#C07A2E"/><ellipse cx="200" cy="208" rx="26" ry="9" fill="#C07A2E"/><path d="M190 160l30 12 18-8 34 20M280 196l26-10 24 14 30-6M232 214l22-14M312 150l-10 18" stroke="#8F5420" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><rect x="48" y="300" width="150" height="22" rx="11" fill="#9A5B34" transform="rotate(-14 123 311)"/><path d="M392 318c26-22 64-28 96-14c-8 16-44 30-78 30c-8 0-14-6-18-16z" fill="#F4D35E" stroke="#D9B53C" stroke-width="3" stroke-linejoin="round"/></svg>`;
 
 function kidAdvanceWeek() {
-  if (currentView === "parent" || !settings.allowAhead[currentChild] || !allSubjectsServed()) return;
+  if (currentView === "parent" || !settings.allowAhead[currentChild] || !allSubjectsServed() || unreadCommentCount(currentWeek()) > 0) return;
   bkRecordEarnedTreats();
   advanceWeek();
   window.scrollTo({ top: 0, behavior: "smooth" });

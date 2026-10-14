@@ -100,6 +100,12 @@ and push that change. Every device that loads the page will then connect automat
 2. Flip the toggle to Parent view — you should see the station's progress update.
 3. Open the same Pages URL on a second device or browser tab — the completed task should show as done there too, confirming the Sheet is genuinely the shared source of truth and not per-device `localStorage` state.
 
+## Leaving comments, and moving to the next week
+
+- **Leave comments in the app, not in the Sheet.** The "she must read my note" rule is tracked inside the app (a `commentAcked` flag in `answers_json`). If you type directly into the `parent_comment` column of Submissions, the app doesn't know the note is new and won't make her read it.
+- **Use the app's Advance button, not the Settings sheet.** Changing `kenley_current_week` (or `adelyn_current_week`) by hand in the `Settings` tab skips the unread-notes check. Notes from earlier weeks carry forward and must be read before Advance works.
+- Project feedback (`proj_*` tasks) is a separate path and is **not** covered by the unread-notes rule.
+
 ## Adding Adelyn's real content later
 
 Once her AAS Step 11 PDF and curriculum docs are ready, the cleanest path is: tell me (or whoever's driving Claude Code next) to convert them into the same `content_json` shape used for Kenley's tasks, and add rows to the `Schedule` tab (student = `adelyn`) the same way `Setup.gs` seeded Kenley's. No frontend code changes needed — the app renders whatever's in the Schedule sheet for that student.

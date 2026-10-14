@@ -473,6 +473,12 @@ function advanceAnyway() {
   advanceWeek();
 }
 function advanceWeek() {
+  // The unread-note gate lives here (not just on the buttons) so no code path can skip it.
+  const unread = unreadCommentCount(currentWeek());
+  if (unread > 0) {
+    alert(`${CHILD_META[currentChild].name} still has ${unread} chef's ${unread === 1 ? "note" : "notes"} to read (${unreadNoteWeeksText()}). She needs to mark ${unread === 1 ? "it" : "them"} as read before moving on.`);
+    return;
+  }
   settings.weeks[currentChild] = currentWeek() + 1;
   // Repeating tasks (Word Bakery, review drill) start the new week fresh.
   Object.keys(DATA).forEach(key => DATA[key].tasks.forEach(t => {
@@ -491,28 +497,33 @@ function isLiveComment(s) {
 function hasUnreadComment(s) {
   return isLiveComment(s) && !s.commentAcked;
 }
-// Unread chef's notes on THIS week's tasks — these are a hard gate on advancing,
-// independent of the "allow ahead work" toggle (that toggle only ever relaxes the
-// pending-review gate below).
-function unreadCommentCount(week) {
-  let n = 0;
-  Object.keys(DATA).forEach(key => DATA[key].tasks.forEach(t => {
-    if (t.dynamic || t.week_number !== week) return;
-    if (hasUnreadComment(state[key].tasks[t.id])) n++;
-  }));
-  return n;
-}
-// Unread chef's notes left on weeks she's already moved past (only possible once
-// "allow ahead work" has let her advance while a note was still waiting). These don't
-// block anything further — she just needs a way back to them.
-function pastUnreadComments() {
+// Unread chef's notes on this week's tasks AND every earlier week (a note left late,
+// or left before an "advance anyway", carries forward until she reads it). This is a
+// hard gate on advancing, independent of the "allow ahead work" toggle (that toggle
+// only ever relaxes the pending-review gate). Nothing is copied or moved: the note
+// stays on its original Submissions row; this is derived from commentAcked.
+function unreadNotes(week) {
   const items = [];
   Object.keys(DATA).forEach(key => DATA[key].tasks.forEach(t => {
-    if (t.dynamic || t.week_number >= currentWeek()) return;
+    if (t.dynamic || t.week_number > week) return;
     const s = state[key].tasks[t.id];
     if (hasUnreadComment(s)) items.push({ key, t, s });
   }));
   return items;
+}
+function unreadCommentCount(week) { return unreadNotes(week).length; }
+// "Week 2" / "Weeks 2 and 3" — which weeks the unread notes came from.
+function unreadNoteWeeksText() {
+  const wks = [...new Set(unreadNotes(currentWeek()).map(i => i.t.week_number))].sort((a, b) => a - b);
+  if (!wks.length) return "";
+  if (wks.length === 1) return `Week ${wks[0]}`;
+  return `Weeks ${wks.slice(0, -1).join(", ")} and ${wks[wks.length - 1]}`;
+}
+// Approved-but-unread notes on weeks she's already moved past — shown in the same
+// Chef's Notes list as this week's notes, labelled with their original week.
+// Sent-back tasks are excluded; they appear as sent-back rows instead.
+function pastUnreadComments() {
+  return unreadNotes(currentWeek()).filter(i => i.t.week_number < currentWeek() && !i.s.sentBack);
 }
 function ackComment(key, id) {
   const s = state[key].tasks[id];
@@ -579,8 +590,10 @@ function taskOrderRank(t) {
 }
 function activeTasks(key) {
   const week = currentWeek();
+  // A task sent back in an earlier week and never resubmitted stays on her page
+  // (so she has to redo it) instead of vanishing when the week advances.
   return DATA[key].tasks
-    .filter(t => t.dynamic || t.week_number === week)
+    .filter(t => t.dynamic || t.week_number === week || (t.week_number < week && state[key].tasks[t.id].sentBack && !state[key].tasks[t.id].done))
     .sort((a, b) => taskOrderRank(a) - taskOrderRank(b));
 }
 function unlockedActiveTasks(key) {
@@ -1930,6 +1943,8 @@ function applyGradeInput(key, id) {
   const v = Math.max(0, Math.min(100, Math.round(Number(raw))));
   if (!Number.isNaN(v)) s.score = `${v}/100`;
 }
+// Typed-but-not-yet-sent notes survive render() (e.g. when "Save grade" re-renders the card).
+const commentDraft = {};
 function saveReflectionGrade(key, id) {
   applyGradeInput(key, id);
   persistTask(key, id);
@@ -1943,6 +1958,7 @@ function approveReflection(key, id) {
   s.parentComment = comment || null;
   s.commentAcked = !comment; // nothing to acknowledge if she wasn't left a note
   s.sentBack = false;
+  delete commentDraft[key + ":" + id];
   persistTask(key, id);
   render();
 }
@@ -1958,6 +1974,7 @@ function sendBackReflection(key, id) {
   s.needsReview = false;
   s.reviewed = false;
   s.sentBack = true;
+  delete commentDraft[key + ":" + id];
   persistTask(key, id);
   render();
 }
@@ -2479,7 +2496,7 @@ function renderPastTaskReport(key, t, s) {
   }
   if (awaiting) {
     // Review happens right here, next to the prompt and sample answer it responds to.
-    extra += `<textarea id="comment-${key}-${t.id}" placeholder="Optional feedback (shown either way — required reading if you send it back)" style="min-height:50px;margin-top:6px;"></textarea>
+    extra += `<textarea id="comment-${key}-${t.id}" placeholder="Optional. She\u2019ll see this whether you approve or send back, and she has to mark it read before she moves on." oninput="commentDraft['${key}:${t.id}']=this.value" style="min-height:50px;margin-top:6px;">${escHtml(commentDraft[key + ":" + t.id] || "")}</textarea>
       <div class="review-actions">
         <button onclick="sendBackReflection('${key}','${t.id}')">Refire (send back)</button>
         <button class="approve" onclick="approveReflection('${key}','${t.id}')">Approve</button>
