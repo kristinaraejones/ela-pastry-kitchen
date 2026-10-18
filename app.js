@@ -2046,7 +2046,8 @@ function taskBodyHTML(key, t) {
     inner = `${trimReadAloud && key === "reading" ? "" : readAloudButton(promptId, "Read the question to me")}
       <div class="lesson-text" id="${promptId}"><p>${t.prompt}</p></div>
       ${feedbackNote}
-      <textarea id="ta-${key}-${t.id}" placeholder="Type your answer here..." ${s.done ? "disabled" : ""}>${s.answers.text || ""}</textarea>
+      ${key === "reading" && !s.done ? `<div class="because-tip"><b>Remember the "because"!</b> Tell me what the character does or says that shows it. Try: "I know because ___."</div>` : ""}
+      <textarea id="ta-${key}-${t.id}" placeholder="${key === "reading" ? "Type your answer here... (I know because ...)" : "Type your answer here..."}" ${s.done ? "disabled" : ""}>${s.answers.text || ""}</textarea>
       ${s.done ? `<div class="graded-note">Submitted — waiting on parent review.</div>` : `<button class="btn primary" onclick="submitReflection('${key}','${t.id}')">${s.sentBack ? "Refire" : "Submit"}</button>`}
       ${attemptHistoryHTML(t, s, { forStudent: true })}`;
   } else if (t.type === "graded-dictation") {
