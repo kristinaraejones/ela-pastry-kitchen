@@ -31,31 +31,16 @@
  *   Kenley's Level-1 tap-to-tag mechanic exactly — tap a word, choose its
  *   part of speech from the week's options list).
  *
- * Category simplification (per explicit direction, 2026-09-03): the
- * source doc's answer key gets very granular per word ("team = common/
- * collective noun", "cooking = noun used as an adjective (describes
- * class)", "Adelyn's = possessive proper noun"). Rather than exploding
- * the tap menu into 20+ narrow options, every word's TAPPABLE answer is
- * simplified down to its functional category — Noun, Pronoun, Verb,
- * Adjective, Adverb, Preposition, Conjunction, Interjection, plus three
- * new verbal categories the unit explicitly teaches as their own concept
- * (Gerund, Participle, Infinitive, unlocked in the options list starting
- * the week each is introduced — Weeks 4, 5, and 6 respectively). The
- * source doc's fuller nuance ("collective noun", "used as an adjective",
- * "possessive proper noun", etc.) is preserved verbatim in that word's
- * explanations entry, shown after she submits — same pattern Kenley's
- * own pos-tagger already uses for articles-as-adjectives.
- *
- * One consequence worth knowing: the source doc's own answer key
- * sometimes previews a verbal ahead of its teaching week as a forward
- * reference (e.g. Week 4's answer key casually calls "to relax" an
- * "infinitive" even though Infinitive isn't taught/unlocked until Week
- * 6). Tagging generation downgrades those early mentions to the closest
- * category she'd have actually been taught by that point (Gerund→Noun,
- * Participle→Adjective, Infinitive→Verb, before each one's unlock week)
- * so every tappable answer always exists in that week's own options list
- * — see downgradeIfUntaught in this session's generate_grammar_unit1.js
- * scratchpad script if reproducing this for Units 2-5.
+ * Two-step design (updated 2026-10-23, per MCT): Step 1 (pos-tagger) uses
+ * ONLY the 8 parts of speech, by the word's job in the sentence. A gerund is
+ * tagged Noun, a participle Adjective, and both "to" and its verb in an
+ * infinitive are tagged Verb ("to" before a noun stays Preposition). Step 2
+ * (concept-check, id = sentence id + "c") then asks which verb-built words
+ * are gerunds, participles, infinitives, or regular verbs. Any later week
+ * that adds a verbal must follow the same split. Sentences in Weeks 1-5
+ * contain no infinitives, since infinitives are not taught until Week 6. The
+ * source doc's fuller nuance is kept in each word's explanations entry,
+ * shown after she submits.
  *
  * A few sentences also needed hand-built overrides rather than automatic
  * parsing, because the source docx lost some paragraph breaks on export
@@ -202,13 +187,47 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "castle."
             ],
             "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
-            "options": ["Common", "Proper", "Collective", "Compound"],
+            "options": [
+              "Common",
+              "Proper",
+              "Collective",
+              "Compound"
+            ],
             "targets": [
-              {"index":0,"answer":"Proper","explanation":"names one specific person, place, or thing, so it's capitalized"},
-              {"index":2,"answer":["Common", "Collective"],"explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"},
-              {"index":6,"answer":["Common", "Compound"],"explanation": "it is BOTH: common (a general name, not one specific one) and compound (two words joined into one noun idea)"},
-              {"index":9,"answer":["Common", "Compound"],"explanation": "it is BOTH: common (a general name, not one specific one) and compound (two words joined into one noun idea)"},
-              {"index":12,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"}
+              {
+                "index": 0,
+                "answer": "Proper",
+                "explanation": "names one specific person, place, or thing, so it's capitalized"
+              },
+              {
+                "index": 2,
+                "answer": [
+                  "Common",
+                  "Collective"
+                ],
+                "explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"
+              },
+              {
+                "index": 6,
+                "answer": [
+                  "Common",
+                  "Compound"
+                ],
+                "explanation": "it is BOTH: common (a general name, not one specific one) and compound (two words joined into one noun idea)"
+              },
+              {
+                "index": 9,
+                "answer": [
+                  "Common",
+                  "Compound"
+                ],
+                "explanation": "it is BOTH: common (a general name, not one specific one) and compound (two words joined into one noun idea)"
+              },
+              {
+                "index": 12,
+                "answer": "Common",
+                "explanation": "names any person, place, or thing — not one specific one"
+              }
             ]
           },
           {
@@ -279,12 +298,42 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "class."
             ],
             "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
-            "options": ["Common", "Proper", "Collective", "Compound"],
+            "options": [
+              "Common",
+              "Proper",
+              "Collective",
+              "Compound"
+            ],
             "targets": [
-              {"index":2,"answer":["Common", "Collective"],"explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"},
-              {"index":5,"answer":["Common", "Compound"],"explanation": "it is BOTH: common (a general name, not one specific one) and compound (two words joined into one noun idea)"},
-              {"index":7,"answer":"Proper","explanation":"names one specific person, place, or thing, so it's capitalized"},
-              {"index":9,"answer":["Common","Collective"],"explanation":"it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"}
+              {
+                "index": 2,
+                "answer": [
+                  "Common",
+                  "Collective"
+                ],
+                "explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"
+              },
+              {
+                "index": 5,
+                "answer": [
+                  "Common",
+                  "Compound"
+                ],
+                "explanation": "it is BOTH: common (a general name, not one specific one) and compound (two words joined into one noun idea)"
+              },
+              {
+                "index": 7,
+                "answer": "Proper",
+                "explanation": "names one specific person, place, or thing, so it's capitalized"
+              },
+              {
+                "index": 9,
+                "answer": [
+                  "Common",
+                  "Collective"
+                ],
+                "explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"
+              }
             ]
           },
           {
@@ -359,12 +408,39 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "spices."
             ],
             "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
-            "options": ["Common", "Proper", "Collective", "Compound"],
+            "options": [
+              "Common",
+              "Proper",
+              "Collective",
+              "Compound"
+            ],
             "targets": [
-              {"index":0,"answer":"Proper","explanation":"names one specific person, place, or thing, so it's capitalized"},
-              {"index":2,"answer":["Common","Collective"],"explanation":"it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"},
-              {"index":6,"answer":["Common", "Compound"],"explanation": "it is BOTH: common (a general name, not one specific one) and compound (two words joined into one noun idea)"},
-              {"index":10,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"}
+              {
+                "index": 0,
+                "answer": "Proper",
+                "explanation": "names one specific person, place, or thing, so it's capitalized"
+              },
+              {
+                "index": 2,
+                "answer": [
+                  "Common",
+                  "Collective"
+                ],
+                "explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"
+              },
+              {
+                "index": 6,
+                "answer": [
+                  "Common",
+                  "Compound"
+                ],
+                "explanation": "it is BOTH: common (a general name, not one specific one) and compound (two words joined into one noun idea)"
+              },
+              {
+                "index": 10,
+                "answer": "Common",
+                "explanation": "names any person, place, or thing — not one specific one"
+              }
             ]
           },
           {
@@ -443,11 +519,34 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "studio."
             ],
             "prompt": "Now look at the nouns you found in this sentence. Is each one common, proper, collective, or compound?",
-            "options": ["Common", "Proper", "Collective", "Compound"],
+            "options": [
+              "Common",
+              "Proper",
+              "Collective",
+              "Compound"
+            ],
             "targets": [
-              {"index":2,"answer":["Common", "Collective"],"explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"},
-              {"index":6,"answer":["Common", "Collective"],"explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"},
-              {"index":11,"answer":"Common","explanation":"names any person, place, or thing — not one specific one"}
+              {
+                "index": 2,
+                "answer": [
+                  "Common",
+                  "Collective"
+                ],
+                "explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"
+              },
+              {
+                "index": 6,
+                "answer": [
+                  "Common",
+                  "Collective"
+                ],
+                "explanation": "it is BOTH: common (a general name, not one specific one) and collective (a group acting as one unit)"
+              },
+              {
+                "index": 11,
+                "answer": "Common",
+                "explanation": "names any person, place, or thing — not one specific one"
+              }
             ]
           }
         ]
@@ -535,11 +634,31 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "perfectly."
             ],
             "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
-            "options": ["Subject", "Object", "Possessive", "Indefinite"],
+            "options": [
+              "Subject",
+              "Object",
+              "Possessive",
+              "Indefinite"
+            ],
             "targets": [
-              {"index":0,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"},
-              {"index":3,"answer":"Object","explanation":"it's receiving the action, or following a preposition"},
-              {"index":5,"answer":"Subject","explanation":"it's doing the action in its clause"}
+              {
+                "index": 0,
+                "answer": [
+                  "Subject",
+                  "Indefinite"
+                ],
+                "explanation": "it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"
+              },
+              {
+                "index": 3,
+                "answer": "Object",
+                "explanation": "it's receiving the action, or following a preposition"
+              },
+              {
+                "index": 5,
+                "answer": "Subject",
+                "explanation": "it's doing the action in its clause"
+              }
             ]
           },
           {
@@ -618,13 +737,44 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "was."
             ],
             "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
-            "options": ["Subject", "Object", "Possessive", "Indefinite"],
+            "options": [
+              "Subject",
+              "Object",
+              "Possessive",
+              "Indefinite"
+            ],
             "targets": [
-              {"index":0,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"},
-              {"index":2,"answer":"Possessive","explanation":"it shows ownership"},
-              {"index":7,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"},
-              {"index":9,"answer":"Possessive","explanation":"it shows ownership"},
-              {"index":10,"answer":"Subject","explanation":"it's doing the action in its clause"}
+              {
+                "index": 0,
+                "answer": [
+                  "Subject",
+                  "Indefinite"
+                ],
+                "explanation": "it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"
+              },
+              {
+                "index": 2,
+                "answer": "Possessive",
+                "explanation": "it shows ownership"
+              },
+              {
+                "index": 7,
+                "answer": [
+                  "Subject",
+                  "Indefinite"
+                ],
+                "explanation": "it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"
+              },
+              {
+                "index": 9,
+                "answer": "Possessive",
+                "explanation": "it shows ownership"
+              },
+              {
+                "index": 10,
+                "answer": "Subject",
+                "explanation": "it's doing the action in its clause"
+              }
             ]
           },
           {
@@ -633,9 +783,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "type": "pos-tagger",
             "sentence": [
               "Everybody",
-              "wanted",
-              "to",
-              "try",
+              "tried",
               "her",
               "new",
               "yoga",
@@ -652,8 +800,6 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             ],
             "answers": [
               "Pronoun",
-              "Verb",
-              "Verb",
               "Verb",
               "Pronoun",
               "Adjective",
@@ -682,8 +828,6 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "explanations": [
               "indefinite pronoun",
               "action verb",
-              "the \"to\" that starts the infinitive \"to try\"",
-              "infinitive",
               "possessive pronoun",
               "adjective",
               "noun used as an adjective (describes pose)",
@@ -705,9 +849,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "type": "concept-check",
             "sentence": [
               "Everybody",
-              "wanted",
-              "to",
-              "try",
+              "tried",
               "her",
               "new",
               "yoga",
@@ -723,12 +865,39 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "could."
             ],
             "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
-            "options": ["Subject", "Object", "Possessive", "Indefinite"],
+            "options": [
+              "Subject",
+              "Object",
+              "Possessive",
+              "Indefinite"
+            ],
             "targets": [
-              {"index":0,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"},
-              {"index":4,"answer":"Possessive","explanation":"it shows ownership"},
-              {"index":9,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"},
-              {"index":15,"answer":"Subject","explanation":"it's doing the action in its clause"}
+              {
+                "index": 0,
+                "answer": [
+                  "Subject",
+                  "Indefinite"
+                ],
+                "explanation": "it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"
+              },
+              {
+                "index": 2,
+                "answer": "Possessive",
+                "explanation": "it shows ownership"
+              },
+              {
+                "index": 7,
+                "answer": [
+                  "Subject",
+                  "Indefinite"
+                ],
+                "explanation": "it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"
+              },
+              {
+                "index": 13,
+                "answer": "Subject",
+                "explanation": "it's doing the action in its clause"
+              }
             ]
           },
           {
@@ -807,11 +976,37 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "bite."
             ],
             "prompt": "Now look at the pronouns you found in this sentence. Is each one subject, object, possessive, or indefinite?",
-            "options": ["Subject", "Object", "Possessive", "Indefinite"],
+            "options": [
+              "Subject",
+              "Object",
+              "Possessive",
+              "Indefinite"
+            ],
             "targets": [
-              {"index":0,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"},
-              {"index":2,"answer":["Object","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the object in its clause"},
-              {"index":8,"answer":["Subject","Indefinite"],"explanation":"it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"}
+              {
+                "index": 0,
+                "answer": [
+                  "Subject",
+                  "Indefinite"
+                ],
+                "explanation": "it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"
+              },
+              {
+                "index": 2,
+                "answer": [
+                  "Object",
+                  "Indefinite"
+                ],
+                "explanation": "it is BOTH: an indefinite pronoun (no specific person or thing) and the object in its clause"
+              },
+              {
+                "index": 8,
+                "answer": [
+                  "Subject",
+                  "Indefinite"
+                ],
+                "explanation": "it is BOTH: an indefinite pronoun (no specific person or thing) and the subject in its clause"
+              }
             ]
           }
         ]
@@ -899,11 +1094,27 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "carefully."
             ],
             "prompt": "Now look at the verbs you found in this sentence. Is each one action, linking, or helping?",
-            "options": ["Action", "Linking", "Helping"],
+            "options": [
+              "Action",
+              "Linking",
+              "Helping"
+            ],
             "targets": [
-              {"index":2,"answer":"Linking","explanation":"connects the subject to a word that renames or describes it, instead of showing action"},
-              {"index":6,"answer":"Helping","explanation":"works with the main verb to show tense, ability, or mood"},
-              {"index":7,"answer":"Action","explanation":"shows something the subject does"}
+              {
+                "index": 2,
+                "answer": "Linking",
+                "explanation": "connects the subject to a word that renames or describes it, instead of showing action"
+              },
+              {
+                "index": 6,
+                "answer": "Helping",
+                "explanation": "works with the main verb to show tense, ability, or mood"
+              },
+              {
+                "index": 7,
+                "answer": "Action",
+                "explanation": "shows something the subject does"
+              }
             ]
           },
           {
@@ -978,11 +1189,27 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "now."
             ],
             "prompt": "Now look at the verbs you found in this sentence. Is each one action, linking, or helping?",
-            "options": ["Action", "Linking", "Helping"],
+            "options": [
+              "Action",
+              "Linking",
+              "Helping"
+            ],
             "targets": [
-              {"index":1,"answer":"Helping","explanation":"works with the main verb to show tense, ability, or mood"},
-              {"index":2,"answer":"Action","explanation":"shows something the subject does"},
-              {"index":7,"answer":"Linking","explanation":"connects the subject to a word that renames or describes it, instead of showing action"}
+              {
+                "index": 1,
+                "answer": "Helping",
+                "explanation": "works with the main verb to show tense, ability, or mood"
+              },
+              {
+                "index": 2,
+                "answer": "Action",
+                "explanation": "shows something the subject does"
+              },
+              {
+                "index": 7,
+                "answer": "Linking",
+                "explanation": "connects the subject to a word that renames or describes it, instead of showing action"
+              }
             ]
           },
           {
@@ -1049,12 +1276,32 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "earlier."
             ],
             "prompt": "Now look at the verbs you found in this sentence. Is each one action, linking, or helping?",
-            "options": ["Action", "Linking", "Helping"],
+            "options": [
+              "Action",
+              "Linking",
+              "Helping"
+            ],
             "targets": [
-              {"index":1,"answer":"Helping","explanation":"works with the main verb to show tense, ability, or mood"},
-              {"index":2,"answer":"Action","explanation":"shows something the subject does"},
-              {"index":6,"answer":"Helping","explanation":"works with the main verb to show tense, ability, or mood"},
-              {"index":7,"answer":"Action","explanation":"shows something the subject does"}
+              {
+                "index": 1,
+                "answer": "Helping",
+                "explanation": "works with the main verb to show tense, ability, or mood"
+              },
+              {
+                "index": 2,
+                "answer": "Action",
+                "explanation": "shows something the subject does"
+              },
+              {
+                "index": 6,
+                "answer": "Helping",
+                "explanation": "works with the main verb to show tense, ability, or mood"
+              },
+              {
+                "index": 7,
+                "answer": "Action",
+                "explanation": "shows something the subject does"
+              }
             ]
           },
           {
@@ -1133,10 +1380,22 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "baking."
             ],
             "prompt": "Now look at the verbs you found in this sentence. Is each one action, linking, or helping?",
-            "options": ["Action", "Linking", "Helping"],
+            "options": [
+              "Action",
+              "Linking",
+              "Helping"
+            ],
             "targets": [
-              {"index":2,"answer":"Linking","explanation":"connects the subject to a word that renames or describes it, instead of showing action"},
-              {"index":6,"answer":"Linking","explanation":"connects the subject to a word that renames or describes it, instead of showing action"}
+              {
+                "index": 2,
+                "answer": "Linking",
+                "explanation": "connects the subject to a word that renames or describes it, instead of showing action"
+              },
+              {
+                "index": 6,
+                "answer": "Linking",
+                "explanation": "connects the subject to a word that renames or describes it, instead of showing action"
+              }
             ]
           }
         ]
@@ -1154,7 +1413,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl4",
             "label": "Week 4 Lesson: NEW: Verbals — Gerunds (Verbs Acting as Nouns)",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 4: NEW: Verbals — Gerunds (Verbs Acting as Nouns)</b></p><p style=\"opacity:.7;font-size:0.78rem;\">NEW TOPIC — Standards: L.4.1 (Town-level enrichment beyond CCSS minimum; supports W.4.3 sentence variety)</p><p>Hi Adelyn!</p><p>Here's something totally new, straight from Town-level grammar: a <b>VERBAL</b> is a verb form that stopped acting like a verb and started doing a different job.</p><p>The first kind is the <b>GERUND</b> — a verb + -ing that acts as a <b>NOUN</b>.'<b>CARTWHEELING</b> is Adelyn's favorite activity.'</p><p>Cartwheeling looks like a verb, but here it's the <b>SUBJECT</b> of the sentence — a noun job!</p><p>Compare that to 'Adelyn is cartwheeling,' where cartwheeling is just part of the verb.</p><p>The trick: ask what job the -ing word is doing.</p><p>If it's acting as a person/place/thing (subject, object, etc.), it's a gerund.</p><p>If it's paired with a helping verb showing action happening, it's just a regular verb.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 4: NEW: Verbals — Gerunds (Verbs Acting as Nouns)</b></p><p style=\"opacity:.7;font-size:0.78rem;\">NEW TOPIC — Standards: L.4.1 (Town-level enrichment beyond CCSS minimum; supports W.4.3 sentence variety)</p><p>Hi Adelyn!</p><p>Here's something totally new, straight from Town-level grammar: a <b>VERBAL</b> is a verb form that stopped acting like a verb and started doing a different job.</p><p>The first kind is the <b>GERUND</b> — a verb + -ing that acts as a <b>NOUN</b>.'<b>CARTWHEELING</b> is Adelyn's favorite activity.'</p><p>Cartwheeling looks like a verb, but here it's the <b>SUBJECT</b> of the sentence — a noun job!</p><p>Compare that to 'Adelyn is cartwheeling,' where cartwheeling is just part of the verb.</p><p>The trick: ask what job the -ing word is doing.</p><p>If it's acting as a person/place/thing (subject, object, etc.), it's a gerund.</p><p>If it's paired with a helping verb showing action happening, it's just a regular verb.</p><p>In Step 1 you still label a gerund as a <b>NOUN</b>, because that is its job. Step 2 is where you name it.</p><p style=\"opacity:.8;\"><b>Step 1:</b> For each sentence, label every word using only the 8 parts of speech, based on the job the word is doing in that sentence.</p><p style=\"opacity:.8;\"><b>Step 2:</b> After a sentence, a Gerund Check asks you to spot the gerunds.</p></div>"
           },
           {
             "id": "ag4_1",
@@ -1165,20 +1424,16 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "is",
               "Kenley's",
               "favorite",
-              "way",
-              "to",
-              "relax",
+              "activity",
               "after",
               "school."
             ],
             "answers": [
-              "Gerund",
+              "Noun",
               "Verb",
               "Noun",
               "Adjective",
               "Noun",
-              "Preposition",
-              "Verb",
               "Preposition",
               "Noun"
             ],
@@ -1190,19 +1445,43 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund"
+              "Interjection"
             ],
             "explanations": [
-              "gerund, acting as a noun (subject)",
+              "noun: it names the activity, so it does a noun's job here",
               "linking verb",
               "possessive proper noun",
               "adjective",
               "noun",
-              "The \"to\" that starts the infinitive \"to relax\".",
-              "infinitive, describing 'way'",
               "preposition",
               "noun"
+            ]
+          },
+          {
+            "id": "ag4_1c",
+            "label": "Sentence 1 — Gerund Check",
+            "type": "concept-check",
+            "sentence": [
+              "Cooking",
+              "is",
+              "Kenley's",
+              "favorite",
+              "activity",
+              "after",
+              "school."
+            ],
+            "prompt": "Now look at the -ing words in this sentence. Each one is built from a verb. Is it working as a regular verb, or as a gerund (a verb form doing a noun's job)?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 0,
+                "answer": "Gerund",
+                "explanation": "an -ing verb form that names an activity, so it works as a noun"
+              }
             ]
           },
           {
@@ -1211,19 +1490,27 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "type": "pos-tagger",
             "sentence": [
               "Adelyn",
+              "is",
+              "stretching",
+              "now,",
+              "but",
+              "she",
               "loves",
               "stretching",
               "before",
-              "every",
               "practice."
             ],
             "answers": [
               "Noun",
               "Verb",
-              "Gerund",
+              "Verb",
+              "Adverb",
+              "Conjunction",
+              "Pronoun",
+              "Verb",
+              "Noun",
               "Preposition",
-              "Adjective",
-              "Gerund"
+              "Noun"
             ],
             "options": [
               "Noun",
@@ -1233,16 +1520,54 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund"
+              "Interjection"
             ],
             "explanations": [
               "proper noun",
+              "helping verb",
+              "action verb (part of the verb phrase \"is stretching\")",
+              "adverb",
+              "conjunction",
+              "subject pronoun",
               "action verb",
-              "gerund, acting as a noun (direct object)",
+              "noun: it names the activity, so it does a noun's job here",
               "preposition",
-              "adjective",
-              "nounstretching = gerund (noun job — it's the direct object of 'loves': loves WHAT? stretching)"
+              "noun"
+            ]
+          },
+          {
+            "id": "ag4_2c",
+            "label": "Sentence 2 — Gerund Check",
+            "type": "concept-check",
+            "sentence": [
+              "Adelyn",
+              "is",
+              "stretching",
+              "now,",
+              "but",
+              "she",
+              "loves",
+              "stretching",
+              "before",
+              "practice."
+            ],
+            "prompt": "Now look at the -ing words in this sentence. Each one is built from a verb. Is it working as a regular verb, or as a gerund (a verb form doing a noun's job)?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 2,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 7,
+                "answer": "Gerund",
+                "explanation": "an -ing verb form that names an activity, so it works as a noun"
+              }
             ]
           },
           {
@@ -1259,13 +1584,13 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "homeschooling."
             ],
             "answers": [
-              "Gerund",
+              "Noun",
               "Verb",
               "Noun",
               "Adjective",
               "Noun",
               "Preposition",
-              "Gerund"
+              "Noun"
             ],
             "options": [
               "Noun",
@@ -1275,17 +1600,48 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund"
+              "Interjection"
             ],
             "explanations": [
-              "gerund, acting as a noun (subject)",
+              "noun: it names the activity, so it does a noun's job here",
               "linking verb",
               "possessive proper noun",
               "adjective",
               "noun",
               "preposition",
-              "gerund, acting as a noun (object of 'of')"
+              "noun: it names the activity, so it does a noun's job here"
+            ]
+          },
+          {
+            "id": "ag4_3c",
+            "label": "Sentence 3 — Gerund Check",
+            "type": "concept-check",
+            "sentence": [
+              "Traveling",
+              "is",
+              "Adelyn's",
+              "favorite",
+              "part",
+              "of",
+              "homeschooling."
+            ],
+            "prompt": "Now look at the -ing words in this sentence. Each one is built from a verb. Is it working as a regular verb, or as a gerund (a verb form doing a noun's job)?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 0,
+                "answer": "Gerund",
+                "explanation": "an -ing verb form that names an activity, so it works as a noun"
+              },
+              {
+                "index": 6,
+                "answer": "Gerund",
+                "explanation": "an -ing verb form that names an activity, so it works as a noun"
+              }
             ]
           },
           {
@@ -1304,11 +1660,11 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "answers": [
               "Noun",
               "Verb",
-              "Gerund",
+              "Noun",
               "Adverb",
               "Conjunction",
-              "Gerund",
-              "Gerund"
+              "Noun",
+              "Noun"
             ],
             "options": [
               "Noun",
@@ -1318,17 +1674,48 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund"
+              "Interjection"
             ],
             "explanations": [
               "proper noun",
               "action verb",
-              "gerund, acting as a noun (direct object)",
+              "noun: it names the activity, so it does a noun's job here",
               "adverb",
               "comparison word",
-              "gerund, acting as a noun",
-              "noun (object of the gerund 'cooking')"
+              "noun: it names the activity, so it does a noun's job here",
+              "noun (what is being cooked)"
+            ]
+          },
+          {
+            "id": "ag4_4c",
+            "label": "Sentence 4 — Gerund Check",
+            "type": "concept-check",
+            "sentence": [
+              "Kenley",
+              "enjoys",
+              "baking",
+              "more",
+              "than",
+              "cooking",
+              "pasta."
+            ],
+            "prompt": "Now look at the -ing words in this sentence. Each one is built from a verb. Is it working as a regular verb, or as a gerund (a verb form doing a noun's job)?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 2,
+                "answer": "Gerund",
+                "explanation": "an -ing verb form that names an activity, so it works as a noun"
+              },
+              {
+                "index": 5,
+                "answer": "Gerund",
+                "explanation": "an -ing verb form that names an activity, so it works as a noun"
+              }
             ]
           }
         ]
@@ -1346,7 +1733,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl5",
             "label": "Week 5 Lesson: NEW: Verbals — Participles (Verbs Acting as Adjectives)",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 5: NEW: Verbals — Participles (Verbs Acting as Adjectives)</b></p><p style=\"opacity:.7;font-size:0.78rem;\">NEW TOPIC — Standards: L.4.1 (Town-level enrichment; supports W.4.3)</p><p>Hi Adelyn!</p><p>Second verbal: the <b>PARTICIPLE</b> — a verb form (usually ending in -ing or -ed) that acts as an <b>ADJECTIVE</b>, describing a noun.'The <b>GIGGLING</b> gymnasts stretched.'</p><p>Giggling looks like a verb, but here it describes gymnasts — an adjective job!</p><p>Same word family as a gerund, totally different job depending on what it's doing in the sentence.</p><p>Compare: 'Adelyn was <b>LAUGHING</b>' (verb, part of the action) vs.</p><p>'the <b>LAUGHING</b> chef' (participle, describing chef).</p><p>Same word, different job — grammar is sneaky like that!</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 5: NEW: Verbals — Participles (Verbs Acting as Adjectives)</b></p><p style=\"opacity:.7;font-size:0.78rem;\">NEW TOPIC — Standards: L.4.1 (Town-level enrichment; supports W.4.3)</p><p>Hi Adelyn!</p><p>Second verbal: the <b>PARTICIPLE</b> — a verb form (usually ending in -ing or -ed) that acts as an <b>ADJECTIVE</b>, describing a noun.'The <b>GIGGLING</b> gymnasts stretched.'</p><p>Giggling looks like a verb, but here it describes gymnasts — an adjective job!</p><p>Same word family as a gerund, totally different job depending on what it's doing in the sentence.</p><p>Compare: 'Adelyn was <b>LAUGHING</b>' (verb, part of the action) vs.</p><p>'the <b>LAUGHING</b> chef' (participle, describing chef).</p><p>Same word, different job — grammar is sneaky like that!</p><p>In Step 1 you label a participle as an <b>ADJECTIVE</b>, because that is its job. Step 2 is where you name it.</p><p style=\"opacity:.8;\"><b>Step 1:</b> For each sentence, label every word using only the 8 parts of speech, based on the job the word is doing in that sentence.</p><p style=\"opacity:.8;\"><b>Step 2:</b> After a sentence, a Participle Check asks you to spot the participles.</p></div>"
           },
           {
             "id": "ag5_1",
@@ -1370,7 +1757,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             ],
             "answers": [
               "Adjective",
-              "Participle",
+              "Adjective",
               "Noun",
               "Verb",
               "Preposition",
@@ -1378,7 +1765,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Noun",
               "Conjunction",
               "Adjective",
-              "Participle",
+              "Adjective",
               "Noun",
               "Verb",
               "Adjective",
@@ -1392,13 +1779,11 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle"
+              "Interjection"
             ],
             "explanations": [
               "article",
-              "participle, describes gymnasts",
+              "adjective: it describes a noun here",
               "noun",
               "action verb",
               "preposition",
@@ -1406,11 +1791,61 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "noun",
               "starts a clause here, acts like a conjunction (subordinating conjunction, Week 25)",
               "article",
-              "participle, describes coach",
+              "adjective: it describes a noun here",
               "noun",
               "action verb",
               "article",
               "noun"
+            ]
+          },
+          {
+            "id": "ag5_1c",
+            "label": "Sentence 1 — Participle Check",
+            "type": "concept-check",
+            "sentence": [
+              "The",
+              "exhausted",
+              "gymnasts",
+              "collapsed",
+              "onto",
+              "the",
+              "mats",
+              "after",
+              "the",
+              "giggling",
+              "coach",
+              "called",
+              "a",
+              "break."
+            ],
+            "prompt": "Now look at the words built from verbs (-ing and -ed words) in this sentence. Is each one a regular verb, a gerund (doing a noun's job), or a participle (describing a noun)?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 1,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              },
+              {
+                "index": 3,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 9,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              },
+              {
+                "index": 11,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              }
             ]
           },
           {
@@ -1433,11 +1868,11 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Noun",
               "Verb",
               "Adjective",
-              "Participle",
+              "Adjective",
               "Noun",
               "Preposition",
               "Pronoun",
-              "Participle",
+              "Adjective",
               "Adjective",
               "Noun"
             ],
@@ -1449,21 +1884,60 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle"
+              "Interjection"
             ],
             "explanations": [
               "proper noun",
               "action verb",
               "article",
-              "participle, describes soup",
+              "adjective: it describes a noun here",
               "noun",
               "preposition",
               "possessive pronoun",
-              "participle, describes sister",
+              "adjective: it describes a noun here",
               "adjective",
               "noun"
+            ]
+          },
+          {
+            "id": "ag5_2c",
+            "label": "Sentence 2 — Participle Check",
+            "type": "concept-check",
+            "sentence": [
+              "Kenley",
+              "served",
+              "the",
+              "steaming",
+              "soup",
+              "to",
+              "her",
+              "smiling",
+              "little",
+              "sister."
+            ],
+            "prompt": "Now look at the words built from verbs (-ing and -ed words) in this sentence. Is each one a regular verb, a gerund (doing a noun's job), or a participle (describing a noun)?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 1,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 3,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              },
+              {
+                "index": 7,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              }
             ]
           },
           {
@@ -1484,14 +1958,14 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             ],
             "answers": [
               "Adjective",
-              "Participle",
+              "Adjective",
               "Noun",
               "Verb",
               "Preposition",
               "Adjective",
-              "Participle",
+              "Adjective",
               "Conjunction",
-              "Participle",
+              "Adjective",
               "Noun"
             ],
             "options": [
@@ -1502,21 +1976,65 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle"
+              "Interjection"
             ],
             "explanations": [
               "article",
-              "participle, describes coach",
+              "adjective: it describes a noun here",
               "noun",
               "action verb",
               "preposition",
               "article",
-              "participle, describes gymnasts",
+              "adjective: it describes a noun here",
               "conjunction",
-              "participle, describes gymnasts",
+              "adjective: it describes a noun here",
               "noun"
+            ]
+          },
+          {
+            "id": "ag5_3c",
+            "label": "Sentence 3 — Participle Check",
+            "type": "concept-check",
+            "sentence": [
+              "The",
+              "smiling",
+              "coach",
+              "clapped",
+              "for",
+              "the",
+              "exhausted",
+              "but",
+              "excited",
+              "gymnasts."
+            ],
+            "prompt": "Now look at the words built from verbs (-ing and -ed words) in this sentence. Is each one a regular verb, a gerund (doing a noun's job), or a participle (describing a noun)?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 1,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              },
+              {
+                "index": 3,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 6,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              },
+              {
+                "index": 8,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              }
             ]
           },
           {
@@ -1538,11 +2056,11 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Noun",
               "Verb",
               "Adjective",
-              "Participle",
+              "Adjective",
               "Noun",
               "Preposition",
               "Adjective",
-              "Participle",
+              "Adjective",
               "Noun"
             ],
             "options": [
@@ -1553,20 +2071,58 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle"
+              "Interjection"
             ],
             "explanations": [
               "proper noun",
               "action verb",
               "article",
-              "participle, describes batter",
+              "adjective: it describes a noun here",
               "noun",
               "preposition",
               "article",
-              "participle, describes pan",
+              "adjective: it describes a noun here",
               "noun"
+            ]
+          },
+          {
+            "id": "ag5_4c",
+            "label": "Sentence 4 — Participle Check",
+            "type": "concept-check",
+            "sentence": [
+              "Kenley",
+              "poured",
+              "the",
+              "sizzling",
+              "batter",
+              "into",
+              "a",
+              "waiting",
+              "pan."
+            ],
+            "prompt": "Now look at the words built from verbs (-ing and -ed words) in this sentence. Is each one a regular verb, a gerund (doing a noun's job), or a participle (describing a noun)?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 1,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 3,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              },
+              {
+                "index": 7,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              }
             ]
           }
         ]
@@ -1584,7 +2140,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl6",
             "label": "Week 6 Lesson: NEW: Verbals — Infinitives (To + Verb)",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 6: NEW: Verbals — Infinitives (To + Verb)</b></p><p style=\"opacity:.7;font-size:0.78rem;\">NEW TOPIC — Standards: L.4.1 (Town-level enrichment; supports W.4.3)</p><p>Hi Adelyn!</p><p>Third and final verbal: the <b>INFINITIVE</b> — 'to' + a verb (to jump, to cook, to travel).</p><p>Infinitives can act as a noun, an adjective, or an adverb, depending on the sentence.'Adelyn wants TO <b>PRACTICE</b> every morning.'</p><p>To practice acts as a noun (wants <b>WHAT</b>? to practice).</p><p>'Kenley has a recipe TO <b>TRY</b>.'</p><p>To try acts as an adjective (describes which recipe).</p><p>'They traveled TO <b>EXPLORE</b> new places.'</p><p>To explore acts as an adverb (traveled <b>WHY</b>?).</p><p>Don't worry about perfectly labeling noun/adjective/adverb infinitive jobs yet — for now, just get great at <b>SPOTTING</b> an infinitive: 'to' + a verb, working as a team.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 6: NEW: Verbals — Infinitives (To + Verb)</b></p><p style=\"opacity:.7;font-size:0.78rem;\">NEW TOPIC — Standards: L.4.1 (Town-level enrichment; supports W.4.3)</p><p>Hi Adelyn!</p><p>Third and final verbal: the <b>INFINITIVE</b> — 'to' + a verb (to jump, to cook, to travel).</p><p>Infinitives can act as a noun, an adjective, or an adverb, depending on the sentence.'Adelyn wants TO <b>PRACTICE</b> every morning.'</p><p>To practice acts as a noun (wants <b>WHAT</b>? to practice).</p><p>'Kenley has a recipe TO <b>TRY</b>.'</p><p>To try acts as an adjective (describes which recipe).</p><p>'They traveled TO <b>EXPLORE</b> new places.'</p><p>To explore acts as an adverb (traveled <b>WHY</b>?).</p><p>Don't worry about perfectly labeling noun/adjective/adverb infinitive jobs yet — for now, just get great at <b>SPOTTING</b> an infinitive: 'to' + a verb, working as a team.</p><p>In Step 1, label both \"to\" and its verb as <b>VERB</b> when they work as a team (\"to master\"). But \"to\" before a noun (\"to the market\") is a <b>PREPOSITION</b>. Step 2 is where you name the infinitive.</p><p style=\"opacity:.8;\"><b>Step 1:</b> For each sentence, label every word using only the 8 parts of speech, based on the job the word is doing in that sentence.</p><p style=\"opacity:.8;\"><b>Step 2:</b> After a sentence, a Infinitive Check asks you to spot the infinitives.</p></div>"
           },
           {
             "id": "ag6_1",
@@ -1593,7 +2149,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "sentence": [
               "Adelyn",
               "is",
-              "determined",
+              "ready",
               "to",
               "master",
               "a",
@@ -1609,8 +2165,8 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Noun",
               "Verb",
               "Adjective",
-              "Preposition",
-              "Infinitive",
+              "Verb",
+              "Verb",
               "Adjective",
               "Noun",
               "Preposition",
@@ -1618,7 +2174,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Noun",
               "Preposition",
               "Adjective",
-              "Infinitive"
+              "Noun"
             ],
             "options": [
               "Noun",
@@ -1628,17 +2184,14 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "proper noun",
               "linking verb",
               "describes Adelyn (predicate adjective)",
-              "The \"to\" that starts the infinitive \"to master\".",
-              "infinitive, describing 'determined' (in what way?)",
+              "\"to\" and the verb after it work together as one verb form",
+              "verb: it follows \"to\"",
               "article",
               "compound noun",
               "preposition",
@@ -1646,7 +2199,42 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "noun",
               "preposition",
               "article",
-              "nounInfinitive: to master"
+              "noun"
+            ]
+          },
+          {
+            "id": "ag6_1c",
+            "label": "Sentence 1 — Infinitive Check",
+            "type": "concept-check",
+            "sentence": [
+              "Adelyn",
+              "is",
+              "ready",
+              "to",
+              "master",
+              "a",
+              "backflip",
+              "by",
+              "the",
+              "end",
+              "of",
+              "the",
+              "year."
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 4,
+                "answer": "Infinitive",
+                "explanation": "the verb that follows \"to\"; \"to\" and the verb work as a team"
+              }
             ]
           },
           {
@@ -1672,12 +2260,12 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Preposition",
               "Adjective",
               "Noun",
-              "Preposition",
-              "Infinitive",
+              "Verb",
+              "Verb",
               "Adjective",
               "Noun",
               "Preposition",
-              "Infinitive"
+              "Noun"
             ],
             "options": [
               "Noun",
@@ -1687,10 +2275,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "proper noun",
@@ -1698,12 +2283,50 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "preposition (with 'the market')",
               "article",
               "noun",
-              "The \"to\" that starts the infinitive \"to buy\".",
-              "infinitive, telling why she traveled",
+              "\"to\" and the verb after it work together as one verb form",
+              "verb: it follows \"to\"",
               "adjective",
               "noun",
               "preposition",
-              "nounInfinitive: to buy"
+              "noun"
+            ]
+          },
+          {
+            "id": "ag6_2c",
+            "label": "Sentence 2 — Infinitive Check",
+            "type": "concept-check",
+            "sentence": [
+              "Kenley",
+              "traveled",
+              "to",
+              "the",
+              "market",
+              "to",
+              "buy",
+              "fresh",
+              "mangoes",
+              "for",
+              "breakfast."
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 1,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 6,
+                "answer": "Infinitive",
+                "explanation": "the verb that follows \"to\"; \"to\" and the verb work as a team"
+              }
             ]
           },
           {
@@ -1724,13 +2347,13 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "answers": [
               "Noun",
               "Verb",
-              "Preposition",
-              "Infinitive",
+              "Verb",
+              "Verb",
               "Conjunction",
               "Pronoun",
               "Verb",
-              "Preposition",
-              "Infinitive"
+              "Verb",
+              "Verb"
             ],
             "options": [
               "Noun",
@@ -1740,21 +2363,64 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "proper noun",
               "action verb",
-              "The \"to\" that starts the infinitive \"to stretch\".",
-              "infinitive (tells why she stopped)",
+              "\"to\" and the verb after it work together as one verb form",
+              "verb: it follows \"to\"",
               "subordinating conjunction",
               "subject pronoun",
               "action verb",
-              "The \"to\" that starts the infinitive \"to practice\".",
-              "infinitive (noun, direct object of 'continued')"
+              "\"to\" and the verb after it work together as one verb form",
+              "verb: it follows \"to\""
+            ]
+          },
+          {
+            "id": "ag6_3c",
+            "label": "Sentence 3 — Infinitive Check",
+            "type": "concept-check",
+            "sentence": [
+              "Adelyn",
+              "stopped",
+              "to",
+              "stretch",
+              "before",
+              "she",
+              "continued",
+              "to",
+              "practice."
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 1,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 3,
+                "answer": "Infinitive",
+                "explanation": "the verb that follows \"to\"; \"to\" and the verb work as a team"
+              },
+              {
+                "index": 6,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 8,
+                "answer": "Infinitive",
+                "explanation": "the verb that follows \"to\"; \"to\" and the verb work as a team"
+              }
             ]
           },
           {
@@ -1776,8 +2442,8 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Verb",
               "Adjective",
               "Noun",
-              "Preposition",
-              "Infinitive",
+              "Verb",
+              "Verb",
               "Adjective",
               "Noun"
             ],
@@ -1789,20 +2455,47 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "proper noun",
               "action verb",
               "adjective",
               "noun",
-              "The \"to\" that starts the infinitive \"to finish\".",
-              "infinitive, describes 'spices' (which spices?)",
+              "\"to\" and the verb after it work together as one verb form",
+              "verb: it follows \"to\"",
               "article",
               "noun"
+            ]
+          },
+          {
+            "id": "ag6_4c",
+            "label": "Sentence 4 — Infinitive Check",
+            "type": "concept-check",
+            "sentence": [
+              "Kenley",
+              "needs",
+              "more",
+              "spices",
+              "to",
+              "finish",
+              "the",
+              "recipe."
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 5,
+                "answer": "Infinitive",
+                "explanation": "the verb that follows \"to\"; \"to\" and the verb work as a team"
+              }
             ]
           }
         ]
@@ -1862,10 +2555,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "interrogative word, used here as an adjective describing curry",
@@ -1920,10 +2610,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "demonstrative adjective, describes leotard",
@@ -1977,10 +2664,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "interrogative adjective, describes flavor",
@@ -2032,10 +2716,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "demonstrative adjective, describes leotards",
@@ -2065,7 +2746,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl8",
             "label": "Week 8 Lesson: Adverbs & Prepositions Refresher",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 8: Adverbs &amp; Prepositions Refresher</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1, L.4.1e (foundation)</p><p>Hi Adelyn!</p><p>Two quick refreshers in one week since you know both from Island.</p><p><b>ADVERBS</b> describe verbs (and sometimes adjectives or other adverbs), telling how, when, where, or how much — gracefully, yesterday, extremely.</p><p><b>PREPOSITIONS</b> show a relationship (location, direction, time) and always travel with a noun friend, forming a prepositional phrase — in the courtyard, during breakfast, beside the fountain.</p><p>This week's sentences mix both, plus a verbal or two from the last few weeks — see if your eye catches everything.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 8: Adverbs &amp; Prepositions Refresher</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1, L.4.1e (foundation)</p><p>Hi Adelyn!</p><p>Two quick refreshers in one week since you know both from Island.</p><p><b>ADVERBS</b> describe verbs (and sometimes adjectives or other adverbs), telling how, when, where, or how much — gracefully, yesterday, extremely.</p><p><b>PREPOSITIONS</b> show a relationship (location, direction, time) and always travel with a noun friend, forming a prepositional phrase — in the courtyard, during breakfast, beside the fountain.</p><p>This week's sentences mix both, plus a verbal or two from the last few weeks — see if your eye catches everything.</p><p style=\"opacity:.8;\"><b>Step 1:</b> For each sentence, label every word using only the 8 parts of speech, based on the job the word is doing in that sentence.</p><p style=\"opacity:.8;\"><b>Step 2:</b> After a sentence, a Verbal Check asks you to spot any gerunds, participles, and infinitives.</p></div>"
           },
           {
             "id": "ag8_1",
@@ -2091,7 +2772,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Noun",
               "Adverb",
               "Adverb",
-              "Participle"
+              "Adjective"
             ],
             "options": [
               "Noun",
@@ -2101,10 +2782,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "proper noun",
@@ -2115,7 +2793,43 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "noun",
               "adverb",
               "adverb",
-              "participle, describes Adelyn"
+              "adjective: it describes a noun here"
+            ]
+          },
+          {
+            "id": "ag8_1c",
+            "label": "Sentence 1 — Verbal Check",
+            "type": "concept-check",
+            "sentence": [
+              "Adelyn",
+              "gracefully",
+              "cartwheeled",
+              "across",
+              "the",
+              "courtyard",
+              "yesterday,",
+              "still",
+              "smiling."
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 2,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 8,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              }
             ]
           },
           {
@@ -2148,7 +2862,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Noun",
               "Preposition",
               "Pronoun",
-              "Gerund"
+              "Noun"
             ],
             "options": [
               "Noun",
@@ -2158,10 +2872,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "preposition",
@@ -2175,7 +2886,41 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "noun",
               "preposition",
               "possessive pronoun",
-              "gerund, acting as a noun (object of 'about')"
+              "noun: it names the activity, so it does a noun's job here"
+            ]
+          },
+          {
+            "id": "ag8_2c",
+            "label": "Sentence 2 — Verbal Check",
+            "type": "concept-check",
+            "sentence": [
+              "During",
+              "breakfast,",
+              "Kenley",
+              "quickly",
+              "told",
+              "an",
+              "extremely",
+              "silly",
+              "joke",
+              "about",
+              "her",
+              "cooking."
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 11,
+                "answer": "Gerund",
+                "explanation": "an -ing verb form that names an activity, so it works as a noun"
+              }
             ]
           },
           {
@@ -2201,7 +2946,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Verb",
               "Preposition",
               "Adjective",
-              "Participle",
+              "Adjective",
               "Noun",
               "Preposition",
               "Adjective",
@@ -2216,10 +2961,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "proper noun",
@@ -2227,12 +2969,50 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "action verb",
               "preposition",
               "article",
-              "participle, describes kitten",
+              "adjective: it describes a noun here",
               "noun",
               "preposition",
               "article",
               "noun used as an adjective",
               "noun"
+            ]
+          },
+          {
+            "id": "ag8_3c",
+            "label": "Sentence 3 — Verbal Check",
+            "type": "concept-check",
+            "sentence": [
+              "Adelyn",
+              "quietly",
+              "tiptoed",
+              "around",
+              "the",
+              "sleeping",
+              "kitten",
+              "near",
+              "the",
+              "market",
+              "stall."
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 2,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 5,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              }
             ]
           },
           {
@@ -2273,10 +3053,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "proper noun",
@@ -2307,7 +3084,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl9",
             "label": "Week 9 Lesson: Conjunctions & Interjections Refresher — Full Cumulative Review",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 9: Conjunctions &amp; Interjections Refresher — Full Cumulative Review</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1 (cumulative)</p><p>Hi Adelyn!</p><p>Last quick refresher: <b>CONJUNCTIONS</b> join things together (<b>FANBOYS</b>: for, and, nor, but, or, yet, so).</p><p><b>INTERJECTIONS</b> burst out with sudden feeling (Wow!</p><p>Yikes!).</p><p>Both straight from Island — you've got these.</p><p>Now for the big picture: you know all 8 original parts of speech, <b>PLUS</b> this unit's new depth — collective/compound nouns, indefinite pronouns, gerunds, participles, infinitives, and demonstrative/interrogative words.</p><p>That's a serious upgrade from Island!</p><p>This week, label everything you can in two sentences — old parts of speech <b>AND</b> new Town-level layers.</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 9: Conjunctions &amp; Interjections Refresher — Full Cumulative Review</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1 (cumulative)</p><p>Hi Adelyn!</p><p>Last quick refresher: <b>CONJUNCTIONS</b> join things together (<b>FANBOYS</b>: for, and, nor, but, or, yet, so).</p><p><b>INTERJECTIONS</b> burst out with sudden feeling (Wow!</p><p>Yikes!).</p><p>Both straight from Island — you've got these.</p><p>Now for the big picture: you know all 8 original parts of speech, <b>PLUS</b> this unit's new depth — collective/compound nouns, indefinite pronouns, gerunds, participles, infinitives, and demonstrative/interrogative words.</p><p>That's a serious upgrade from Island!</p><p>This week, label every word with one of the 8 parts of speech. After a sentence that has a verb form doing a new job, a Verbal Check asks you to name it.</p><p style=\"opacity:.8;\"><b>Step 1:</b> For each sentence, label every word using only the 8 parts of speech, based on the job the word is doing in that sentence.</p><p style=\"opacity:.8;\"><b>Step 2:</b> After a sentence, a Verbal Check asks you to spot any gerunds, participles, and infinitives.</p></div>"
           },
           {
             "id": "ag9_1",
@@ -2317,35 +3094,27 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Wow,",
               "everyone",
               "watched",
-              "Adelyn",
-              "perform",
-              "a",
+              "Adelyn's",
               "stunning",
               "cartwheel,",
               "but",
               "nobody",
               "expected",
-              "the",
-              "giggling",
-              "to",
-              "start!"
+              "her",
+              "giggling!"
             ],
             "answers": [
               "Interjection",
               "Pronoun",
               "Verb",
               "Noun",
-              "Verb",
               "Adjective",
-              "Participle",
               "Noun",
               "Conjunction",
               "Pronoun",
               "Verb",
               "Adjective",
-              "Gerund",
-              "Preposition",
-              "Infinitive"
+              "Noun"
             ],
             "options": [
               "Noun",
@@ -2355,27 +3124,68 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "interjection",
               "indefinite pronoun",
               "action verb",
-              "proper noun",
-              "verb form after 'watched' (advanced — just notice it's verb-related, no need to name it yet)",
-              "article",
-              "participle, describes cartwheel",
-              "compound noun",
+              "possessive proper noun",
+              "adjective: it describes a noun here",
+              "noun",
               "conjunction",
               "indefinite pronoun",
               "action verb",
-              "article",
-              "gerund, acting as a noun (direct object)",
-              "The \"to\" that starts the infinitive \"to start\".",
-              "infinitive"
+              "possessive pronoun",
+              "noun: it names the activity, so it does a noun's job here"
+            ]
+          },
+          {
+            "id": "ag9_1c",
+            "label": "Sentence 1 — Verbal Check",
+            "type": "concept-check",
+            "sentence": [
+              "Wow,",
+              "everyone",
+              "watched",
+              "Adelyn's",
+              "stunning",
+              "cartwheel,",
+              "but",
+              "nobody",
+              "expected",
+              "her",
+              "giggling!"
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 2,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 4,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              },
+              {
+                "index": 8,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 10,
+                "answer": "Gerund",
+                "explanation": "an -ing verb form that names an activity, so it works as a noun"
+              }
             ]
           },
           {
@@ -2412,7 +3222,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Verb",
               "Adjective",
               "Preposition",
-              "Gerund",
+              "Noun",
               "Preposition",
               "Adjective",
               "Adjective",
@@ -2426,10 +3236,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "demonstrative adjective, describes soup",
@@ -2443,11 +3250,49 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "linking verb",
               "predicate adjective",
               "preposition",
-              "gerund, acting as a noun (object of 'for')",
+              "noun: it names the activity, so it does a noun's job here",
               "preposition",
               "article",
               "adjective",
               "collective noun"
+            ]
+          },
+          {
+            "id": "ag9_2c",
+            "label": "Sentence 2 — Verbal Check",
+            "type": "concept-check",
+            "sentence": [
+              "This",
+              "delicious",
+              "soup,",
+              "which",
+              "Kenley",
+              "made",
+              "this",
+              "morning,",
+              "is",
+              "perfect",
+              "for",
+              "sharing",
+              "with",
+              "the",
+              "whole",
+              "family."
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 11,
+                "answer": "Gerund",
+                "explanation": "an -ing verb form that names an activity, so it works as a noun"
+              }
             ]
           },
           {
@@ -2494,10 +3339,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "interjection",
@@ -2548,7 +3390,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Verb",
               "Pronoun",
               "Preposition",
-              "Gerund",
+              "Noun",
               "Adjective",
               "Noun"
             ],
@@ -2560,10 +3402,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "interjection",
@@ -2577,9 +3416,50 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "action verb",
               "object pronoun",
               "preposition",
-              "gerund, acting as a noun (object of 'from')",
+              "noun: it names the activity, so it does a noun's job here",
               "article",
               "noun"
+            ]
+          },
+          {
+            "id": "ag9_4c",
+            "label": "Sentence 4 — Verbal Check",
+            "type": "concept-check",
+            "sentence": [
+              "Ouch!",
+              "Something",
+              "pinched",
+              "her",
+              "toe,",
+              "but",
+              "nothing",
+              "could",
+              "stop",
+              "her",
+              "from",
+              "finishing",
+              "the",
+              "cartwheel."
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 2,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 11,
+                "answer": "Gerund",
+                "explanation": "an -ing verb form that names an activity, so it works as a noun"
+              }
             ]
           }
         ]
@@ -2597,7 +3477,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "id": "agl10",
             "label": "Week 10 Lesson: Unit 1 Assessment — Full Grammar Safari",
             "type": "read",
-            "content": "<div class=\"lesson-text\"><p><b>Week 10: Unit 1 Assessment — Full Grammar Safari</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1, L.4.6 (cumulative assessment)</p><p>Hi Adelyn!</p><p>Time for a full Grammar Safari!</p><p>Label every single word (or verbal) in two whole sentences, all by yourself, pulling together your Island knowledge plus everything new from this unit.</p><p>Don't stress about perfection — even professional grammarians debate a few tricky words.</p><p>The goal is showing me you understand the <b>JOB</b> each word is doing, at a real Town-level depth now.</p><p>When you finish, do a victory cartwheel — you've officially leveled up past Grammar Island.</p><p>Level 1 of the Four-Level Analysis, Town edition, is yours!</p><p style=\"opacity:.8;\">For each sentence, label the part of speech of every word.</p></div>"
+            "content": "<div class=\"lesson-text\"><p><b>Week 10: Unit 1 Assessment — Full Grammar Safari</b></p><p style=\"opacity:.7;font-size:0.78rem;\">REVIEW / PRACTICE — Standards: L.4.1, L.4.6 (cumulative assessment)</p><p>Hi Adelyn!</p><p>Time for a full Grammar Safari!</p><p>Label every single word with one of the 8 parts of speech in two whole sentences, then name any gerunds, participles, and infinitives in the checks that follow, all by yourself, pulling together your Island knowledge plus everything new from this unit.</p><p>Don't stress about perfection — even professional grammarians debate a few tricky words.</p><p>The goal is showing me you understand the <b>JOB</b> each word is doing, at a real Town-level depth now.</p><p>When you finish, do a victory cartwheel — you've officially leveled up past Grammar Island.</p><p>Level 1 of the Four-Level Analysis, Town edition, is yours!</p><p style=\"opacity:.8;\"><b>Step 1:</b> For each sentence, label every word using only the 8 parts of speech, based on the job the word is doing in that sentence.</p><p style=\"opacity:.8;\"><b>Step 2:</b> After a sentence, a Verbal Check asks you to spot any gerunds, participles, and infinitives.</p></div>"
           },
           {
             "id": "ag10_1",
@@ -2625,10 +3505,10 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Conjunction",
               "Adjective",
               "Noun",
-              "Participle",
+              "Adjective",
               "Adverb",
               "Verb",
-              "Gerund",
+              "Noun",
               "Preposition",
               "Adjective",
               "Adjective",
@@ -2643,10 +3523,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "article",
@@ -2654,15 +3531,61 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "conjunction",
               "adjective",
               "common noun",
-              "participle, describes gymnast",
+              "adjective: it describes a noun here",
               "adverb",
               "action verb",
-              "gerund, direct object of 'loved'",
+              "noun: it names the activity, so it does a noun's job here",
               "preposition",
               "article",
               "adjective",
               "adjective",
               "common noun"
+            ]
+          },
+          {
+            "id": "ag10_1c",
+            "label": "Sentence 1 — Verbal Check",
+            "type": "concept-check",
+            "sentence": [
+              "The",
+              "tired",
+              "but",
+              "happy",
+              "gymnast,",
+              "smiling",
+              "proudly,",
+              "loved",
+              "stretching",
+              "near",
+              "the",
+              "warm,",
+              "cozy",
+              "fire."
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 5,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              },
+              {
+                "index": 7,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 8,
+                "answer": "Gerund",
+                "explanation": "an -ing verb form that names an activity, so it works as a noun"
+              }
             ]
           },
           {
@@ -2689,8 +3612,8 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
             "answers": [
               "Pronoun",
               "Verb",
-              "Infinitive",
-              "Infinitive",
+              "Verb",
+              "Verb",
               "Adjective",
               "Adjective",
               "Adjective",
@@ -2711,16 +3634,13 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "indefinite pronoun",
               "action verb",
-              "the \"to\" that starts the infinitive \"to visit\"",
-              "infinitive (noun job, direct object of \"wanted\")",
+              "\"to\" and the verb after it work together as one verb form",
+              "verb: it follows \"to\"",
               "article",
               "adjective",
               "adjective",
@@ -2732,6 +3652,48 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "possessive pronoun",
               "adjective",
               "common noun"
+            ]
+          },
+          {
+            "id": "ag10_2c",
+            "label": "Sentence 2 — Verbal Check",
+            "type": "concept-check",
+            "sentence": [
+              "Everyone",
+              "wanted",
+              "to",
+              "visit",
+              "the",
+              "delicious",
+              "little",
+              "bakery",
+              "that",
+              "Kenley",
+              "found",
+              "near",
+              "our",
+              "new",
+              "apartment."
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 1,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 3,
+                "answer": "Infinitive",
+                "explanation": "the verb that follows \"to\"; \"to\" and the verb work as a team"
+              }
             ]
           },
           {
@@ -2755,14 +3717,14 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Interjection",
               "Pronoun",
               "Verb",
-              "Gerund",
               "Noun",
-              "Participle",
+              "Noun",
+              "Adjective",
               "Noun",
               "Conjunction",
               "Noun",
               "Adjective",
-              "Gerund"
+              "Noun"
             ],
             "options": [
               "Noun",
@@ -2772,23 +3734,68 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "interjection",
               "indefinite pronoun",
               "action verb",
-              "gerund, acting as a noun (direct object)",
+              "noun: it names the activity, so it does a noun's job here",
               "possessive proper noun",
-              "participle, describes routine",
+              "adjective: it describes a noun here",
               "noun",
               "conjunction",
               "possessive proper noun",
               "adjective",
-              "gerund, acting as a noun"
+              "noun: it names the activity, so it does a noun's job here"
+            ]
+          },
+          {
+            "id": "ag10_3c",
+            "label": "Sentence 3 — Verbal Check",
+            "type": "concept-check",
+            "sentence": [
+              "Wow,",
+              "everyone",
+              "loved",
+              "watching",
+              "Adelyn's",
+              "stunning",
+              "routine",
+              "and",
+              "Kenley's",
+              "delicious",
+              "cooking!"
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 2,
+                "answer": "Verb",
+                "explanation": "it shows the action (or helps the action) in its clause, so it is a regular verb"
+              },
+              {
+                "index": 3,
+                "answer": "Gerund",
+                "explanation": "an -ing verb form that names an activity, so it works as a noun"
+              },
+              {
+                "index": 5,
+                "answer": "Participle",
+                "explanation": "built from a verb, but here it describes a noun, so it works as an adjective"
+              },
+              {
+                "index": 10,
+                "answer": "Gerund",
+                "explanation": "an -ing verb form that names an activity, so it works as a noun"
+              }
             ]
           },
           {
@@ -2822,8 +3829,8 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Pronoun",
               "Adjective",
               "Noun",
-              "Preposition",
-              "Infinitive"
+              "Verb",
+              "Verb"
             ],
             "options": [
               "Noun",
@@ -2833,10 +3840,7 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "Adverb",
               "Preposition",
               "Conjunction",
-              "Interjection",
-              "Gerund",
-              "Participle",
-              "Infinitive"
+              "Interjection"
             ],
             "explanations": [
               "demonstrative adjective, describes market",
@@ -2850,8 +3854,43 @@ var ADELYN_GRAMMAR_UNIT1_WEEKS = [
               "possessive pronoun",
               "adjective",
               "noun",
-              "The \"to\" that starts the infinitive \"to visit\".",
-              "infinitive, describes place"
+              "\"to\" and the verb after it work together as one verb form",
+              "verb: it follows \"to\""
+            ]
+          },
+          {
+            "id": "ag10_4c",
+            "label": "Sentence 4 — Verbal Check",
+            "type": "concept-check",
+            "sentence": [
+              "This",
+              "tiny",
+              "market,",
+              "which",
+              "sells",
+              "fresh",
+              "mangoes,",
+              "is",
+              "our",
+              "favorite",
+              "place",
+              "to",
+              "visit."
+            ],
+            "prompt": "Now look at the words built from verbs in this sentence. For an infinitive, tap the verb that comes after \"to\". Is each one a regular verb, a gerund, a participle, or an infinitive?",
+            "question": "What is \"{w}\" doing in this sentence?",
+            "options": [
+              "Infinitive",
+              "Participle",
+              "Gerund",
+              "Verb"
+            ],
+            "targets": [
+              {
+                "index": 12,
+                "answer": "Infinitive",
+                "explanation": "the verb that follows \"to\"; \"to\" and the verb work as a team"
+              }
             ]
           }
         ]

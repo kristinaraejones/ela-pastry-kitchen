@@ -1808,7 +1808,11 @@ const CONCEPT_DEFS = {
   Indefinite: "points to no specific person or thing (everyone, someone, nobody)",
   Action: "shows something the subject does",
   Linking: "connects the subject to a word that describes or renames it (is, seems, tasted)",
-  Helping: "works with the main verb to show tense or mood (was stirring, has practiced)"
+  Helping: "works with the main verb to show tense or mood (was stirring, has practiced)",
+  Verb: "shows the action (or helps the action) in its clause, so it is a regular verb here",
+  Gerund: "is an -ing verb form that names an activity, so it works as a noun",
+  Participle: "is built from a verb but describes a noun, so it works as an adjective",
+  Infinitive: "is the verb after \"to\"; \"to\" and the verb work together as one verb form"
 };
 function conceptWhyHTML(word, given, tg, options) {
   const expected = conceptAnswerText(tg, options);
@@ -2264,7 +2268,7 @@ function taskBodyHTML(key, t) {
       if (popupOpen) {
         const multi = conceptIsMulti(t);
         const picked = (label || "").split(" + ");
-        openConceptTray = `<div class="pos-tray"><div class="pos-tray-title">${multi ? `What kind of noun is "<b>${word}</b>"? It can be more than one — tap every one that fits, then Done.` : `What kind of noun is "<b>${word}</b>"?`}</div><div class="pos-tray-options">${t.options.map(o => `<button class="${multi && picked.includes(o) ? "picked" : ""}" onclick="selectConceptAnswer('${key}','${t.id}',${i},'${o}',${multi})">${o}</button>`).join("")}${multi ? `<button class="tray-done" onclick="closeConceptPopup()">Done</button>` : ""}</div></div>`;
+        openConceptTray = `<div class="pos-tray"><div class="pos-tray-title">${t.question ? t.question.replace("{w}", `<b>${word}</b>`) : multi ? `What kind of noun is "<b>${word}</b>"? It can be more than one — tap every one that fits, then Done.` : `What kind of noun is "<b>${word}</b>"?`}</div><div class="pos-tray-options">${t.options.map(o => `<button class="${multi && picked.includes(o) ? "picked" : ""}" onclick="selectConceptAnswer('${key}','${t.id}',${i},'${o}',${multi})">${o}</button>`).join("")}${multi ? `<button class="tray-done" onclick="closeConceptPopup()">Done</button>` : ""}</div></div>`;
       }
     });
     inner += `</div>${openConceptTray}`;
