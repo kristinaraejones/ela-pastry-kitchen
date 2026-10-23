@@ -240,7 +240,11 @@ function bkDictationRowsHTML(key, t) {
   const s = (key && state[key] && state[key].tasks[t.id]) || {};
   let words = t.words;
   if (t.dynamic === "reviewPool") words = s.done && s._reviewWords ? s._reviewWords : getReviewWords(REVIEW_WORDS_PER_ROUND, s._reviewRound || 0);
-  else if (t.dynamic) return `<div class="bk-q-empty">These words are picked at random when ${name} opens the test, so read them from the screen she is on.</div>`;
+  else if (t.dynamic === "spellingMonthBank" || t.dynamic === "examSpellingBank") {
+    if (s.done) return `<div class="bk-q-empty">${name} has already taken this test.</div>`;
+    const bank = (banksCache[currentChild] || {}).spelling || [];
+    words = t.dynamic === "spellingMonthBank" ? sampleSpellingWords(bank, Math.min(15, bank.length)) : sampleExamSpellingWords(bank, Math.min(30, bank.length));
+  } else if (t.dynamic) return `<div class="bk-q-empty">This test's questions are generated when ${name} opens it.</div>`;
   if (!words || !words.length) return `<div class="bk-q-empty">No words yet.</div>`;
   return `<div class="bk-ds-rows">${words.map((w, i) => w.kind === "sentence"
     ? `<div class="bk-ds-row"><span class="bk-ds-n">Sentence</span><span class="bk-ds-line">${escHtml(w.answer)}</span></div>`
@@ -699,7 +703,7 @@ window.renderWeekReportPanel = function renderWeekReportPanel() {
   const sections = [];
   const jumps = [];
   SUBJECT_ORDER.forEach(key => {
-    const tasks = weekScopedTasks(key, week).concat(week === currentWeek() ? DATA[key].tasks.filter(t => t.type === "graded-dictation" && t.dynamic === "reviewPool") : []);
+    const tasks = weekScopedTasks(key, week).concat(week === currentWeek() ? DATA[key].tasks.filter(t => t.type === "graded-dictation" && ["reviewPool", "spellingMonthBank", "examSpellingBank"].includes(t.dynamic) && !isTaskLocked(t)) : []);
     if (tasks.length === 0) return;
     jumps.push(`<button class="bk-jump-chip" onclick="bkJumpToStation('${key}')">${bkTitle(DATA[key].name)}</button>`);
     sections.push(`<div class="bk-report-subject" id="report-subj-${key}">${bkPastry(bkPastryFor(key), kid, 34)}<span>${bkTitle(DATA[key].name)}</span><span class="bk-report-tag">${escHtml(DATA[key].tagsByWeek[week] || DATA[key].tag || "")}</span></div>`);

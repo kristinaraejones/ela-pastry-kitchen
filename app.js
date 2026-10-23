@@ -1185,9 +1185,21 @@ function sampleVocabQuestions(bank, n) {
     return { q: `Which sentence uses "${item.word}" correctly?`, options: opts, correct: opts.indexOf(item.correct) };
   });
 }
+// Spelling tests are dictated, so the parent has to be able to see the same list the child gets.
+// The shuffle is seeded from the child, the bank and the test marker (not Math.random), so every
+// device computes the identical words until the bank or marker changes.
+function seededShuffle(list, seedText) {
+  let h = 2166136261;
+  for (let i = 0; i < seedText.length; i++) { h ^= seedText.charCodeAt(i); h = Math.imul(h, 16777619); }
+  const rand = () => { h += 0x6D2B79F5; let t = h; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const a = [...list];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
 function sampleSpellingWords(bank, n) {
   const pool = getNewSinceLastTest(bank, "spelling");
-  return [...pool].sort(() => Math.random() - 0.5).slice(0, n).map(w => ({ answer: w.word, kind: "word", context: w.context || null }));
+  const marker = (markersCache[currentChild] && markersCache[currentChild].spelling) || 0;
+  return seededShuffle(pool, `${currentChild}:spelling:${bank.length}:${marker}`).slice(0, n).map(w => ({ answer: w.word, kind: "word", context: w.context || null }));
 }
 function sampleGrammarQuestions(bank, n) {
   return [...getNewSinceLastTest(bank, "grammar")].sort(() => Math.random() - 0.5).slice(0, n);
@@ -1205,7 +1217,7 @@ function sampleExamVocabQuestions(bank, n) {
 function sampleExamGrammarQuestions(bank, n) { return sampleFull(bank, n); }
 function sampleExamReadingQuestions(bank, n) { return sampleFull(bank, n); }
 function sampleExamSpellingWords(bank, n) {
-  return sampleFull(bank, n).map(w => ({ answer: w.word, kind: "word", context: w.context || null }));
+  return seededShuffle(bank, `${currentChild}:exam-spelling:${bank.length}`).slice(0, n).map(w => ({ answer: w.word, kind: "word", context: w.context || null }));
 }
 function getDynamicBankConfig(dynamicKey) {
   const b = banksCache[currentChild] || {};
