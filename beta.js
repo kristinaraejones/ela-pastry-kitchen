@@ -382,9 +382,35 @@ window.render = function render() {
   const stationsWrap = document.getElementById("bkStationsWrap");
   const grid = document.getElementById("stationsGrid");
   const panel = document.getElementById("detailPanel");
+  // Station cards: kid opens a station; parent jumps to that station in the week report below.
+  const buildStationCards = () => {
+    grid.innerHTML = "";
+    grid.className = `stations bk-stations count-${keys.length}`;
+    keys.forEach((key, idx) => {
+      const status = stationStatus(key);
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "station bk-station" + (status === "served" ? " done" : "") + (status === "burning" ? " burning" : "") + (openStation === key ? " active" : "");
+      if (status === "served") {
+        const stampId = `${currentChild}:${key}:${currentWeek()}`;
+        if (!stampedStations.has(stampId)) {
+          stampedStations.add(stampId);
+          if (stampSeeded[currentChild] && !isParent) card.classList.add("stamp-new");
+        }
+      }
+      card.onclick = () => { if (isParent && document.getElementById(`report-subj-${key}`)) bkJumpToStation(key); else openStationFn(key); };
+      card.dataset.key = key;
+      if (typeof bkPerfected === "function" && bkPerfected(key)) card.classList.add("perfected");
+      card.innerHTML = bkStationCardHTML(key, idx);
+      grid.appendChild(card);
+    });
+
+  };
   document.getElementById("weekReportPanel").style.display = isParent ? "block" : "none";
   if (isParent) {
-    notes.innerHTML = ""; stationsWrap.style.display = "none"; panel.className = "detail"; panel.innerHTML = "";
+    notes.innerHTML = ""; stationsWrap.style.display = "block"; panel.className = "detail"; panel.innerHTML = "";
+    buildStationCards();
+    document.getElementById("bkWeekMeta").textContent = `Week ${currentWeek()}${isMonthlyTestWeek() ? " · test week" : ""}`;
     renderWeekReportPanel();
   } else {
     stationsWrap.style.display = "block";
@@ -421,26 +447,7 @@ window.render = function render() {
     notes.innerHTML = notesHTML;
     document.getElementById("bkWeekMeta").textContent = `Week ${currentWeek()}${isMonthlyTestWeek() ? " · test week" : ""}`;
 
-    grid.innerHTML = "";
-    grid.className = `stations bk-stations count-${keys.length}`;
-    keys.forEach((key, idx) => {
-      const status = stationStatus(key);
-      const card = document.createElement("button");
-      card.type = "button";
-      card.className = "station bk-station" + (status === "served" ? " done" : "") + (status === "burning" ? " burning" : "") + (openStation === key ? " active" : "");
-      if (status === "served") {
-        const stampId = `${currentChild}:${key}:${currentWeek()}`;
-        if (!stampedStations.has(stampId)) {
-          stampedStations.add(stampId);
-          if (stampSeeded[currentChild]) card.classList.add("stamp-new");
-        }
-      }
-      card.onclick = () => openStationFn(key);
-      card.dataset.key = key;
-      if (typeof bkPerfected === "function" && bkPerfected(key)) card.classList.add("perfected");
-      card.innerHTML = bkStationCardHTML(key, idx);
-      grid.appendChild(card);
-    });
+    buildStationCards();
 
     if (openStation && DATA[openStation]) {
       const d = DATA[openStation];
@@ -701,11 +708,9 @@ window.renderWeekReportPanel = function renderWeekReportPanel() {
   const isPast = week <= currentWeek();
   const kid = currentChild;
   const sections = [];
-  const jumps = [];
   SUBJECT_ORDER.forEach(key => {
     const tasks = weekScopedTasks(key, week).concat(week === currentWeek() ? DATA[key].tasks.filter(t => t.type === "graded-dictation" && ["reviewPool", "spellingMonthBank", "examSpellingBank"].includes(t.dynamic) && !isTaskLocked(t)) : []);
     if (tasks.length === 0) return;
-    jumps.push(`<button class="bk-jump-chip" onclick="bkJumpToStation('${key}')">${bkTitle(DATA[key].name)}</button>`);
     sections.push(`<div class="bk-report-subject" id="report-subj-${key}">${bkPastry(bkPastryFor(key), kid, 34)}<span>${bkTitle(DATA[key].name)}</span><span class="bk-report-tag">${escHtml(DATA[key].tagsByWeek[week] || DATA[key].tag || "")}</span></div>`);
     tasks.forEach(t => {
       const s = state[key].tasks[t.id];
@@ -714,7 +719,6 @@ window.renderWeekReportPanel = function renderWeekReportPanel() {
   });
   const titleSuffix = week < currentWeek() ? "Completed Record" : week === currentWeek() ? "In Progress" : "Preview";
   panel.innerHTML = `<div class="bk-report-title">Week ${week} · ${titleSuffix}</div>
-    ${jumps.length ? `<nav class="bk-jump" aria-label="Jump to a station">${jumps.join("")}</nav>` : ""}
     ${sections.length ? sections.join("") : `<div class="empty-note">Nothing planned yet for Week ${week}.</div>`}`;
 };
 
