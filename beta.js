@@ -698,16 +698,23 @@ window.renderUpcomingTaskPreview = function renderUpcomingTaskPreview(t) {
     <details class="bk-lesson"><summary>${bkIcon("book", 16)}What She’ll See</summary><div class="bk-lesson-body">${bkDeEmoji(renderTaskContent(t))}</div></details></article>`;
 };
 
+function bkJumpToStation(key) {
+  const el = document.getElementById(`report-subj-${key}`);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 window.renderWeekReportPanel = function renderWeekReportPanel() {
   const panel = document.getElementById("weekReportPanel");
   const week = parentNavWeek;
   const isPast = week <= currentWeek();
   const kid = currentChild;
   const sections = [];
+  const jumps = [];
   SUBJECT_ORDER.forEach(key => {
     const tasks = weekScopedTasks(key, week);
     if (tasks.length === 0) return;
-    sections.push(`<div class="bk-report-subject">${bkPastry(bkPastryFor(key), kid, 34)}<span>${bkTitle(DATA[key].name)}</span><span class="bk-report-tag">${escHtml(DATA[key].tagsByWeek[week] || DATA[key].tag || "")}</span></div>`);
+    jumps.push(`<button class="bk-jump-chip" onclick="bkJumpToStation('${key}')">${bkTitle(DATA[key].name)}</button>`);
+    sections.push(`<div class="bk-report-subject" id="report-subj-${key}">${bkPastry(bkPastryFor(key), kid, 34)}<span>${bkTitle(DATA[key].name)}</span><span class="bk-report-tag">${escHtml(DATA[key].tagsByWeek[week] || DATA[key].tag || "")}</span></div>`);
     tasks.forEach(t => {
       const s = state[key].tasks[t.id];
       sections.push(isPast ? renderPastTaskReport(key, t, s) : renderUpcomingTaskPreview(t));
@@ -715,6 +722,7 @@ window.renderWeekReportPanel = function renderWeekReportPanel() {
   });
   const titleSuffix = week < currentWeek() ? "Completed Record" : week === currentWeek() ? "In Progress" : "Preview";
   panel.innerHTML = `<div class="bk-report-title">Week ${week} · ${titleSuffix}</div>
+    ${jumps.length ? `<nav class="bk-jump" aria-label="Jump to a station">${jumps.join("")}</nav>` : ""}
     ${sections.length ? sections.join("") : `<div class="empty-note">Nothing planned yet for Week ${week}.</div>`}`;
 };
 
