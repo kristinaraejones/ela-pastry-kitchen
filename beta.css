@@ -772,3 +772,10 @@ body[data-view="parent"] .bk-seg{height:6px;}
 body[data-view="parent"] .bk-stations-wrap{margin-bottom:26px;}
 body[data-view="parent"] .bk-stations{align-items:stretch;}
 body[data-view="parent"] .bk-stations-wrap .bk-section-head{margin-bottom:10px;}
+
+.bk-dictscript{margin:16px 0;}
+.bk-ds-help{margin:0 0 10px;color:var(--bk-muted);font-size:14px;}
+.bk-ds-group{margin:0 0 16px;}
+.bk-ds-list{margin:6px 0 0;padding-left:26px;font-size:18px;line-height:1.7;}
+.bk-ds-ctx{color:var(--bk-muted);font-size:15px;}
+.bk-ds-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bk-muted);margin-right:6px;}

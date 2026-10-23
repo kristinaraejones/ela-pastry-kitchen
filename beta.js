@@ -231,6 +231,32 @@ function bkLegendHTML() {
     ${bkPill("graded", "Graded", "check")}`;
 }
 
+// ---------- Parent: read-aloud script for dictation ----------
+// Lists exactly what each dictation task asks the student to spell so the parent can read it
+// aloud when the audio is hard to hear. Parent view only; never rendered for the student.
+function bkDictationScriptHTML() {
+  const kid = currentChild, name = CHILD_META[kid].name, week = parentNavWeek;
+  const groups = [];
+  Object.keys(DATA).forEach(key => {
+    DATA[key].tasks.filter(t => t.type === "graded-dictation" && (t.dynamic === "reviewPool" || t.week_number === week)).forEach(t => {
+      const s = (state[key] && state[key].tasks[t.id]) || {};
+      let words = t.words, note = "";
+      if (t.dynamic === "reviewPool") words = s.done && s._reviewWords ? s._reviewWords : getReviewWords(REVIEW_WORDS_PER_ROUND, s._reviewRound || 0);
+      else if (t.dynamic) { words = s._reviewWords || []; note = `These words are picked at random when ${name} opens the test, so read them from the screen she is on.`; }
+      if ((!words || !words.length) && !note) return;
+      groups.push({ subj: DATA[key].name, label: t.label, done: !!s.done, words: words || [], note });
+    });
+  });
+  if (!groups.length) return "";
+  const items = g => g.words.map(w => w.kind === "sentence"
+    ? `<li><span class="bk-ds-tag">Sentence</span> ${escHtml(w.answer)}</li>`
+    : `<li><b>${escHtml(w.answer)}</b>${w.context ? ` <span class="bk-ds-ctx">— ${escHtml(w.context)}</span>` : ""}</li>`).join("");
+  return `<details class="bk-lesson bk-ds-box"><summary>${bkIcon("book", 16)}Read-aloud script · ${name} · Week ${week}</summary><div class="bk-lesson-body">
+    <p class="bk-ds-help">Parent only. This is what ${name} is asked to spell, in order, so you can read it to her.</p>
+    ${groups.map(g => `<div class="bk-ds-group"><div class="bk-q-head">${escHtml(g.subj)} · ${bkTitle(g.label)}${g.done ? " · already done" : ""}</div>${g.note ? `<div class="bk-q-empty">${g.note}</div>` : `<ol class="bk-ds-list">${items(g)}</ol>`}</div>`).join("")}
+  </div></details>`;
+}
+
 function bkQueueHTML() {
   const name = CHILD_META[currentChild].name;
   const needs = bkNeedsGradeItems(), sent = bkSentBackItems(), auto = bkAutoScoredItems(parentNavWeek);
@@ -318,6 +344,7 @@ window.render = function render() {
   document.getElementById("bkLegend").style.display = isParent ? "flex" : "none";
   document.getElementById("bkParentMain").style.display = isParent ? "grid" : "none";
   document.getElementById("reviewQueue").style.display = isParent ? "block" : "none";
+  document.getElementById("bkDictScript").style.display = "none";
   document.getElementById("waitingOnYou").style.display = "none";
   if (isParent) {
     document.querySelectorAll("#bkTools .bk-ico-slot").forEach(el => { el.innerHTML = bkIcon(el.dataset.ico, 18); });
@@ -330,6 +357,9 @@ window.render = function render() {
     document.getElementById("termFinalBtn").textContent = settings.termFinalsUnlocked ? "Re-lock finals" : "Unlock finals";
     document.getElementById("bkLegend").innerHTML = bkLegendHTML();
     document.getElementById("bkQueue").innerHTML = bkQueueHTML();
+    const ds = document.getElementById("bkDictScript");
+    ds.innerHTML = bkDictationScriptHTML();
+    ds.style.display = ds.innerHTML ? "block" : "none";
   }
 
   // Advance-to-next-week card (parent) / all-done banner (kid)
