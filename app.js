@@ -1375,7 +1375,7 @@ function alignWords(correctWords, typedWords) {
   return merged;
 }
 
-const GRADE_VERSION = 2; // bump when grading rules change; older saved results get re-graded
+const GRADE_VERSION = 3; // bump when grading rules change; older saved results get re-graded
 
 // Spacing is not graded yet: a word typed as two ("news paper") or two words
 // run together ("cannot" for "can not") counts as right. Looks for a short run
@@ -1403,11 +1403,51 @@ function forgiveSpacing(ops) {
   return out;
 }
 
+// Spacing is never graded. This aligns the typed words to the correct words at the whole-sentence
+// level: any run of up to 5 words on either side counts as right when the letters, joined with
+// no spaces, are identical ("news paper", "cannot" for "can not", "alot of" for "a lot of").
+// Otherwise the cheapest alignment is used, so a plain misspelling is one wrong word.
+function alignWordsIgnoringSpacing(correctWords, typedWords) {
+  const n = correctWords.length, m = typedWords.length, MAXRUN = 5;
+  const lc = w => w.toLowerCase();
+  const INF = 1e9;
+  const cost = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(INF));
+  const move = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(null));
+  cost[n][m] = 0;
+  for (let i = n; i >= 0; i--) {
+    for (let j = m; j >= 0; j--) {
+      if (i === n && j === m) continue;
+      let best = INF, bm = null;
+      const take = (c, mv) => { if (c < best) { best = c; bm = mv; } };
+      for (let a = 1; a <= MAXRUN && i + a <= n; a++) {
+        const cj = correctWords.slice(i, i + a).map(lc).join("");
+        for (let b = 1; b <= MAXRUN && j + b <= m; b++) {
+          if (cj === typedWords.slice(j, j + b).map(lc).join("") && cost[i + a][j + b] < INF) take(cost[i + a][j + b], { a, b, match: true });
+        }
+      }
+      if (i < n && j < m && cost[i + 1][j + 1] < INF) take(cost[i + 1][j + 1] + 1, { a: 1, b: 1, match: false });
+      if (i < n && cost[i + 1][j] < INF) take(cost[i + 1][j] + 1, { a: 1, b: 0, match: false });
+      if (j < m && cost[i][j + 1] < INF) take(cost[i][j + 1] + 1, { a: 0, b: 1, match: false });
+      cost[i][j] = best; move[i][j] = bm;
+    }
+  }
+  const ops = [];
+  let i = 0, j = 0;
+  while (i < n || j < m) {
+    const mv = move[i][j];
+    ops.push({ correctWord: correctWords.slice(i, i + mv.a).join(" "), typedWord: typedWords.slice(j, j + mv.b).join(" "), match: mv.match });
+    i += mv.a; j += mv.b;
+  }
+  return ops;
+}
+
 function gradeSentence(correctText, typedText) {
+  // iPad keyboards type curly apostrophes; treat them as the plain one.
+  correctText = correctText.replace(/[‘’]/g, "'"); typedText = typedText.replace(/[‘’]/g, "'");
   const tokenize = s => s.match(/[A-Za-z']+/g) || [];
   const correctWords = tokenize(correctText);
   const typedWords = tokenize(typedText);
-  const wordResults = forgiveSpacing(alignWords(correctWords, typedWords)).map(op => ({
+  const wordResults = alignWordsIgnoringSpacing(correctWords, typedWords).map(op => ({
     correctWord: op.correctWord, typedWord: op.typedWord, spellingCorrect: op.match
   }));
   const correctTrim = correctText.trim(), typedTrim = typedText.trim();
